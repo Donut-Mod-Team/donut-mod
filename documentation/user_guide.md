@@ -2,7 +2,7 @@
 
 ## Installation
 
-Describe the prerequisites and how to use the add-on mode, as well as data compatability.
+Describe the prerequisites and how to use the add-on mode, as well as data compatibility.
 
 ## Guide for usage
 
