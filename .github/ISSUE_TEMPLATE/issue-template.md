@@ -1,6 +1,6 @@
 ---
 name: Issue template
-about: Issue template, used to document and truck requirements/tasks
+about: Issue template, used to document and track requirements/tasks
 title: '[#ID] Title'
 labels: ''
 assignees: ''
