@@ -20,3 +20,7 @@ A complete guide to installation and getting started using mod can be found [her
 ## Team
 
 [The development team and their roles.](/documentation/team_roles.md)
+
+## Licence
+
+TBD
