@@ -1,17 +1,18 @@
 ---
 name: Issue template
-about: Issue template, use to document and truck requirments/tasks
-title: ''
+about: Issue template, used to document and truck requirements/tasks
+title: '[#ID] Title'
 labels: ''
 assignees: ''
 
 ---
 
-- User Story/Requirement:
+- User Story/Requirement description:
 
-As a ... I want ... so that ...
+EX: As a ... I want ... so that ...
+
+OR: FR/NFR: .....
 
 - Acceptance Criteria:
-Given ...
-When ...
-Then ...
+
+Given ...  When ... Then ...
