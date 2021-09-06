@@ -3,7 +3,7 @@ The Donut Mod is an extension addon for the TIBCO Spotfire platform, which compl
 
 ## Requirements Specification
 
-[A list of the system requirements.](/documentation/requirments.md)
+[A list of the system requirements.](/documentation/requirements.md)
 
 ## UI design, Prototypes, Use cases
 
