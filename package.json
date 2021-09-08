@@ -1,10 +1,10 @@
 {
-    "name": "mod-starter",
+    "name": "donut-mod",
     "version": "1.0.0",
     "description": "",
     "scripts": {
         "start": "npm install && npm run server",
-        "server": "echo \"Welcome to the Donut-Mod!\" && exit 0"
+        "server": "echo \"Welcome to the Donut-Mod!\" && mods-dev-server src"
     },
     "keywords": [],
     "author": "Krasen Anatoliev Parvanov, Clementine Jensen, Eemil Jeskanen, Chrysostomos Tsagkidis",
