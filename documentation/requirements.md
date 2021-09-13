@@ -22,3 +22,4 @@ This document gives a descriptive overview for the requirements used for the dev
 * [DMT-8](https://donut-mod-team.atlassian.net/browse/DMT-8) As a data analyst, I want to be able to select a single subset of data on the Donut Chart, so that I can highlight an aspect of my data.
 * [DMT-6](https://donut-mod-team.atlassian.net/browse/DMT-6) As a data analyst, I want the mod to display data in a Donut Chart representation, so that I can visualize my data in the appropriate format.
 * [DMT-5](https://donut-mod-team.atlassian.net/browse/DMT-5) As a data analyst, I want the mod to be able to connect to the Spotfire framework, so that I can visualize my data.
+
