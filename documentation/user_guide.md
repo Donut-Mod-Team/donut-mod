@@ -19,7 +19,7 @@ To run the mod and install the necessary dependencies, [Node.js](https://nodejs.
 To install this mod, you first need to download the repository from the repository on the front page by pressing the Code button and selecting one of the options.
 Once you have the repository downloaded and extracted, you navigate inside the folder using the command line, and run:
 
->npm install
+>npm start
 
 Followed by:
 >npm run server
