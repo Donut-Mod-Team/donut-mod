@@ -6,29 +6,25 @@
     "icon": "icon.svg",
     "properties": [
         {
-            "name": "myProperty",
+            "name": "y-axis-mode",
             "type": "string",
-            "defaultValue": "myValue"
+            "defaultValue": "numeric"
+        },
+        {
+            "name": "split-bars",
+            "type": "boolean",
+            "defaultValue": true
         }
     ],
     "dataViewDefinition": {
         "colorAxis": {
-            "mode": "dual",
+            "mode": "categorical",
             "dropTarget": {
                 "icon": "Color",
                 "description": "Color by {0}"
             }
         },
         "axes": [
-            {
-                "name": "X",
-                "mode": "categorical",
-                "placement": "bottom",
-                "dropTarget": {
-                    "icon": "XAxis3D",
-                    "description": "Use {0} on the mod's X-axis"
-                }
-            },
             {
                 "name": "Y",
                 "mode": "continuous",
@@ -39,6 +35,6 @@
     "files": [
         "index.html",
         "main.css",
-        "main.js"
+        "bundle.js"
     ]
 }
