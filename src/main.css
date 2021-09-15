@@ -3,12 +3,25 @@
 * This file is subject to the license terms contained
 * in the license file that is distributed with this file.
 */
-
-body{
-    margin: 0;
-    overflow: hidden;
+* {
+    box-sizing: border-box;
 }
 
-#mod-container {
-    white-space: pre;
+body {
+    white-space: pre-line;
+    margin: 10px;
+    overflow: hidden;
+    position: relative;
+}
+#mod-container svg {
+    margin:auto;
+    display:inherit;
+}
+text {
+    font: 10px sans-serif;
+}
+form {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
