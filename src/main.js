@@ -5,7 +5,7 @@
  */
 
 //@ts-check - Get type warnings from the TypeScript language server. Remove if not wanted.
-import { donutChart } from "./donutChart"
+import { donutChart } from "./donutChart";
 /**
  * Get access to the Spotfire Mod API by providing a callback to the initialize method.
  * @param {Spotfire.Mod} mod - mod api
@@ -23,8 +23,6 @@ Spotfire.initialize(async (mod) => {
      */
     const reader = mod.createReader(mod.visualization.data(), mod.windowSize());
 
-
-
     /**
      * Initiate the read loop
      */
@@ -36,7 +34,6 @@ Spotfire.initialize(async (mod) => {
      * @param {Spotfire.Size} size
      */
     async function render(dataView, size) {
-
         /**
          * Check for any errors.
          */
@@ -73,8 +70,7 @@ Spotfire.initialize(async (mod) => {
 
         let colorLeaves = colorRoot.leaves();
 
-        let data = colorLeaves.map(leaf => {
-
+        let data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
@@ -84,8 +80,8 @@ Spotfire.initialize(async (mod) => {
                 tooltip: () => {
                     return leaf.formattedValue() + " " + sumValue(rows, "Y");
                 }
-            }
-        })
+            };
+        });
 
         donutChart(size, data, mod);
 

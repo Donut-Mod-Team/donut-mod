@@ -14,8 +14,8 @@ body {
     position: relative;
 }
 #mod-container svg {
-    margin:auto;
-    display:inherit;
+    margin: auto;
+    display: inherit;
 }
 text {
     font: 10px sans-serif;
