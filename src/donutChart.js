@@ -7,12 +7,18 @@
 import * as d3 from "d3";
 
 function donutChart(size, data, mod) {
-    const width = size.width - 40;
-    const height = size.height - 40;
-    const radius = Math.min(width, height) / 2 - 40;
+    // Added a constant to remove the magic numbers within the width, height and radius calculations.
+    const sizeModifier = 40;
+    // D3 animation duration used for svg shapes
+    const animationDuration = 300;
+
+    const width = size.width - sizeModifier;
+    const height = size.height - sizeModifier;
+    const radius = Math.min(width, height) / 2 - sizeModifier;
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
-    const g = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+    const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     const pie = d3.pie().value((d) => d.value);
 
@@ -23,11 +29,11 @@ function donutChart(size, data, mod) {
         .outerRadius(radius);
 
     // Join new data
-    const path = g.selectAll("path").data(pie(data), (d) => {
+    const sectors = svg.selectAll("path").data(pie(data), (d) => {
         return d.data.id;
     });
 
-    let newPaths = path
+    let newSectors = sectors
         .enter()
         .append("path")
         .on("click", function (d) {
@@ -41,9 +47,9 @@ function donutChart(size, data, mod) {
         })
         .attr("fill", (d) => "transparent");
 
-    path.merge(newPaths)
+    sectors.merge(newSectors)
         .transition()
-        .duration(300)
+        .duration(animationDuration)
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
@@ -60,7 +66,7 @@ function donutChart(size, data, mod) {
         };
     }
 
-    path.exit().transition().duration(300).attr("fill", "transparent").remove();
+    sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }
 
 /**
@@ -91,7 +97,7 @@ export async function render(mod) {
     mod.controls.errorOverlay.hide("dataView");
 
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
-    // render the bars.
+    // render the chart.
     let colorHierarchy = await dataView.hierarchy("Color");
     let colorRoot = await colorHierarchy.root();
     if (colorRoot == null) {
