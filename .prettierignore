@@ -1,0 +1,7 @@
+documentation
+.github
+spotfire
+*.md
+*.svg
+*.html
+*.json
