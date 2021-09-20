@@ -4,7 +4,7 @@
  * @param {any[]} data
  * @param {Spotfire.Mod} mod
  */
-import * as d3 from "d3"
+import * as d3 from "d3";
 
 export function donutChart(size, data, mod) {
     const width = size.width - 40;
