@@ -36,7 +36,7 @@ module.exports = {
     resolve: {
         extensions: [".tsx", ".ts", ".js"]
     },
-    plugins: [new webpack.NamedModulesPlugin(), new CopyPlugin({ patterns: [{ from: "src" }] })],
+    plugins: [new webpack.NamedModulesPlugin(), new CopyPlugin({ patterns: [{ from: "src/resources" }] })],
     devtool: "inline-source-map",
     // TODO: do we need the max?
     performance: {
