@@ -5,6 +5,7 @@
  * @param {Spotfire.Mod} mod
  */
 import * as d3 from "d3";
+import * as marker from "./marker";
 
 function donutChart(size, data, mod) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
@@ -36,9 +37,7 @@ function donutChart(size, data, mod) {
     let newSectors = sectors
         .enter()
         .append("path")
-        .on("click", function (d) {
-            d.data.mark();
-        })
+        .on("click", marker.select)
         .on("mouseenter", function (d) {
             mod.controls.tooltip.show(d.data.tooltip());
         })
@@ -47,7 +46,8 @@ function donutChart(size, data, mod) {
         })
         .attr("fill", (d) => "transparent");
 
-    sectors.merge(newSectors)
+    sectors
+        .merge(newSectors)
         .transition()
         .duration(animationDuration)
         .attr("fill", (d) => d.data.color)
