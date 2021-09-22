@@ -12,7 +12,6 @@ function donutChart(size, data, mod) {
     const sizeModifier = 40;
     // D3 animation duration used for svg shapes
     const animationDuration = 300;
-
     const width = size.width - sizeModifier;
     const height = size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
@@ -72,6 +71,7 @@ function donutChart(size, data, mod) {
 /**
  * Render the visualization
  * @param {Spotfire.Mod} mod API
+ * @return data
  */
 export async function render(mod) {
     /**
@@ -119,6 +119,13 @@ export async function render(mod) {
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
+    const background = findElement("#mod-container svg");
+
+    background.onclick = (e) => {
+        if (e.target === background) {
+            marker.unSelect(dataView);
+        }
+    };
 
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
@@ -145,4 +152,8 @@ export async function render(mod) {
  */
 function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
+}
+
+function findElement(sector) {
+    return document.querySelector(sector);
 }
