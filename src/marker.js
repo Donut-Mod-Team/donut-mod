@@ -7,8 +7,11 @@ export function select(d) {
 }
 /**
  * Method for clearing the selected dataView elements
- * @param {Spotfire.DataView} data
+ * @param {data} d
  */
-export function unSelect(data) {
-    data.clearMarking();
+export function unSelect(d) {
+    // TODO: check if we can improve the logic for clear marking
+    if (d.length > 0) {
+        d[0].clearMarking();
+    }
 }
