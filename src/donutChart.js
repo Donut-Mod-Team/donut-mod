@@ -7,6 +7,7 @@ import * as marker from "./marker";
  * @param {Spotfire.Mod} mod
  */
 var markData = { marking: false, marked: [] };
+
 function donutChart(size, data, mod) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
     const sizeModifier = 40;
@@ -68,7 +69,7 @@ function donutChart(size, data, mod) {
         console.log("down", markData.marking);
     };
 
-    findElement("#mod-container").onmouseup = (e) => {
+    /*findElement("#mod-container").onmouseup = (e) => {
         if (markData.marked.length > 0) {
             for (let i = 0; i < markData.marked.length; i++) {
                 data.forEach((d) => {
@@ -82,29 +83,59 @@ function donutChart(size, data, mod) {
         clearMarkData();
         setMarking(false);
         console.log("up", markData.marking);
+    };*/
+    var div = document.getElementById("div"),
+        x1 = 0,
+        y1 = 0,
+        x2 = 0,
+        y2 = 0;
+    function reCalc() {
+        //This will restyle the div
+        var x3 = Math.min(x1, x2); //Smaller X
+        var x4 = Math.max(x1, x2); //Larger X
+        var y3 = Math.min(y1, y2); //Smaller Y
+        var y4 = Math.max(y1, y2); //Larger Y
+        div.style.left = x3 + "px";
+        div.style.top = y3 + "px";
+        div.style.width = x4 - x3 + "px";
+        div.style.height = y4 - y3 + "px";
+    }
+    onmousedown = function (e) {
+        div.hidden = 0; //Unhide the div
+        x1 = e.clientX; //Set the initial X
+        y1 = e.clientY; //Set the initial Y
+        reCalc();
     };
-    /*    findElement("#mod-container").onmouseup = async (e) => {
-            if (markData.marked.length > 0) {
-                let foundData = [];
-                for (let i = 0; i < markData.marked.length; i++) {
-
-                    let found = data.find((d) => {
-                        return d.id === markData.marked[i];
-                    });
-                    console.log(found);
-                    if (found) {
-                        console.log("Found");
-                        foundData.push(found);
-                    }
+    onmousemove = function (e) {
+        x2 = e.clientX; //Update the current position X
+        y2 = e.clientY; //Update the current position Y
+        reCalc();
+    };
+    onmouseup = function (e) {
+        div.hidden = 1; //Hide the div
+    };
+    findElement("#mod-container").onmouseup = async (e) => {
+        if (markData.marked.length > 0) {
+            let foundData = [];
+            for (let i = 0; i < markData.marked.length; i++) {
+                let found = data.find((d) => {
+                    return d.id === markData.marked[i];
+                });
+                console.log(found);
+                if (found) {
+                    console.log("Found");
+                    foundData.push(found);
                 }
-                console.log("Found: ", foundData.length, " Data: ", foundData);
-                let dataView = await mod.visualization.data();
-                dataView.mark(foundData, "Toggle");
             }
-            clearMarkData();
-            setMarking(false);
-            console.log("up", markData.marking);
-        };*/
+            console.log("Found: ", foundData.length, " Data: ", foundData);
+            let dataView = await mod.visualization.data();
+            dataView.mark(foundData, "ToggleOrAdd");
+        }
+        clearMarkData();
+        setMarking(false);
+        console.log("up", markData.marking);
+    };
+
     sectors
         .merge(newSectors)
         .transition()
@@ -178,12 +209,6 @@ export async function render(dataView, size, mod) {
 
     let colorLeaves = colorRoot.leaves();
     const background = findElement("#mod-container svg");
-
-    background.onclick = (e) => {
-        if (e.target === background && markData.marked.length === 0 && !markData.marking) {
-            marker.unSelect(dataView);
-        }
-    };
 
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
