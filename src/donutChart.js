@@ -1,20 +1,31 @@
+import * as d3 from "d3";
+import * as marker from "./marker";
 /**
  *
  * @param {Spotfire.Size} size
  * @param {any[]} data
  * @param {Spotfire.Mod} mod
  */
-import * as d3 from "d3";
-import * as marker from "./marker";
-
+var markData = { marking: false, marked: [] };
 function donutChart(size, data, mod) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
     const sizeModifier = 40;
+
     // D3 animation duration used for svg shapes
-    const animationDuration = 300;
+    const animationDuration = 100;
     const width = size.width - sizeModifier;
     const height = size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
+
+    function setMarking(marking) {
+        markData.marking = marking;
+    }
+    function clearMarkData() {
+        markData.marked = [];
+    }
+    function addMarking(d) {
+        markData.marked.push(d.id);
+    }
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
 
@@ -38,6 +49,13 @@ function donutChart(size, data, mod) {
         .append("path")
         .on("click", marker.select)
         .on("mouseenter", function (d) {
+            console.log("here");
+            if (markData.marking) {
+                console.log("enter", markData.marking);
+                console.log("data", d.data.id);
+                addMarking(d.data);
+                console.log("added", markData.marked);
+            }
             mod.controls.tooltip.show(d.data.tooltip());
         })
         .on("mouseleave", function (d) {
@@ -45,6 +63,48 @@ function donutChart(size, data, mod) {
         })
         .attr("fill", (d) => "transparent");
 
+    findElement("#mod-container").onmousedown = (e) => {
+        setMarking(true);
+        console.log("down", markData.marking);
+    };
+
+    findElement("#mod-container").onmouseup = (e) => {
+        if (markData.marked.length > 0) {
+            for (let i = 0; i < markData.marked.length; i++) {
+                data.forEach((d) => {
+                    if (d.id === markData.marked[i]) {
+                        console.log("Same", d);
+                        d.mark();
+                    }
+                });
+            }
+        }
+        clearMarkData();
+        setMarking(false);
+        console.log("up", markData.marking);
+    };
+    /*    findElement("#mod-container").onmouseup = async (e) => {
+            if (markData.marked.length > 0) {
+                let foundData = [];
+                for (let i = 0; i < markData.marked.length; i++) {
+
+                    let found = data.find((d) => {
+                        return d.id === markData.marked[i];
+                    });
+                    console.log(found);
+                    if (found) {
+                        console.log("Found");
+                        foundData.push(found);
+                    }
+                }
+                console.log("Found: ", foundData.length, " Data: ", foundData);
+                let dataView = await mod.visualization.data();
+                dataView.mark(foundData, "Toggle");
+            }
+            clearMarkData();
+            setMarking(false);
+            console.log("up", markData.marking);
+        };*/
     sectors
         .merge(newSectors)
         .transition()
@@ -70,18 +130,16 @@ function donutChart(size, data, mod) {
 
 /**
  * Render the visualization
+ * @param {Spotfire.DataView} dataView - dataView
+ * @param {Spotfire.Size} size
  * @param {Spotfire.Mod} mod API
  * @return data
  */
-export async function render(mod) {
+export async function render(dataView, size, mod) {
     /**
      * Initialize dataView, size, and context based on the mod API
-     * @param {Spotfire.DataView} dataView
-     * @param {Spotfire.Size} size
      * @param {Spotfire.RenderContext} context
      */
-    const dataView = await mod.visualization.data();
-    const size = await mod.windowSize();
     const context = await mod.getRenderContext();
 
     /**
@@ -122,7 +180,7 @@ export async function render(mod) {
     const background = findElement("#mod-container svg");
 
     background.onclick = (e) => {
-        if (e.target === background) {
+        if (e.target === background && markData.marked.length === 0 && !markData.marking) {
             marker.unSelect(dataView);
         }
     };

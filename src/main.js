@@ -13,16 +13,19 @@ import { render } from "./donutChart";
 const Spotfire = window.Spotfire;
 
 Spotfire.initialize(async (mod) => {
-
     /**
      * Create the read function.
      */
     const reader = mod.createReader(mod.visualization.data(), mod.windowSize());
 
+    reader.subscribe(onChange);
+
     /**
      * Initiate the read loop
+     * @param {Spotfire.DataView} dataView
+     * @param {Spotfire.Size} windowSize
      */
-    reader.subscribe(() => {
-        render(mod);
-    });
+    async function onChange(dataView, windowSize) {
+        await render(dataView, windowSize, mod);
+    }
 });
