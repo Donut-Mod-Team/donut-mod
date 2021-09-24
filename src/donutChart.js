@@ -21,7 +21,8 @@ function donutChart(size, data, mod) {
     function setMarking(marking) {
         markData.marking = marking;
     }
-    function clearMarkData() {
+    function clearMarkedData() {
+        marker.unSelect(data);
         markData.marked = [];
     }
     function addMarking(d) {
@@ -49,13 +50,6 @@ function donutChart(size, data, mod) {
         .append("path")
         .on("click", marker.select)
         .on("mouseenter", function (d) {
-            console.log("here");
-            if (markData.marking) {
-                console.log("enter", markData.marking);
-                console.log("data", d.data.id);
-                addMarking(d.data);
-                console.log("added", markData.marked);
-            }
             mod.controls.tooltip.show(d.data.tooltip());
         })
         .on("mouseleave", function (d) {
@@ -95,6 +89,7 @@ function donutChart(size, data, mod) {
     onclick = function (e) {
         let background = findElement("#mod-container svg");
         if (e.target === background) {
+            console.log("CLEAR");
             marker.unSelect(data);
         }
     };
@@ -110,8 +105,6 @@ function donutChart(size, data, mod) {
             .attr("y", rectangle.y1)
             .attr("width", rectangle.width)
             .attr("height", rectangle.height);
-        console.log("EVENT", e);
-        console.log("RECT ", rectangle);
     };
     onmousemove = function (e) {
         if (markData.marking && rectangleDiv) {
@@ -119,35 +112,37 @@ function donutChart(size, data, mod) {
             rectangle.y2 = clamp(e.clientY, 0, window.innerHeight - 2);
             rectangleCalculateWidthAndHeight();
             rectangleDiv.attr("width", rectangle.width).attr("height", rectangle.height);
-            console.log("DIV ", rectangleDiv);
         }
     };
     onmouseup = async function (e) {
         if (rectangleDiv) {
+            endSelection([rectangle.x1, rectangle.y1], [rectangle.x2, rectangle.y2]);
             d3.select("#mod-container svg").selectAll("rect").remove();
             rectangle = { x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0 };
         }
-        if (markData.marked.length > 0) {
-            let foundData = [];
-            for (let i = 0; i < markData.marked.length; i++) {
-                let found = data.find((d) => {
-                    return d.id === markData.marked[i];
-                });
-                console.log(found);
-                if (found) {
-                    console.log("Found");
-                    foundData.push(found);
-                }
-            }
-            console.log("Found: ", foundData.length, " Data: ", foundData);
-            let dataView = await mod.visualization.data();
-            dataView.mark(foundData, "ToggleOrAdd");
-        }
-        clearMarkData();
         setMarking(false);
-        console.log("up", markData.marking);
     };
 
+    const endSelection = function (start, end) {
+        const selectionBox = rectangleDiv.node().getBoundingClientRect();
+        const svgRadarMarkedCircles = svg.selectAll("path").filter(function () {
+            const box = this.getBoundingClientRect();
+            return (
+                box.x >= selectionBox.x &&
+                box.y >= selectionBox.y &&
+                box.x + box.width <= selectionBox.x + selectionBox.width &&
+                box.y + box.height <= selectionBox.y + selectionBox.height
+            );
+        });
+        if (svgRadarMarkedCircles.size() === 0) {
+            clearMarkedData();
+        }
+
+        svgRadarMarkedCircles.each(mark);
+    };
+    function mark(d) {
+        d.data.mark("ToggleOrAdd");
+    }
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }
 
@@ -207,7 +202,7 @@ export async function render(dataView, size, mod) {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: sumValue(rows, "Y"),
             id: leaf.key,
-            mark: () => leaf.mark(),
+            mark: (m) => leaf.mark(m),
             clearMarking: () => dataView.clearMarking(),
             tooltip: () => {
                 return leaf.formattedValue() + " " + sumValue(rows, "Y");
