@@ -83,10 +83,15 @@ function donutChart(size, data, mod) {
     }
     let rectangle = { x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0 };
     let rectangleDiv;
-    function reCalc() {
-        rectangle.width = Math.max(0, rectangle.x2 - +rectangle.x1);
-        rectangle.height = Math.max(0, rectangle.y2 - +rectangle.y1);
+    function rectangleCalculateWidthAndHeight() {
+        rectangle.width = Math.abs(rectangle.x2 - rectangle.x1);
+        rectangle.height = Math.abs(rectangle.y2 - rectangle.y1);
+        rectangle.x2 < rectangle.x1 && rectangleDiv.attr("x", rectangle.x2);
+        rectangle.y2 < rectangle.y1 && rectangleDiv.attr("y", rectangle.y2);
     }
+    const clamp = (value, min, max) => {
+        return Math.min(Math.max(min, value), max);
+    };
     onclick = function (e) {
         let background = findElement("#mod-container svg");
         if (e.target === background) {
@@ -107,13 +112,12 @@ function donutChart(size, data, mod) {
             .attr("height", rectangle.height);
         console.log("EVENT", e);
         console.log("RECT ", rectangle);
-        reCalc();
     };
     onmousemove = function (e) {
-        if (markData.marking) {
-            rectangle.x2 = e.clientX;
-            rectangle.y2 = e.clientY;
-            reCalc();
+        if (markData.marking && rectangleDiv) {
+            rectangle.x2 = clamp(e.clientX, 0, window.innerWidth - 2);
+            rectangle.y2 = clamp(e.clientY, 0, window.innerHeight - 2);
+            rectangleCalculateWidthAndHeight();
             rectangleDiv.attr("width", rectangle.width).attr("height", rectangle.height);
             console.log("DIV ", rectangleDiv);
         }
@@ -121,6 +125,7 @@ function donutChart(size, data, mod) {
     onmouseup = async function (e) {
         if (rectangleDiv) {
             d3.select("#mod-container svg").selectAll("rect").remove();
+            rectangle = { x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0 };
         }
         if (markData.marked.length > 0) {
             let foundData = [];
