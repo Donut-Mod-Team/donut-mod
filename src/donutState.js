@@ -50,8 +50,10 @@ export async function createDonutState(mod) {
 
     let colorLeaves = colorRoot.leaves();
 
+    let sumOfValues = 0;
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
+        sumOfValues += sumValue(rows, "Y");
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: sumValue(rows, "Y"),
@@ -71,6 +73,7 @@ export async function createDonutState(mod) {
         dataView: dataView,
         modControls: mod.controls,
         context: context,
+        sumOfValues: sumOfValues,
         clearMarking: () => dataView.clearMarking()
     };
 
