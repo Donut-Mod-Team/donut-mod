@@ -9,16 +9,16 @@ export function select(d) {
 }
 /**
  * Method for clearing the selected dataView elements
- * @param {data} d
+ * @param {donutState} donutState
  */
-export function unSelect(d) {
-    // TODO: check if we can improve the logic for clear marking
-    if (d.length > 0) {
-        d[0].clearMarking();
-    }
+export function unSelect(donutState) {
+    return donutState.clearMarking()
 }
-
-export function drawRectangularSelection(data) {
+/**
+ * The function handles rectangle drag selection
+ * @param {donutState} donutState
+ */
+export function drawRectangularSelection(donutState) {
     function drawRectangle(x, y, w, h) {
         return "M" + [x, y] + " l" + [w, 0] + " l" + [0, h] + " l" + [-w, 0] + "z";
     }
@@ -41,7 +41,7 @@ export function drawRectangularSelection(data) {
             if (d3.select(d3.event.target).node().nodeName === "path") {
                 return;
             }
-            return unSelect(data);
+            return unSelect(donutState);
         }
 
         const selectionBox = rectangle.node().getBoundingClientRect();

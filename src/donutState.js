@@ -1,7 +1,7 @@
 /**
  * Render the visualization
  * @param {Spotfire.Mod} mod API
- * @return donutState
+ * @return {donutState}
  */
 export async function createDonutState(mod) {
     /**

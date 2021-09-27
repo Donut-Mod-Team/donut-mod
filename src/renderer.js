@@ -1,4 +1,6 @@
 import * as d3 from "d3";
+import * as marker from "./marker"
+
 /**
  * @param {donutState} donutState
  */
@@ -33,7 +35,7 @@ export async function render(donutState) {
         .enter()
         .append("path")
         .on("click", function (d) {
-            d.data.mark();
+            marker.select(d);
         })
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
@@ -62,6 +64,8 @@ export async function render(donutState) {
             return arc(i(value));
         };
     }
+
+    marker.drawRectangularSelection(donutState);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
