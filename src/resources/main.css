@@ -32,13 +32,12 @@ form {
     right: 10px;
     top: 10px;
 }
-.rect {
+.rectangle {
     fill: #add8e6;
     stroke: #add8e6;
-    stroke-width: 2;
     fill-opacity: 0.3;
     stroke-opacity: 0.7;
-    position: absolute;
+    stroke-width: 2;
 }
 
 .selection {

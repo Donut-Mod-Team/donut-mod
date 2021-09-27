@@ -8,7 +8,7 @@ import * as marker from "./marker";
  */
 function donutChart(size, data, mod) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
-    const sizeModifier = 10;
+    const sizeModifier = 40;
 
     // D3 animation duration used for svg shapes
     const animationDuration = 100;
@@ -24,7 +24,7 @@ function donutChart(size, data, mod) {
     const arc = d3
         .arc()
         .padAngle(0.1 / data.length)
-        .innerRadius(radius * 0.6)
+        .innerRadius(radius * 0.5)
         .outerRadius(radius);
 
     // Join new data

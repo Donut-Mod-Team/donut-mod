@@ -23,7 +23,7 @@ export function drawRectangularSelection(data) {
         return "M" + [x, y] + " l" + [w, 0] + " l" + [0, h] + " l" + [-w, 0] + "z";
     }
     let canvas = d3.select("#mod-container svg");
-    const rectangle = canvas.append("path").attr("class", "rect").attr("visibility", "hidden");
+    const rectangle = canvas.append("path").attr("class", "rectangle").attr("visibility", "hidden");
 
     const startSelection = function (start) {
         rectangle.attr("d", drawRectangle(start[0], start[1], 0, 0)).attr("visibility", "visible");
@@ -64,7 +64,7 @@ export function drawRectangularSelection(data) {
         svgRadarMarkedCircles.each(select);
     };
 
-    d3.select("#mod-container").on("mousedown", function () {
+    canvas.on("mousedown", function () {
         if (d3.event.which === 3 || d3.event.which === 2) {
             return;
         }
