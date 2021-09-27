@@ -32,7 +32,7 @@ form {
     right: 10px;
     top: 10px;
 }
-rect {
+.rect {
     fill: #add8e6;
     stroke: #add8e6;
     stroke-width: 2;

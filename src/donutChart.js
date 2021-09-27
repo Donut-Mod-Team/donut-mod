@@ -6,28 +6,15 @@ import * as marker from "./marker";
  * @param {any[]} data
  * @param {Spotfire.Mod} mod
  */
-var markData = { marking: false, marked: [] };
-
 function donutChart(size, data, mod) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
-    const sizeModifier = 40;
+    const sizeModifier = 10;
 
     // D3 animation duration used for svg shapes
     const animationDuration = 100;
     const width = size.width - sizeModifier;
     const height = size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
-
-    function setMarking(marking) {
-        markData.marking = marking;
-    }
-    function clearMarkedData() {
-        marker.unSelect(data);
-        markData.marked = [];
-    }
-    function addMarking(d) {
-        markData.marked.push(d.id);
-    }
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
     const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
@@ -37,7 +24,7 @@ function donutChart(size, data, mod) {
     const arc = d3
         .arc()
         .padAngle(0.1 / data.length)
-        .innerRadius(radius * 0.5)
+        .innerRadius(radius * 0.6)
         .outerRadius(radius);
 
     // Join new data
@@ -48,7 +35,10 @@ function donutChart(size, data, mod) {
     let newSectors = sectors
         .enter()
         .append("path")
-        .on("click", marker.select)
+        .on("click", function (d) {
+            marker.select(d);
+            d3.event.stopPropagation();
+        })
         .on("mouseenter", function (d) {
             mod.controls.tooltip.show(d.data.tooltip());
         })
@@ -75,74 +65,9 @@ function donutChart(size, data, mod) {
             return arc(i(value));
         };
     }
-    let rectangle = { x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0 };
-    let rectangleDiv;
-    function rectangleCalculateWidthAndHeight() {
-        rectangle.width = Math.abs(rectangle.x2 - rectangle.x1);
-        rectangle.height = Math.abs(rectangle.y2 - rectangle.y1);
-        rectangle.x2 < rectangle.x1 && rectangleDiv.attr("x", rectangle.x2);
-        rectangle.y2 < rectangle.y1 && rectangleDiv.attr("y", rectangle.y2);
-    }
-    const clamp = (value, min, max) => {
-        return Math.min(Math.max(min, value), max);
-    };
-    onclick = function (e) {
-        let background = findElement("#mod-container svg");
-        if (e.target === background) {
-            console.log("CLEAR");
-            marker.unSelect(data);
-        }
-    };
 
-    onmousedown = function (e) {
-        setMarking(true);
-        rectangle.x1 = e.clientX; //Set the initial X
-        rectangle.y1 = e.clientY; //Set the initial Y
-        rectangleDiv = d3
-            .select("#mod-container svg")
-            .append("rect")
-            .attr("x", rectangle.x1)
-            .attr("y", rectangle.y1)
-            .attr("width", rectangle.width)
-            .attr("height", rectangle.height);
-    };
-    onmousemove = function (e) {
-        if (markData.marking && rectangleDiv) {
-            rectangle.x2 = clamp(e.clientX, 0, window.innerWidth - 2);
-            rectangle.y2 = clamp(e.clientY, 0, window.innerHeight - 2);
-            rectangleCalculateWidthAndHeight();
-            rectangleDiv.attr("width", rectangle.width).attr("height", rectangle.height);
-        }
-    };
-    onmouseup = async function (e) {
-        if (rectangleDiv) {
-            endSelection([rectangle.x1, rectangle.y1], [rectangle.x2, rectangle.y2]);
-            d3.select("#mod-container svg").selectAll("rect").remove();
-            rectangle = { x1: 0, y1: 0, x2: 0, y2: 0, width: 0, height: 0 };
-        }
-        setMarking(false);
-    };
+    marker.drawRectangularSelection(data);
 
-    const endSelection = function (start, end) {
-        const selectionBox = rectangleDiv.node().getBoundingClientRect();
-        const svgRadarMarkedCircles = svg.selectAll("path").filter(function () {
-            const box = this.getBoundingClientRect();
-            return (
-                box.x >= selectionBox.x &&
-                box.y >= selectionBox.y &&
-                box.x + box.width <= selectionBox.x + selectionBox.width &&
-                box.y + box.height <= selectionBox.y + selectionBox.height
-            );
-        });
-        if (svgRadarMarkedCircles.size() === 0) {
-            clearMarkedData();
-        }
-
-        svgRadarMarkedCircles.each(mark);
-    };
-    function mark(d) {
-        d.data.mark("ToggleOrAdd");
-    }
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }
 
@@ -202,13 +127,19 @@ export async function render(dataView, size, mod) {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: sumValue(rows, "Y"),
             id: leaf.key,
-            mark: (m) => leaf.mark(m),
+            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             clearMarking: () => dataView.clearMarking(),
             tooltip: () => {
                 return leaf.formattedValue() + " " + sumValue(rows, "Y");
             }
         };
     });
+    let DonutChart = {
+        data: [],
+        dataView: dataView,
+        size: size,
+        clearMarking: () => dataView.clearMarking()
+    };
 
     donutChart(size, data, mod);
 
@@ -222,8 +153,4 @@ export async function render(dataView, size, mod) {
  */
 function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
-}
-
-function findElement(sector) {
-    return document.querySelector(sector);
 }
