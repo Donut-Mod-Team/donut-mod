@@ -26,7 +26,10 @@ export function drawRectangularSelection(donutState) {
     const rectangle = canvas.append("path").attr("class", "rectangle").attr("visibility", "hidden");
 
     const startSelection = function (start) {
-        rectangle.attr("d", drawRectangle(start[0], start[1], 0, 0)).attr("visibility", "visible");
+        /* Here we change the colour to the Tibco-approved colour. (See the style property).
+        The problem is that the colour returned is white. Change the colour in the css file
+        if you want to see that the colour changes (remove style tag as well).*/
+        rectangle.attr("d", drawRectangle(start[0], start[1], 0, 0)).attr("visibility", "visible", "red").style("fill", donutState.mod.getRenderContext().styling.general.font.color).style("stroke", donutState.mod.getRenderContext().styling.general.font.color);
     };
 
     const moveSelection = function (start, moved) {
