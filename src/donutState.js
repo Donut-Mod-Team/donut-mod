@@ -63,9 +63,10 @@ export async function createDonutState(mod) {
         };
     });
     /**
-     * @typedef {donutState} donutState containing dataView, size, data[], modControls, context
+     * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
     let donutState = {
+        mod: mod,
         data: data,
         size: size,
         dataView: dataView,
