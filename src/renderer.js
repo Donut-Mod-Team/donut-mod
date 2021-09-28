@@ -14,7 +14,7 @@ export async function render(donutState) {
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
 
-    const svg = d3.select("#mod-container").select("svg#svg").attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     const pie = d3.pie().value((d) => d.value);
 
@@ -65,10 +65,10 @@ export async function render(donutState) {
             (enter) => {
                 return enter
                     .append("text")
-                    .style("opacity", 0)
+                    .style("opacity", 1)
                     .attr("dy", "0.35em")
                     .attr("font-size", 40)
-                    .attr("fill", "transparent")
+                    .attr("overflow", "visible")
                     .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1))
                     .call((enter) =>
                         enter
@@ -112,7 +112,11 @@ export async function render(donutState) {
         return (({ value, x0, x1, y0, y1 }) => ({ value, x0, x1, y0, y1 }))(data);
     }
 
-
+    function labelPosition(d) {
+        const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
+        const y = (d.y0 + d.y1) / 2;
+        return { x, y };
+    }
 
     donutState.context.signalRenderComplete();
 }
