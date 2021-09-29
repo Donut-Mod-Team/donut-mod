@@ -43,6 +43,7 @@ export async function render(donutState) {
         .append("path")
         .on("click", function (d) {
             marker.select(d);
+            d3.event.stopPropagation();
         })
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
