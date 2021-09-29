@@ -17,9 +17,6 @@ body {
     margin: auto;
     display: inherit;
 }
-text {
-    font: 20px sans-serif;
-}
 form {
     position: absolute;
     right: 10px;

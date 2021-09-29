@@ -6,7 +6,7 @@ export async function render(donutState) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
     const sizeModifier = 40;
     // D3 animation duration used for svg shapes
-    const animationDuration = 300;
+    const animationDuration = 200;
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
@@ -18,11 +18,13 @@ export async function render(donutState) {
 
     const pie = d3.pie().value((d) => d.value);
 
+
     const arc = d3
         .arc()
         .padAngle(0.1 / donutState.data.length)
         .innerRadius(radius * 0.5)
         .outerRadius(radius);
+
 
     // Join new data
     const sectors = svg.select("g#sectors").selectAll("path").data(pie(donutState.data), (d) => {
@@ -44,6 +46,7 @@ export async function render(donutState) {
         })
         .attr("fill", () => "transparent");
 
+
     sectors
         .merge(newSectors)
         .attr("class", "sector")
@@ -58,7 +61,6 @@ export async function render(donutState) {
 
     svg.select("g#labels")
         .attr("pointer-events", "none")
-        .attr("text-anchor", "middle")
         .selectAll("text")
         .data(pie(donutState.data), (d) => `label-${d.data.id}`)
         .join(
@@ -67,20 +69,31 @@ export async function render(donutState) {
                     .append("text")
                     .style("opacity", 1)
                     .attr("dy", "0.35em")
-                    .attr("font-size", 40)
+                    .attr("font-size", 12)
+                    .attr("text-anchor", "middle")
                     .attr("overflow", "visible")
-                    .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1))
+                    .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
                     .call((enter) =>
                         enter
                             .transition("add labels")
                             .duration(animationDuration)
                             .style("opacity", 1)
-                            .attrTween("transform", tweenTransform)
+                            .attr("transform", calculateLabelPosition)
                     );
             },
-            (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-        );
+            (update) =>
+                update.call((update) =>
+                    update
+                        .transition("update labels")
+                        .duration(animationDuration)
+                        .style("opacity", 1)
+                        .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
+                        .attr("transform", calculateLabelPosition)
 
+                ),
+            (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
+
+        );
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
@@ -94,28 +107,15 @@ export async function render(donutState) {
         };
     }
 
-    function tweenTransform(data) {
-        let prevValue = this.__prev ? getTransformData(this.__prev) : {};
-        let newValue = getTransformData(data);
-        this.__prev = newValue;
+    function calculateLabelPosition(data){
+        let centeringFactor = radius * 0.75
+        let c = arc.centroid(data)
+        let x = c[0]
+        let y = c[1]
+        let h = Math.sqrt(x * x + y * y);
+        console.log(h)
+        return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
 
-        var i = d3.interpolate(prevValue, newValue);
-
-        return function (value) {
-            var { x, y } = labelPosition(i(value));
-            return `rotate(${x - 90}) translate(${y},0) rotate(${Math.sin((Math.PI * x) / 180) >= 0 ? 0 : 180})`;
-        };
-    }
-
-    function getTransformData(data) {
-        // d3.interpolate should not try to interpolate other properties
-        return (({ value, x0, x1, y0, y1 }) => ({ value, x0, x1, y0, y1 }))(data);
-    }
-
-    function labelPosition(d) {
-        const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
-        const y = (d.y0 + d.y1) / 2;
-        return { x, y };
     }
 
     donutState.context.signalRenderComplete();
