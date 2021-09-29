@@ -66,11 +66,11 @@ export async function createDonutState(mod) {
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
     let donutState = {
-        mod: mod,
         data: data,
         size: size,
         dataView: dataView,
         modControls: mod.controls,
+        donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
         clearMarking: () => dataView.clearMarking()
     };

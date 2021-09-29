@@ -12,7 +12,7 @@ export function select(d) {
  * @param {donutState} donutState
  */
 export function unSelect(donutState) {
-    return donutState.clearMarking()
+    return donutState.clearMarking();
 }
 /**
  * The function handles rectangle drag selection
@@ -29,7 +29,7 @@ export function drawRectangularSelection(donutState) {
         /* Here we change the colour to the Tibco-approved colour. (See the style property).
         The problem is that the colour returned is white. Change the colour in the css file
         if you want to see that the colour changes (remove style tag as well).*/
-        rectangle.attr("d", drawRectangle(start[0], start[1], 0, 0)).attr("visibility", "visible", "red").style("fill", donutState.mod.getRenderContext().styling.general.font.color).style("stroke", donutState.mod.getRenderContext().styling.general.font.color);
+        rectangle.attr("d", drawRectangle(start[0], start[1], 0, 0)).attr("visibility", "visible");
     };
 
     const moveSelection = function (start, moved) {
@@ -52,13 +52,16 @@ export function drawRectangularSelection(donutState) {
             .select("#mod-container svg g")
             .selectAll("path")
             .filter(function () {
-                const box = this.getBoundingClientRect();
-                return !(
-                    selectionBox.left >= box.right ||
-                    selectionBox.top >= box.bottom ||
-                    selectionBox.right <= box.left ||
-                    selectionBox.bottom <= box.top
-                );
+                const boundingClientRect = this.getBoundingClientRect();
+                let match = false;
+                if (
+                    checkIfRectanglesOverlap(selectionBox, boundingClientRect) &&
+                    rectangularCircleColliding(selectionBox, donutState.donutCircle)
+                ) {
+                    let overlappingRectangle = getOverlappingRectangle(selectionBox, boundingClientRect);
+                    match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
+                }
+                return match;
             });
 
         if (svgRadarMarkedCircles.size() === 0) {
@@ -83,4 +86,53 @@ export function drawRectangularSelection(donutState) {
                 subject.on("mousemove.rectangle", null).on("mouseup.rectangle", null);
             });
     });
+}
+
+//https://www.codegrepper.com/code-examples/javascript/check+if+two+rectangles+overlap+javascript+canvas
+//https://stackoverflow.com/questions/16005136/how-do-i-see-if-two-rectangles-intersect-in-javascript-or-pseudocode/29614525#29614525
+function checkIfRectanglesOverlap(selectionBox, rectangle) {
+    return !(
+        selectionBox.left >= rectangle.right ||
+        selectionBox.top >= rectangle.bottom ||
+        selectionBox.right <= rectangle.left ||
+        selectionBox.bottom <= rectangle.top
+    );
+}
+
+//https://stackoverflow.com/questions/14097290/check-if-circle-contains-rectangle
+function checkIfRectangularIsInMiddle(overlappingRectangle, donutCircle) {
+    let distanceX = Math.max(
+        donutCircle.x - overlappingRectangle.x,
+        overlappingRectangle.x + overlappingRectangle.width - donutCircle.x
+    );
+    let distanceY = Math.max(
+        donutCircle.y - overlappingRectangle.y,
+        overlappingRectangle.y + overlappingRectangle.height - donutCircle.y
+    );
+    return donutCircle.innerRadius * donutCircle.innerRadius >= distanceX * distanceX + distanceY * distanceY;
+}
+
+//https://stackoverflow.com/questions/22437523/return-intersection-position-and-size
+function getOverlappingRectangle(selectionBox, rectangle) {
+    let x = Math.max(selectionBox.x, rectangle.x);
+    let y = Math.max(selectionBox.y, rectangle.y);
+    let widthX = Math.min(selectionBox.x + selectionBox.width, rectangle.x + rectangle.width);
+    let heightY = Math.min(selectionBox.y + selectionBox.height, rectangle.y + rectangle.height);
+    return { x: x, y: y, width: widthX - x, height: heightY - y };
+}
+
+//https://www.geeksforgeeks.org/check-if-any-point-overlaps-the-given-circle-and-rectangle/
+function rectangularCircleColliding(selectionBox, donutCircle) {
+    let closestX = clamp(donutCircle.x, selectionBox.x, selectionBox.x + selectionBox.width);
+    let closestY = clamp(donutCircle.y, selectionBox.y, selectionBox.y + selectionBox.height);
+
+    // also test for corner collisions
+    let distanceX = donutCircle.x - closestX;
+    let distanceY = donutCircle.y - closestY;
+    let distanceSquared = distanceX * distanceX + distanceY * distanceY;
+    return distanceSquared <= donutCircle.radius * donutCircle.radius;
+}
+
+function clamp(min, max, value) {
+    return Math.max(max, Math.min(min, value));
 }
