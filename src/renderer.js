@@ -13,7 +13,9 @@ export async function render(donutState) {
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
-    let innerRadius = radius * 0.5;
+    const innerRadius = radius * 0.5;
+
+    // Initialize the circle state
     donutState.donutCircle.x = width / 2;
     donutState.donutCircle.y = height / 2;
     donutState.donutCircle.radius = radius;
