@@ -67,9 +67,10 @@ export async function render(donutState) {
             (enter) => {
                 return enter
                     .append("text")
+                    .attr("fill", donutState.context.styling.general.font.color)
                     .style("opacity", 1)
                     .attr("dy", "0.35em")
-                    .attr("font-size", 12)
+                    .attr("font-size", donutState.context.styling.general.font.fontSize)
                     .attr("text-anchor", "middle")
                     .attr("overflow", "visible")
                     .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
@@ -89,6 +90,7 @@ export async function render(donutState) {
                         .style("opacity", 1)
                         .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
                         .attr("transform", calculateLabelPosition)
+                        .attr("fill", donutState.context.styling.general.font.color)
 
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
