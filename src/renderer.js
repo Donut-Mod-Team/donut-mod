@@ -1,16 +1,25 @@
 import * as d3 from "d3";
+import * as marker from "./marker";
+
 /**
  * @param {donutState} donutState
  */
 export async function render(donutState) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
-    const sizeModifier = 40;
+    const sizeModifier = 10;
     // D3 animation duration used for svg shapes
-    const animationDuration = 300;
+    const animationDuration = 100;
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
+    const innerRadius = radius * 0.5;
+
+    // Initialize the circle state
+    donutState.donutCircle.x = width / 2;
+    donutState.donutCircle.y = height / 2;
+    donutState.donutCircle.radius = radius;
+    donutState.donutCircle.innerRadius = innerRadius;
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
 
@@ -21,7 +30,7 @@ export async function render(donutState) {
     const arc = d3
         .arc()
         .padAngle(0.1 / donutState.data.length)
-        .innerRadius(radius * 0.5)
+        .innerRadius(innerRadius)
         .outerRadius(radius);
 
     // Join new data
@@ -33,7 +42,8 @@ export async function render(donutState) {
         .enter()
         .append("path")
         .on("click", function (d) {
-            d.data.mark();
+            marker.select(d);
+            d3.event.stopPropagation();
         })
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
@@ -62,6 +72,8 @@ export async function render(donutState) {
             return arc(i(value));
         };
     }
+
+    marker.drawRectangularSelection(donutState);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
