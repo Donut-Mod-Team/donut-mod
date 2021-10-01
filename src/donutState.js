@@ -45,6 +45,10 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide("y");
     }
 
+    // Awaiting and retrieving the Color and Y axis from the mod.
+    let yAxis = await mod.visualization.axis("Y");
+    const colorAxisMeta = await mod.visualization.axis("Color");
+
     // Hide tooltip
     mod.controls.tooltip.hide();
 
@@ -58,7 +62,10 @@ export async function createDonutState(mod) {
             id: leaf.key,
             mark: () => leaf.mark(),
             tooltip: () => {
-                return leaf.formattedValue() + " " + sumValue(rows, "Y");
+                /* Adding the display name from the colorAxis and yAxis to the tooltip,
+                to get the corresponding leaf data onto the tooltip. */
+                return colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n" +
+                        yAxis.parts[0].displayName + ": " + sumValue(rows, "Y");
             }
         };
     });
