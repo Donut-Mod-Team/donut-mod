@@ -115,7 +115,6 @@ export async function render(donutState) {
         let x = c[0]
         let y = c[1]
         let h = Math.sqrt(x * x + y * y);
-        console.log(h)
         return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
 
     }
