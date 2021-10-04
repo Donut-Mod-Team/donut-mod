@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import * as math from "mathjs"
 
 /**
  * Method for selecting a dataset
@@ -101,18 +102,41 @@ export function drawRectangularSelection(donutState) {
                         .attr("visibility", "visible");
                     match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
                     //https://stackoverflow.com/questions/17427088/how-to-get-coordinates-of-slices-along-the-edge-of-a-pie-chart/37502964
-                    console.log(
-                        Math.dot(
-                            [donutState.donutCircle.x, donutState.donutCircle.y],
-                            [overlappingRectangle.x, overlappingRectangle.y]
-                        )
-                    );
-                    console.log(
-                        Math.dot(
-                            [donutState.donutCircle.x, donutState.donutCircle.y],
-                            [overlappingRectangle.x, overlappingRectangle.y]
-                        )
-                    );
+
+                    // let vector1 = [
+                    //     [donutState.donutCircle.x, donutState.donutCircle.y],
+                    //     [overlappingRectangle.x, overlappingRectangle.y]
+                    // ];
+                    // let vector2 = [
+                    //     [donutState.donutCircle.x, donutState.donutCircle.y],
+                    //     [0,1]
+                    // ];
+                    // // Math.acos returns the arccosine in radians
+                    //
+                    // let vecDistance = Math.sqrt(Math.pow(vector1[0]-vector2[0],2)+Math.pow(vector1[1]-vector2[1],2));
+                    // let dotProduct = math.dot(vector1, vector2);
+                    // console.log(Math.acos(dotProduct/vecDistance));
+
+                    let a = [overlappingRectangle.x, overlappingRectangle.y];
+                    let b = [donutState.donutCircle.x,donutState.donutCircle.y + donutState.donutCircle.radius];
+                    let circlePoint = [donutState.donutCircle.x,donutState.donutCircle.y];
+
+                    let vector1 = math.matrix([a, circlePoint]);
+                    let vector2 = math.matrix([b, circlePoint]);
+
+                    console.log("Vector 1:" + vector1);
+                    console.log("Vector 2:" + vector2);
+
+                    let dotProduct = math.dot(vector1, vector2);
+                    //let dotProduct = (a, b) => a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
+                    let vecDistance = Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2));
+
+                    console.log("dot product: " + dotProduct);
+                    console.log("distance " + vecDistance);
+
+                    let acos = Math.acos(dotProduct/vecDistance);
+
+                    console.log("Top left angle: " + acos);
 
                     let xStart =
                         donutState.donutCircle.x +
