@@ -24,9 +24,6 @@ body,
 svg {
     display: block;
 }
-text {
-    font: 10px sans-serif;
-}
 form {
     position: absolute;
     right: 10px;
