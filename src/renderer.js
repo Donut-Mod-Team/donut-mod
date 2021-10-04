@@ -16,7 +16,7 @@ export async function render(donutState) {
 
     const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    const pie = d3.pie().value((d) => d.value);
+    const pie = d3.pie().value((d) => d.absValue);
 
 
     const arc = d3
@@ -52,7 +52,7 @@ export async function render(donutState) {
         .attr("class", "sector")
         .transition()
         .duration(animationDuration)
-        .attr("value", (d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1))
+        .attr("value", (d) => (calculatePercentageValue(d)))
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
@@ -119,12 +119,12 @@ export async function render(donutState) {
 
     }
 
-    // Calculates the percentage value for a set numerator and denominator and returns it
+    // Calculates the percentage value for the specific data and returns it
     // with a set "decimalPlaces" accuracy
     //http://www.jacklmoore.com/notes/rounding-in-javascript/
     function calculatePercentageValue(d) {
         let decimalPlaces = 1;
-        return Number(Math.round(parseFloat((d.data.value / donutState.sumOfValues * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
+        return Number(Math.round(parseFloat((d.data.absValue / donutState.sumOfValues * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
     }
 
     donutState.context.signalRenderComplete();

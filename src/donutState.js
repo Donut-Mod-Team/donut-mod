@@ -53,10 +53,12 @@ export async function createDonutState(mod) {
     let sumOfValues = 0;
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
-        sumOfValues += sumValue(rows, "Y");
+        let yValue = sumValue(rows, "Y")
+        sumOfValues += Math.abs(yValue);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: sumValue(rows, "Y"),
+            value: yValue,
+            absValue: Math.abs(yValue),
             id: leaf.key,
             mark: () => leaf.mark(),
             tooltip: () => {
