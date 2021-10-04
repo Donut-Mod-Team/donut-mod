@@ -7,18 +7,77 @@
     box-sizing: border-box;
 }
 
-body {
-    white-space: pre-line;
-    margin: 10px;
-    overflow: hidden;
-    position: relative;
+html,
+body,
+#mod-container {
+    position: absolute;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    user-select: none;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    overflow-y: auto;
 }
-#mod-container svg {
-    margin: auto;
-    display: inherit;
+
+svg {
+    display: block;
 }
 form {
     position: absolute;
     right: 10px;
     top: 10px;
+}
+.rectangle {
+    fill: #add8e6;
+    stroke: #add8e6;
+    fill-opacity: 0.3;
+    stroke-opacity: 0.7;
+    stroke-width: 2;
+}
+
+.selection {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    border: 1px solid #677085;
+    background-color: rgba(0, 90, 230, 0.17);
+    width: 0;
+    height: 0;
+    top: 0;
+    left: 0;
+}
+
+.selection-bg {
+    visibility: hidden;
+    position: absolute;
+    background-color: rgba(200, 90, 230, 0);
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.line-hover {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.line-hover-fill {
+    pointer-events: none;
+    stroke: #fff;
+    stroke-width: 5px;
+}
+
+.line-hover-casing {
+    pointer-events: none;
+    stroke: #333;
+    stroke-width: 7px;
+}
+
+.line-hover-bg {
+    stroke: #333;
+    stroke-opacity: 0;
+    stroke-width: 7px;
 }

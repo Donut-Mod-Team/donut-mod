@@ -1,7 +1,7 @@
 /**
  * Render the visualization
  * @param {Spotfire.Mod} mod API
- * @return donutState
+ * @return {donutState}
  */
 export async function createDonutState(mod) {
     /**
@@ -45,6 +45,10 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide("y");
     }
 
+    // Awaiting and retrieving the Color and Y axis from the mod.
+    let yAxis = await mod.visualization.axis("Y");
+    const colorAxisMeta = await mod.visualization.axis("Color");
+
     // Hide tooltip
     mod.controls.tooltip.hide();
 
@@ -60,20 +64,24 @@ export async function createDonutState(mod) {
             value: yValue,
             absValue: Math.abs(yValue),
             id: leaf.key,
-            mark: () => leaf.mark(),
+            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             tooltip: () => {
-                return leaf.formattedValue() + " " + sumValue(rows, "Y");
+                /* Adding the display name from the colorAxis and yAxis to the tooltip,
+                to get the corresponding leaf data onto the tooltip. */
+                return colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n" +
+                        yAxis.parts[0].displayName + ": " + sumValue(rows, "Y");
             }
         };
     });
     /**
-     * @typedef {donutState} donutState containing dataView, size, data[], modControls, context
+     * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
     let donutState = {
         data: data,
         size: size,
         dataView: dataView,
         modControls: mod.controls,
+        donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
         sumOfValues: sumOfValues,
         clearMarking: () => dataView.clearMarking()
