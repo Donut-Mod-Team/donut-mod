@@ -67,7 +67,7 @@ export function drawRectangularSelection(donutState) {
         const svgRadarMarkedCircles = d3
             .select("#mod-container svg g")
             .selectAll("path")
-            .filter(function () {
+            .filter(function (d) {
                 /**
                  * Get the coordinates of the bounding rectangle around the path element
                  * @typedef boundingClientRect
@@ -87,7 +87,101 @@ export function drawRectangularSelection(donutState) {
                     let overlappingRectangle = getOverlappingRectangle(selectionRectangle, boundingClientRect);
                     // Check if the overlap-area is inside the middle of the donut.
                     // Handles error case where the rectangle selection overlaps only inside the middle of the donut but don't touch the data-set
+                    const overlap = canvas.append("path").attr("class", "rectangle").attr("visibility", "visible");
+                    overlap
+                        .attr(
+                            "d",
+                            drawRectangle(
+                                overlappingRectangle.x,
+                                overlappingRectangle.y,
+                                overlappingRectangle.width,
+                                overlappingRectangle.height
+                            )
+                        )
+                        .attr("visibility", "visible");
                     match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
+                    //https://stackoverflow.com/questions/17427088/how-to-get-coordinates-of-slices-along-the-edge-of-a-pie-chart/37502964
+                    console.log(
+                        Math.dot(
+                            [donutState.donutCircle.x, donutState.donutCircle.y],
+                            [overlappingRectangle.x, overlappingRectangle.y]
+                        )
+                    );
+                    console.log(
+                        Math.dot(
+                            [donutState.donutCircle.x, donutState.donutCircle.y],
+                            [overlappingRectangle.x, overlappingRectangle.y]
+                        )
+                    );
+
+                    let xStart =
+                        donutState.donutCircle.x +
+                        donutState.donutCircle.radius * Math.sin((d.startAngle - Math.PI) * -1);
+                    let yStart =
+                        donutState.donutCircle.y +
+                        donutState.donutCircle.radius * Math.cos((d.startAngle - Math.PI) * -1);
+                    let xEnd =
+                        donutState.donutCircle.x +
+                        donutState.donutCircle.radius * Math.sin((d.endAngle - Math.PI) * -1);
+                    let yEnd =
+                        donutState.donutCircle.y +
+                        donutState.donutCircle.radius * Math.cos((d.endAngle - Math.PI) * -1);
+                    canvas
+                        .append("line")
+                        .style("stroke", "green")
+                        .style("stroke-width", 1)
+                        .attr("x1", xStart)
+                        .attr("y1", yStart)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
+                    canvas
+                        .append("line")
+                        .style("stroke", "red")
+                        .style("stroke-width", 1)
+                        .attr("x1", xEnd)
+                        .attr("y1", yEnd)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
+                    let xTopLeft = overlappingRectangle.x;
+                    let yTopLeft = overlappingRectangle.y;
+                    let xTopRight = overlappingRectangle.x + overlappingRectangle.width;
+                    let yTopRight = overlappingRectangle.y;
+                    let xBLeft = overlappingRectangle.x;
+                    let yBleft = overlappingRectangle.y + overlappingRectangle.height;
+                    let xBRight = overlappingRectangle.x + overlappingRectangle.width;
+                    let yBRight = overlappingRectangle.y + overlappingRectangle.height;
+                    canvas
+                        .append("line")
+                        .style("stroke", "blue")
+                        .style("stroke-width", 1)
+                        .attr("x1", xBRight)
+                        .attr("y1", yBRight)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
+                    canvas
+                        .append("line")
+                        .style("stroke", "blue")
+                        .style("stroke-width", 1)
+                        .attr("x1", xBLeft)
+                        .attr("y1", yBleft)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
+                    canvas
+                        .append("line")
+                        .style("stroke", "blue")
+                        .style("stroke-width", 1)
+                        .attr("x1", xTopLeft)
+                        .attr("y1", yTopLeft)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
+                    canvas
+                        .append("line")
+                        .style("stroke", "blue")
+                        .style("stroke-width", 1)
+                        .attr("x1", xTopRight)
+                        .attr("y1", yTopRight)
+                        .attr("x2", donutState.donutCircle.x)
+                        .attr("y2", donutState.donutCircle.y);
                 }
                 return match;
             });
