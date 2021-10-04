@@ -54,11 +54,15 @@ export async function createDonutState(mod) {
 
     let colorLeaves = colorRoot.leaves();
 
+    let sumOfValues = 0;
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
+        let yValue = sumValue(rows, "Y")
+        sumOfValues += Math.abs(yValue);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: sumValue(rows, "Y"),
+            value: yValue,
+            absValue: Math.abs(yValue),
             id: leaf.key,
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             tooltip: () => {
@@ -79,6 +83,7 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
+        sumOfValues: sumOfValues,
         clearMarking: () => dataView.clearMarking()
     };
 
