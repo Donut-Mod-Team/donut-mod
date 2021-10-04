@@ -71,9 +71,9 @@ export async function render(donutState) {
                     .style("opacity", 1)
                     .attr("dy", "0.35em")
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
+                    .text((d) => (calculatePercentageValue(d) + "%"))
                     .attr("text-anchor", "middle")
                     .attr("overflow", "visible")
-                    .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
                     .call((enter) =>
                         enter
                             .transition("add labels")
@@ -88,7 +88,7 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => (d.data.value / donutState.sumOfValues * 100).toFixed(1) + "%")
+                        .text((d) => (calculatePercentageValue(d) + "%"))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.context.styling.general.font.color)
 
@@ -111,12 +111,20 @@ export async function render(donutState) {
 
     function calculateLabelPosition(data){
         let centeringFactor = radius * 0.75
-        let c = arc.centroid(data)
-        let x = c[0]
-        let y = c[1]
+        let centroid = arc.centroid(data)
+        let x = centroid[0]
+        let y = centroid[1]
         let h = Math.sqrt(x * x + y * y);
         return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
 
+    }
+
+    // Calculates the percentage value for a set numerator and denominator and returns it
+    // with a set "decimalPlaces" accuracy
+    //http://www.jacklmoore.com/notes/rounding-in-javascript/
+    function calculatePercentageValue(d) {
+        let decimalPlaces = 1;
+        return Number(Math.round(parseFloat((d.data.value / donutState.sumOfValues * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
     }
 
     donutState.context.signalRenderComplete();
