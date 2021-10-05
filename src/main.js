@@ -3,9 +3,8 @@
  * This file is subject to the license terms contained
  * in the license file that is distributed with this file.
  */
-
-import { render } from "./donutChart";
-
+import { render } from "./renderer";
+import { createDonutState } from "./donutState";
 /**
  * Get access to the Spotfire Mod API by providing a callback to the initialize method.
  * @param {Spotfire.Mod} mod - mod api
@@ -13,7 +12,6 @@ import { render } from "./donutChart";
 const Spotfire = window.Spotfire;
 
 Spotfire.initialize(async (mod) => {
-
     /**
      * Create the read function.
      */
@@ -22,7 +20,8 @@ Spotfire.initialize(async (mod) => {
     /**
      * Initiate the read loop
      */
-    reader.subscribe(() => {
-        render(mod);
+    reader.subscribe(async () => {
+        let donutState = await createDonutState(mod);
+        render(donutState);
     });
 });

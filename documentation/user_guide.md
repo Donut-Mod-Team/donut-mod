@@ -43,6 +43,19 @@ Click "Development Server" and connect to the following:
 
 Congratulations! You should now be able to see the Donut Chart!
 
-## Demo steps for main use cases
+## How to use the mod:
 
-Step-by-step guide for the main use cases as well as a link to the website.
+### Functionality
+
+####Marking:
+- Select by clicking(mouse left) on a sub-set of the donut.
+
+- Select and add to selection set by holding left-clicking and holding CTRL.
+
+- Select single/multiple sub-sets by clicking and holding the left mouse button and dragging(rectangle selection) - selects everything within the rectangle.
+
+- Adding to selection with CTRL working with rectangle selection.
+
+- Unselect by clicking on the background(within the mod canvas.
+
+
