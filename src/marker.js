@@ -88,7 +88,9 @@ export function drawRectangularSelection(donutState) {
                     // Check if the overlap-area is inside the middle of the donut.
                     // Handles error case where the rectangle selection overlaps only inside the middle of the donut but don't touch the data-set
                     match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
+                    // Error case check for matches outside of the data slice
                     if (match) {
+                        // Check rectangle points are in the data slice
                         match = checkRectanglesPoints(overlappingRectangle, donutState.donutCircle, d);
                     }
                 }
@@ -120,7 +122,15 @@ export function drawRectangularSelection(donutState) {
     });
 }
 
-function checkRectanglesPoints(overlappingRectangle, donutCircle, d) {
+/**
+ * Function is checking if any of the rectangle points are between the start - end angle of a given data slice
+ * @param {overlappingRectangle} overlappingRectangle
+ * @param {donutState.donutCircle} donutCircle
+ * @param {d} dataSlice
+ * @returns boolean true if points are withing the slice angles and not in the middle
+ */
+function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
+    // Define all the points that need to checked
     let overlappingRectanglePoints = [
         { x: overlappingRectangle.x, y: overlappingRectangle.y },
         { x: overlappingRectangle.x + overlappingRectangle.width, y: overlappingRectangle.y },
@@ -130,46 +140,64 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, d) {
             y: overlappingRectangle.y + overlappingRectangle.height
         }
     ];
-    let xStart, yStart;
-    xStart = donutCircle.x + donutCircle.radius * Math.sin((0 - Math.PI) * -1);
-    yStart = donutCircle.y + donutCircle.radius * Math.cos((0 - Math.PI) * -1);
-
-    let startAxis = { x: xStart, y: yStart };
+    // Default start point coordinates of the donut-chart
+    let xStart = donutCircle.x + donutCircle.radius * Math.sin((0 - Math.PI) * -1);
+    let yStart = donutCircle.y + donutCircle.radius * Math.cos((0 - Math.PI) * -1);
+    let startPoint = { x: xStart, y: yStart };
+    // Default center point
     let centerPoint = { x: donutCircle.x, y: donutCircle.y };
+
     let validMatch = false;
-    console.log("Start Angle ", d.startAngle);
-    console.log("End Angle ", d.endAngle);
+    // Loop in each point
     for (let i = 0; i < overlappingRectanglePoints.length; i++) {
-        let angle = calculateAngle(centerPoint, overlappingRectanglePoints[i], startAxis);
-        console.log(i, " Angle: ", angle);
-        if (angle <= d.endAngle && angle >= d.startAngle) {
-            console.log("Yes");
-            if (!insideInnerCircle(overlappingRectanglePoints[i], donutCircle)) {
+        // Get the angle of the point
+        let angle = calculateAngle(centerPoint, overlappingRectanglePoints[i], startPoint);
+        // Verify that the angle of the point is within the bounds of the slice
+        if (angle <= dataSlice.endAngle && angle >= dataSlice.startAngle) {
+            // Exclude matches in the donut hole
+            if (!insideInnerCircle(overlappingRectanglePoints[i], centerPoint, donutCircle.innerRadius)) {
                 validMatch = true;
             }
         }
     }
     return validMatch;
 }
-
-function insideInnerCircle(point, circle) {
-    let distanceX = point.x - circle.x;
-    let distanceY = point.y - circle.y;
-    return distanceX * distanceX + distanceY * distanceY < circle.innerRadius * circle.innerRadius;
+/**
+ * Function checks if a point is inside a circle given the circle's centerPoint and radius
+ * @param {point} point
+ * @param {point} circleCenter
+ * @param {radius} radius
+ * @returns boolean true if point is inside the circle
+ */
+function insideInnerCircle(point, circleCenter, radius) {
+    let distanceX = point.x - circleCenter.x;
+    let distanceY = point.y - circleCenter.y;
+    return distanceX * distanceX + distanceY * distanceY < radius * radius;
 }
 
-function calculateAngle(centerPoint, rectanglePoint, startAxis) {
-    //https://stackoverflow.com/questions/3486172/angle-between-3-points
-    let centerToRectangle = {},
-        centerToStart = {};
-    centerToRectangle.x = centerPoint.x - rectanglePoint.x;
-    centerToRectangle.y = centerPoint.y - rectanglePoint.y;
-
-    centerToStart.x = centerPoint.x - startAxis.x;
-    centerToStart.y = centerPoint.y - startAxis.y;
-    let atanToRectPoint = Math.atan2(centerToRectangle.x, centerToRectangle.y);
-    let atanToStartPoint = Math.atan2(centerToStart.x, centerToStart.y);
+/**
+ * Function calculates the angle of between 3 points CRS -> point C is the centerPoint, point R is the rectanglePoint and point S is the startPoint
+ * resources: https://stackoverflow.com/questions/3486172/angle-between-3-points
+ * @param {point} centerPoint
+ * @param {point} rectanglePoint
+ * @param {point} startPoint
+ * @returns {angle} angle: returns the angle of CRS in radians between 0 and 2*PI
+ */
+function calculateAngle(centerPoint, rectanglePoint, startPoint) {
+    let distanceToRectangle = {};
+    let distanceToStart = {};
+    // Calculate the distance to rectangle
+    distanceToRectangle.x = centerPoint.x - rectanglePoint.x;
+    distanceToRectangle.y = centerPoint.y - rectanglePoint.y;
+    // Calculate the distance to start
+    distanceToStart.x = centerPoint.x - startPoint.x;
+    distanceToStart.y = centerPoint.y - startPoint.y;
+    // Calculate the arctangent
+    let atanToRectPoint = Math.atan2(distanceToRectangle.x, distanceToRectangle.y);
+    let atanToStartPoint = Math.atan2(distanceToStart.x, distanceToStart.y);
+    // Calculate the angle in -PI to + PI
     let angle = atanToStartPoint - atanToRectPoint;
+    // Handle negative radian angles and transform them to positive
     if (angle < 0) {
         angle = angle + 2 * Math.PI;
     }
