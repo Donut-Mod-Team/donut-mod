@@ -59,7 +59,6 @@ export async function createDonutState(mod) {
         let rows = leaf.rows();
         let yValue =  sumValue(rows, "Y");
         let percentage = calculatePercentageValue(yValue, totalYSum);
-        console.log(percentage)
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: yValue,
