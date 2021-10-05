@@ -62,13 +62,7 @@ export function drawRectangularSelection(donutState) {
          * @typedef selectionRectangle
          */
         const selectionRectangle = rectangle.node().getBoundingClientRect();
-        let xStart,yStart
-        xStart =
-            donutState.donutCircle.x +
-            donutState.donutCircle.radius * Math.sin((0 - Math.PI) * -1);
-        yStart =
-            donutState.donutCircle.y +
-            donutState.donutCircle.radius * Math.cos((0 - Math.PI) * -1);
+
         // Loop in each "path"-data-set and check if it's within the selection rectangle
         const svgRadarMarkedCircles = d3
             .select("#mod-container svg g")
@@ -93,104 +87,10 @@ export function drawRectangularSelection(donutState) {
                     let overlappingRectangle = getOverlappingRectangle(selectionRectangle, boundingClientRect);
                     // Check if the overlap-area is inside the middle of the donut.
                     // Handles error case where the rectangle selection overlaps only inside the middle of the donut but don't touch the data-set
-                    const overlap = canvas.append("path").attr("class", "rectangle").attr("visibility", "visible");
-                    overlap
-                        .attr(
-                            "d",
-                            drawRectangle(
-                                overlappingRectangle.x,
-                                overlappingRectangle.y,
-                                overlappingRectangle.width,
-                                overlappingRectangle.height
-                            )
-                        )
-                        .attr("visibility", "visible");
                     match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
-                    let xEnd =
-                        donutState.donutCircle.x +
-                        donutState.donutCircle.radius * Math.sin((0- Math.PI) * -1);
-                    let yEnd =
-                        donutState.donutCircle.y +
-                        donutState.donutCircle.radius * Math.cos((0 - Math.PI) * -1);
-
-                    let overlappingRectanglePoints = [{ x: overlappingRectangle.x, y: overlappingRectangle.y },
-                        { x: overlappingRectangle.x + overlappingRectangle.width, y: overlappingRectangle.y },
-                        { x: overlappingRectangle.x, y: overlappingRectangle.y + overlappingRectangle.height },
-                        { x: overlappingRectangle.x + overlappingRectangle.width, y: overlappingRectangle.y + overlappingRectangle.height } ];
-
-                    let startAxis = { x: xStart, y: yStart };
-                    let centerPoint = { x: donutState.donutCircle.x, y: donutState.donutCircle.y };
-                    console.log("Start Angle ",d.startAngle)
-                    console.log("End Angle ", d.endAngle)
-                    for (let i = 0; i < overlappingRectanglePoints.length; i++) {
-                        let angle = calculateAngle(centerPoint,overlappingRectanglePoints[i],startAxis);
-                        console.log(i, " Angle: ", angle)
-                        if (angle <= d.endAngle && angle >= d.startAngle) {
-                            console.log("Yes")
-                            // TODO check if it's inside the middle
-                        }
-                        match = false;
+                    if (match) {
+                        match = checkRectanglesPoints(overlappingRectangle, donutState.donutCircle, d);
                     }
-                    canvas
-                        .append("line")
-                        .style("stroke", "green")
-                        .style("stroke-width", 1)
-                        .attr("x1", xStart)
-                        .attr("y1", yStart)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
-                    canvas
-                        .append("line")
-                        .style("stroke", "red")
-                        .style("stroke-width", 1)
-                        .attr("x1", xEnd)
-                        .attr("y1", yEnd)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
-                    let xTopLeft = overlappingRectangle.x;
-                    let yTopLeft = overlappingRectangle.y;
-
-                    let xTopRight = overlappingRectangle.x + overlappingRectangle.width;
-                    let yTopRight = overlappingRectangle.y;
-
-                    let xBLeft = overlappingRectangle.x;
-                    let yBleft = overlappingRectangle.y + overlappingRectangle.height;
-
-                    let xBRight = overlappingRectangle.x + overlappingRectangle.width;
-                    let yBRight = overlappingRectangle.y + overlappingRectangle.height;
-
-                    canvas
-                        .append("line")
-                        .style("stroke", "blue")
-                        .style("stroke-width", 1)
-                        .attr("x1", xBRight)
-                        .attr("y1", yBRight)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
-                    canvas
-                        .append("line")
-                        .style("stroke", "blue")
-                        .style("stroke-width", 1)
-                        .attr("x1", xBLeft)
-                        .attr("y1", yBleft)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
-                    canvas
-                        .append("line")
-                        .style("stroke", "blue")
-                        .style("stroke-width", 1)
-                        .attr("x1", xTopLeft)
-                        .attr("y1", yTopLeft)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
-                    canvas
-                        .append("line")
-                        .style("stroke", "blue")
-                        .style("stroke-width", 1)
-                        .attr("x1", xTopRight)
-                        .attr("y1", yTopRight)
-                        .attr("x2", donutState.donutCircle.x)
-                        .attr("y2", donutState.donutCircle.y);
                 }
                 return match;
             });
@@ -219,9 +119,49 @@ export function drawRectangularSelection(donutState) {
             });
     });
 }
+
+function checkRectanglesPoints(overlappingRectangle, donutCircle, d) {
+    let overlappingRectanglePoints = [
+        { x: overlappingRectangle.x, y: overlappingRectangle.y },
+        { x: overlappingRectangle.x + overlappingRectangle.width, y: overlappingRectangle.y },
+        { x: overlappingRectangle.x, y: overlappingRectangle.y + overlappingRectangle.height },
+        {
+            x: overlappingRectangle.x + overlappingRectangle.width,
+            y: overlappingRectangle.y + overlappingRectangle.height
+        }
+    ];
+    let xStart, yStart;
+    xStart = donutCircle.x + donutCircle.radius * Math.sin((0 - Math.PI) * -1);
+    yStart = donutCircle.y + donutCircle.radius * Math.cos((0 - Math.PI) * -1);
+
+    let startAxis = { x: xStart, y: yStart };
+    let centerPoint = { x: donutCircle.x, y: donutCircle.y };
+    let validMatch = false;
+    console.log("Start Angle ", d.startAngle);
+    console.log("End Angle ", d.endAngle);
+    for (let i = 0; i < overlappingRectanglePoints.length; i++) {
+        let angle = calculateAngle(centerPoint, overlappingRectanglePoints[i], startAxis);
+        console.log(i, " Angle: ", angle);
+        if (angle <= d.endAngle && angle >= d.startAngle) {
+            console.log("Yes");
+            if (!insideInnerCircle(overlappingRectanglePoints[i], donutCircle)) {
+                validMatch = true;
+            }
+        }
+    }
+    return validMatch;
+}
+
+function insideInnerCircle(point, circle) {
+    let distanceX = point.x - circle.x;
+    let distanceY = point.y - circle.y;
+    return distanceX * distanceX + distanceY * distanceY < circle.innerRadius * circle.innerRadius;
+}
+
 function calculateAngle(centerPoint, rectanglePoint, startAxis) {
     //https://stackoverflow.com/questions/3486172/angle-between-3-points
-    let centerToRectangle={}, centerToStart={};
+    let centerToRectangle = {},
+        centerToStart = {};
     centerToRectangle.x = centerPoint.x - rectanglePoint.x;
     centerToRectangle.y = centerPoint.y - rectanglePoint.y;
 
@@ -230,8 +170,8 @@ function calculateAngle(centerPoint, rectanglePoint, startAxis) {
     let atanToRectPoint = Math.atan2(centerToRectangle.x, centerToRectangle.y);
     let atanToStartPoint = Math.atan2(centerToStart.x, centerToStart.y);
     let angle = atanToStartPoint - atanToRectPoint;
-    if (angle<0) {
-        angle = angle + 2*Math.PI
+    if (angle < 0) {
+        angle = angle + 2 * Math.PI;
     }
     return angle;
 }
