@@ -73,7 +73,7 @@ export async function createDonutState(mod) {
                 to get the corresponding leaf data onto the tooltip. */
                 return colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n" +
                         yAxis.parts[0].displayName + ": " + sumValue(rows, "Y") + "\n"
-                        + percentage + "%";
+                        + "Ratio: " + percentage + "%";
             }
         };
     });
