@@ -54,6 +54,10 @@ export async function render(donutState) {
         })
         .on("mouseleave", function () {
             donutState.modControls.tooltip.hide();
+            d3.select(this).style("stroke", "none")
+        })
+        .on("mouseover", function (){
+            d3.select(this).style("stroke", donutState.context.styling.general.font.color)
         })
         .attr("fill", () => "transparent");
 
