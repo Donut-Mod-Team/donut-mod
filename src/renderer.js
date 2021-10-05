@@ -63,7 +63,7 @@ export async function render(donutState) {
         .attr("class", "sector")
         .transition()
         .duration(animationDuration)
-        .attr("value", (d) => (calculatePercentageValue(d)))
+        .attr("value", (d) => (d.data.absPercentage))
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
@@ -82,7 +82,7 @@ export async function render(donutState) {
                     .style("opacity", 1)
                     .attr("dy", "0.35em")
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
-                    .text((d) => (calculatePercentageValue(d) + "%"))
+                    .text((d) => (d.data.absPercentage + "%"))
                     .attr("text-anchor", "middle")
                     .attr("overflow", "visible")
                     .call((enter) =>
@@ -99,7 +99,7 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => (calculatePercentageValue(d) + "%"))
+                        .text((d) => (d.data.absPercentage + "%"))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.context.styling.general.font.color)
 
@@ -128,14 +128,6 @@ export async function render(donutState) {
         let h = Math.sqrt(x * x + y * y);
         return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
 
-    }
-
-    // Calculates the percentage value for the specific data and returns it
-    // with a set "decimalPlaces" accuracy
-    //http://www.jacklmoore.com/notes/rounding-in-javascript/
-    function calculatePercentageValue(d) {
-        let decimalPlaces = 1;
-        return Number(Math.round(parseFloat((d.data.absValue / donutState.sumOfValues * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
     }
 
     marker.drawRectangularSelection(donutState);
