@@ -140,10 +140,7 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
             y: overlappingRectangle.y + overlappingRectangle.height
         }
     ];
-    // Default start point coordinates of the donut-chart
-    let xStart = donutCircle.x + donutCircle.radius * Math.sin((0 - Math.PI) * -1);
-    let yStart = donutCircle.y + donutCircle.radius * Math.cos((0 - Math.PI) * -1);
-    let startPoint = { x: xStart, y: yStart };
+    let startPoint = getPointFromCircle(donutCircle, 0, donutCircle.radius);
     // Default center point
     let centerPoint = { x: donutCircle.x, y: donutCircle.y };
 
@@ -157,6 +154,11 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
             // Exclude matches in the donut hole
             if (!insideInnerCircle(overlappingRectanglePoints[i], centerPoint, donutCircle.innerRadius)) {
                 validMatch = true;
+            } else {
+                // Check if the overlapping rectangle intersects with the current sides of the sector
+                if (checkIfRectangleIntersectsSides(dataSlice.startAngle, dataSlice.endAngle, donutCircle, overlappingRectangle)) {
+                    validMatch = true;
+                }
             }
         }
     }
@@ -284,4 +286,117 @@ function rectangularCircleColliding(selectionRectangle, donutCircle) {
 
 function clamp(min, max, value) {
     return Math.max(max, Math.min(min, value));
+}
+
+/**
+ * Function that returns a point on the circumference of a circle
+ * @param {point} centerPoint
+ * @param {number} angle: measured in radians
+ * @param {radius} radius
+ * @returns {point} point on the circle's circumference
+ *  */
+function getPointFromCircle(centerPoint, angle, radius) {
+    // Default start point coordinates of the donut-chart
+    let xStart = centerPoint.x + radius * Math.sin((angle - Math.PI) * -1);
+    let yStart = centerPoint.y + radius * Math.cos((angle - Math.PI) * -1);
+
+    return {x: xStart, y: yStart}
+}
+
+/**
+ * Function that checks if the rectangle intersects with the circle's sector
+ * @param {angle} startAngle: measured in radians
+ * @param {angle} endAngle: measured in radians
+ * @param {donutCircle} donutCircle
+ * @param {overlappingRectangle} rectangle
+ * @returns {boolean} true when there exists at least one intersection, false otherwise
+ *  */
+function checkIfRectangleIntersectsSides(startAngle, endAngle, donutCircle, rectangle) {
+
+    let startOuterPoint = getPointFromCircle(donutCircle, startAngle, donutCircle.radius);
+    let startInnerPoint = getPointFromCircle(donutCircle, startAngle, donutCircle.innerRadius);
+
+    let endOuterPoint = getPointFromCircle(donutCircle, endAngle, donutCircle.radius);
+    let endInnerPoint = getPointFromCircle(donutCircle, endAngle, donutCircle.innerRadius);
+
+    let startLine = {innerPoint: startInnerPoint, outerPoint: startOuterPoint};
+    let endLine = {innerPoint: endInnerPoint, outerPoint: endOuterPoint};
+
+    let rectangleSides = [
+        // Top side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y},
+        // Bottom side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y + rectangle.height, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        // Right side of the rectangle
+        {x1: rectangle.x + rectangle.width, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        // Left side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height}
+    ]
+
+    let intersections = [];
+
+    // Concatenation of the intersection array's results into one
+    intersections = intersections.concat(checkIfRectangleSidesIntersectLine(startLine, rectangleSides));
+    intersections = intersections.concat(checkIfRectangleSidesIntersectLine(endLine, rectangleSides));
+
+    // If the length of the intersections array is > 0, then it means we found at least one intersection between the lines and the rectangle
+    return intersections.length > 0;
+}
+
+/**
+ * Function that checks if the provided rectangle sides intersect with a given line
+ * @param {line} line
+ * @param {rectangleSides} rectangleSides
+ * @returns {array} intersections
+ *  */
+function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
+    let intersections = [];
+    for (let i = 0; i < rectangleSides.length; i++){
+        let denominator = calculateDenominator(line, rectangleSides[i]);
+
+        if (denominator !== 0) {
+            let gamma = calculateGamma(line, rectangleSides[i], denominator);
+            let lambda = calculateLambda(line, rectangleSides[i], denominator);
+
+            if ((0 < lambda && lambda < 1) && (0 < gamma && gamma < 1)) {
+                intersections.push(true);
+            }
+        }
+    }
+    return intersections;
+}
+
+/**
+ * Function that calculates the denominator used for the intersection calculations between two lines
+ * @param {line} line
+ * @param {rectangleLine} rectangleLine
+ * @returns {number}
+ *  */
+function calculateDenominator(line, rectangleLine) {
+    return ((line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - rectangleLine.y1) -
+        (rectangleLine.x2 - rectangleLine.x1) * (line.outerPoint.y - line.innerPoint.y));
+}
+
+/**
+ * Function that calculates the lambda used for the intersection calculations between two lines
+ * @param {line} line
+ * @param {rectangleLine} rectangleLine
+ * @param {number} denominator
+ * @returns {number}
+ *  */
+function calculateLambda(line, rectangleLine, denominator) {
+    return denominator !== 0 ? ((rectangleLine.y2 - rectangleLine.y1) * (rectangleLine.x2 - line.innerPoint.x)
+    + (rectangleLine.x1 - rectangleLine.x2) * (rectangleLine.y2 - line.innerPoint.y)) / denominator : 0;
+}
+
+/**
+ * Function that calculates the gamma used for the intersection calculations between two lines
+ * @param {line} line
+ * @param {rectangleLine} rectangleLine
+ * @param {number} denominator
+ * @returns {number}
+ *  */
+function calculateGamma(line, rectangleLine, denominator) {
+    return denominator !== 0 ? ((line.innerPoint.y - line.outerPoint.y) * (rectangleLine.x2 - line.innerPoint.x)
+    + (line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - line.innerPoint.y)) / denominator : 0;
 }
