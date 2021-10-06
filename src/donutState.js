@@ -54,22 +54,25 @@ export async function createDonutState(mod) {
 
     let colorLeaves = colorRoot.leaves();
 
-    let sumOfValues = 0;
+    let totalYSum = calculateTotalYSum(colorLeaves);
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
-        let yValue = sumValue(rows, "Y")
-        sumOfValues += Math.abs(yValue);
+        let yValue =  sumValue(rows, "Y");
+        let percentage = calculatePercentageValue(yValue, totalYSum);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: yValue,
             absValue: Math.abs(yValue),
             id: leaf.key,
+            percentage: percentage,
+            absPercentage: Math.abs(percentage),
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
                 to get the corresponding leaf data onto the tooltip. */
-                return colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n" +
-                        yAxis.parts[0].displayName + ": " + sumValue(rows, "Y");
+                return "Ratio: " + percentage + "%" + "\n" +
+                        yAxis.parts[0].displayName + ": " + roundNumber(yValue, 2) + "\n" +
+                        colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n";
             }
         };
     });
@@ -83,7 +86,6 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        sumOfValues: sumOfValues,
         clearMarking: () => dataView.clearMarking()
     };
 
@@ -97,4 +99,23 @@ export async function createDonutState(mod) {
  */
 function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
+}
+
+function calculateTotalYSum(leaves) {
+    let sumOfValues = 0;
+    leaves.map((leaf) => {
+        let rows = leaf.rows();
+        let yValue = sumValue(rows, "Y");
+        sumOfValues += Math.abs(yValue);
+    })
+    return sumOfValues;
+}
+
+
+function calculatePercentageValue(value, totalYSum) {
+    return roundNumber(value / totalYSum * 100, 1);
+}
+
+function roundNumber(value, decimals) {
+    return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
 }
