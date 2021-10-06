@@ -91,12 +91,7 @@ export async function render(donutState) {
                             .duration(animationDuration)
                             .style("opacity", 1)
                             .attr("transform", calculateLabelPosition)
-                    ).each(function (d) {
-                        var bb = this.getBoundingClientRect(),
-                            center = arc.centroid(d);
-                        console.log("DATA",d)
-                        console.log(this)
-                    }).style('display', function (d) { return d.visible ? null : "visible"; });
+                    );
             },
             (update) =>
                 update.call((update) =>
