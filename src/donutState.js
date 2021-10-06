@@ -70,9 +70,9 @@ export async function createDonutState(mod) {
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
                 to get the corresponding leaf data onto the tooltip. */
-                return colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n" +
-                        yAxis.parts[0].displayName + ": " + sumValue(rows, "Y") + "\n"
-                        + "Ratio: " + percentage + "%";
+                return "Ratio: " + percentage + "%" + "\n" +
+                        yAxis.parts[0].displayName + ": " + roundNumber(yValue, 2) + "\n" +
+                        colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n";
             }
         };
     });
@@ -112,10 +112,10 @@ function calculateTotalYSum(leaves) {
 }
 
 
-// Calculates the percentage value for the specific data and returns it
-// with a set "decimalPlaces" accuracy
-//http://www.jacklmoore.com/notes/rounding-in-javascript/
 function calculatePercentageValue(value, totalYSum) {
-    let decimalPlaces = 1;
-    return Number(Math.round(parseFloat((value / totalYSum * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
+    return roundNumber(value / totalYSum * 100, 1);
+}
+
+function roundNumber(value, decimals) {
+    return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
 }
