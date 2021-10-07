@@ -101,6 +101,9 @@ function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
 }
 
+
+/* Function sums the values of each leaf in the data
+* and returns it */
 function calculateTotalYSum(leaves) {
     let sumOfValues = 0;
     leaves.map((leaf) => {
@@ -111,11 +114,15 @@ function calculateTotalYSum(leaves) {
     return sumOfValues;
 }
 
-
+/* Function calculates the percentage value of value as nominator
+and totalYSum as denominator
+ */
 function calculatePercentageValue(value, totalYSum) {
     return roundNumber(value / totalYSum * 100, 1);
 }
 
-function roundNumber(value, decimals) {
+/* Function takes a float value and returns it with
+* set amount of decimals */
+export function roundNumber(value, decimals) {
     return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
 }

@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
+import {roundNumber} from "./donutState"
 
 /**
  * @param {object} donutState
@@ -82,9 +83,11 @@ export async function render(donutState) {
             (enter) => {
                 return enter
                     .append("text")
-                    .attr("fill", donutState.context.styling.general.font.color)
-                    .style("opacity", 1)
+                    .style("opacity", 0)
                     .attr("dy", "0.35em")
+                    .attr("fill", donutState.context.styling.general.font.color)
+                    .attr("font-family", donutState.context.styling.general.font.fontFamily)
+                    .attr("font-weight", donutState.context.styling.general.font.fontWeight)
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
                     .text((d) => (d.data.absPercentage + "%"))
                     .attr("text-anchor", "middle")
@@ -109,15 +112,23 @@ export async function render(donutState) {
 
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-
         );
+
+    d3
+        .select("#centertext")
+        .text("Sum: " + calculateMiddleText(donutState.data))
+        .attr("fill", donutState.context.styling.general.font.color)
+        .attr("font-family", donutState.context.styling.general.font.fontFamily)
+        .attr("font-weight", donutState.context.styling.general.font.fontWeight)
+        .attr("font-size", donutState.context.styling.general.font.fontSize)
+
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
         this.__prev = elem;
 
-        var i = d3.interpolate(prevValue, newValue);
+        let i = d3.interpolate(prevValue, newValue);
 
         return function (value) {
             return arc(i(value));
@@ -132,6 +143,15 @@ export async function render(donutState) {
         let h = Math.sqrt(x * x + y * y);
         return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
 
+    }
+
+
+    function calculateMiddleText(data) {
+        let middleText = 0;
+        for (let i = 0; i < data.length; i++) {
+            middleText+= data[i].absValue
+        }
+        return roundNumber(middleText, 2);
     }
 
     marker.drawRectangularSelection(donutState);
