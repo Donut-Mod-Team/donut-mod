@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import {roundNumber} from "./donutState"
+import {roundNumber} from "./utility"
 
 /**
  * @param {object} donutState
@@ -149,7 +149,7 @@ export async function render(donutState) {
     function calculateMiddleText(data) {
         let middleText = 0;
         for (let i = 0; i < data.length; i++) {
-            middleText+= data[i].absValue
+            middleText+= data[i].absValue;
         }
         return roundNumber(middleText, 2);
     }
