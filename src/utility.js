@@ -196,3 +196,13 @@ function calculateGamma(line, rectangleLine, denominator) {
     return denominator !== 0 ? ((line.innerPoint.y - line.outerPoint.y) * (rectangleLine.x2 - line.innerPoint.x)
         + (line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - line.innerPoint.y)) / denominator : 0;
 }
+
+/** Function takes a float value and returns it with
+ * set amount of decimals
+ * @param {Number} value
+ * @param {int} decimals
+ * @return {Number}
+ */
+export function roundNumber(value, decimals) {
+    return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
+}

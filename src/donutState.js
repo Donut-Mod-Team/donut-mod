@@ -1,3 +1,5 @@
+import {roundNumber} from "./utility";
+
 /**
  * Render the visualization
  * @param {Spotfire.Mod} mod API
@@ -101,6 +103,11 @@ function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
 }
 
+
+/** Function sums the values of each leaf in the data
+ * @param {leaves} leaves
+ * @return {Number} sumOfValues
+ * */
 function calculateTotalYSum(leaves) {
     let sumOfValues = 0;
     leaves.map((leaf) => {
@@ -111,11 +118,12 @@ function calculateTotalYSum(leaves) {
     return sumOfValues;
 }
 
-
+/** Function calculates the percentage value of two given params
+ * @param {Number} value
+ * @param {Number} totalYSum
+ * @return {Number}
+ */
 function calculatePercentageValue(value, totalYSum) {
     return roundNumber(value / totalYSum * 100, 1);
 }
 
-function roundNumber(value, decimals) {
-    return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
-}
