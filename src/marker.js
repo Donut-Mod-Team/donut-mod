@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import * as utilityCalculator from "./utility"
 
 /**
  * Method for selecting a dataset
@@ -67,7 +68,7 @@ export function drawRectangularSelection(donutState) {
         const svgRadarMarkedCircles = d3
             .select("#mod-container svg g")
             .selectAll("path")
-            .filter(function () {
+            .filter(function (d) {
                 /**
                  * Get the coordinates of the bounding rectangle around the path element
                  * @typedef boundingClientRect
@@ -77,17 +78,22 @@ export function drawRectangularSelection(donutState) {
                 // Check if the selection and bounding rectangles overlap and check if the selection rectangle is within the donut-circle
                 // (handles edge case rectangle outside circle giving false positive)
                 if (
-                    checkIfRectanglesOverlap(selectionRectangle, boundingClientRect) &&
-                    rectangularCircleColliding(selectionRectangle, donutState.donutCircle)
+                    utilityCalculator.checkIfRectanglesOverlap(selectionRectangle, boundingClientRect) &&
+                    utilityCalculator.rectangularCircleColliding(selectionRectangle, donutState.donutCircle)
                 ) {
                     /**
                      * Get the overlapping rectangle-area coordinates ( given that both rectangles are static(not rotated) on the dom the overlap is a rectangle as well)
                      * @typedef overlappingRectangle
                      */
-                    let overlappingRectangle = getOverlappingRectangle(selectionRectangle, boundingClientRect);
+                    let overlappingRectangle = utilityCalculator.getOverlappingRectangle(selectionRectangle, boundingClientRect);
                     // Check if the overlap-area is inside the middle of the donut.
                     // Handles error case where the rectangle selection overlaps only inside the middle of the donut but don't touch the data-set
-                    match = !checkIfRectangularIsInMiddle(overlappingRectangle, donutState.donutCircle);
+                    match = !utilityCalculator.checkIfRectangularIsInCircle(overlappingRectangle, donutState.donutCircle, donutState.donutCircle.innerRadius);
+                    // Error case check for matches outside of the data slice
+                    if (match) {
+                        // Check rectangle points are in the data slice
+                        match = checkRectanglesPoints(overlappingRectangle, donutState.donutCircle, d);
+                    }
                 }
                 return match;
             });
@@ -118,83 +124,84 @@ export function drawRectangularSelection(donutState) {
 }
 
 /**
- * Function is checking if two rectangles overlap
- * resources: https://www.codegrepper.com/code-examples/javascript/check+if+two+rectangles+overlap+javascript+canvas
- * resourses: https://stackoverflow.com/questions/16005136/how-do-i-see-if-two-rectangles-intersect-in-javascript-or-pseudocode/29614525#29614525
- * @param {selectionRectangle} selectionRectangle
- * @param {boundingClientRect} boundingClientRect
- * @returns boolean true if rectangles overlap
- */
-function checkIfRectanglesOverlap(selectionRectangle, boundingClientRect) {
-    return !(
-        selectionRectangle.left >= boundingClientRect.right ||
-        selectionRectangle.top >= boundingClientRect.bottom ||
-        selectionRectangle.right <= boundingClientRect.left ||
-        selectionRectangle.bottom <= boundingClientRect.top
-    );
-}
-
-/**
- * Function is checking if an rectangle is in the empty middle space of the donut-chart
- * recourses: https://stackoverflow.com/questions/14097290/check-if-circle-contains-rectangle
+ * Function is checking if any of the rectangle points are between the start - end angle of a given data slice
  * @param {overlappingRectangle} overlappingRectangle
- * @param {donutCircle} donutCircle
- * @returns boolean true if rectangle is in the middle of the donut-chart
- *  */
-function checkIfRectangularIsInMiddle(overlappingRectangle, donutCircle) {
-    let distanceX = Math.max(
-        donutCircle.x - overlappingRectangle.x,
-        overlappingRectangle.x + overlappingRectangle.width - donutCircle.x
-    );
-
-    let distanceY = Math.max(
-        donutCircle.y - overlappingRectangle.y,
-        overlappingRectangle.y + overlappingRectangle.height - donutCircle.y
-    );
-
-    return donutCircle.innerRadius * donutCircle.innerRadius >= distanceX * distanceX + distanceY * distanceY;
-}
-
-/**
- * Function returns the overlapped area rectangle given two rectangles
- * recourses: https://stackoverflow.com/questions/22437523/return-intersection-position-and-size
- * @param {selectionRectangle} selectionRectangle
- * @param {boundingClientRect} boundingClientRect
- * @returns {overlappingRectangle} overlappingRectangle
- *  */
-function getOverlappingRectangle(selectionRectangle, boundingClientRect) {
-    let x = Math.max(selectionRectangle.x, boundingClientRect.x);
-    let y = Math.max(selectionRectangle.y, boundingClientRect.y);
-
-    let widthX = Math.min(
-        selectionRectangle.x + selectionRectangle.width,
-        boundingClientRect.x + boundingClientRect.width
-    );
-    let heightY = Math.min(
-        selectionRectangle.y + selectionRectangle.height,
-        boundingClientRect.y + boundingClientRect.height
-    );
-
-    return { x: x, y: y, width: widthX - x, height: heightY - y };
-}
-/**
- * Function is checking if two rectangles overlap
- * resources: https://www.geeksforgeeks.org/check-if-any-point-overlaps-the-given-circle-and-rectangle/
- * @param {selectionRectangle} selectionRectangle
  * @param {donutState.donutCircle} donutCircle
- * @returns boolean true if rectangle overlaps/collides with the donut chart
+ * @param {d} dataSlice
+ * @returns boolean true if points are withing the slice angles and not in the middle
  */
-function rectangularCircleColliding(selectionRectangle, donutCircle) {
-    let closestX = clamp(donutCircle.x, selectionRectangle.x, selectionRectangle.x + selectionRectangle.width);
-    let closestY = clamp(donutCircle.y, selectionRectangle.y, selectionRectangle.y + selectionRectangle.height);
+function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
+    // Define all the points that need to checked
+    let overlappingRectanglePoints = [
+        { x: overlappingRectangle.x, y: overlappingRectangle.y },
+        { x: overlappingRectangle.x + overlappingRectangle.width, y: overlappingRectangle.y },
+        { x: overlappingRectangle.x, y: overlappingRectangle.y + overlappingRectangle.height },
+        {
+            x: overlappingRectangle.x + overlappingRectangle.width,
+            y: overlappingRectangle.y + overlappingRectangle.height
+        }
+    ];
+    let startPoint = utilityCalculator.getPointFromCircle(donutCircle, 0, donutCircle.radius);
+    // Default center point
+    let centerPoint = { x: donutCircle.x, y: donutCircle.y };
 
-    let distanceX = donutCircle.x - closestX;
-    let distanceY = donutCircle.y - closestY;
-    let distanceSquared = distanceX * distanceX + distanceY * distanceY;
-
-    return distanceSquared <= donutCircle.radius * donutCircle.radius;
+    let validMatch = false;
+    // Loop in each point
+    for (let i = 0; i < overlappingRectanglePoints.length; i++) {
+        // Get the angle of the point
+        let angle = utilityCalculator.calculateAngle(centerPoint, overlappingRectanglePoints[i], startPoint);
+        // Verify that the angle of the point is within the bounds of the slice
+        if (angle <= dataSlice.endAngle && angle >= dataSlice.startAngle) {
+            // Exclude matches in the donut hole
+            if (!utilityCalculator.checkIfPointIsInsideCircle(overlappingRectanglePoints[i], centerPoint, donutCircle.innerRadius)) {
+                validMatch = true;
+            } else {
+                // Check if the overlapping rectangle intersects with the current sides of the sector
+                if (checkIfRectangleIntersectsSides(dataSlice.startAngle, dataSlice.endAngle, donutCircle, overlappingRectangle)) {
+                    validMatch = true;
+                }
+            }
+        }
+    }
+    return validMatch;
 }
 
-function clamp(min, max, value) {
-    return Math.max(max, Math.min(min, value));
+/**
+ * Function that checks if the rectangle intersects with the circle's sector
+ * @param {angle} startAngle: measured in radians
+ * @param {angle} endAngle: measured in radians
+ * @param {donutCircle} donutCircle
+ * @param {overlappingRectangle} rectangle
+ * @returns {boolean} true when there exists at least one intersection, false otherwise
+ *  */
+function checkIfRectangleIntersectsSides(startAngle, endAngle, donutCircle, rectangle) {
+
+    let startOuterPoint = utilityCalculator.getPointFromCircle(donutCircle, startAngle, donutCircle.radius);
+    let startInnerPoint = utilityCalculator.getPointFromCircle(donutCircle, startAngle, donutCircle.innerRadius);
+
+    let endOuterPoint = utilityCalculator.getPointFromCircle(donutCircle, endAngle, donutCircle.radius);
+    let endInnerPoint = utilityCalculator.getPointFromCircle(donutCircle, endAngle, donutCircle.innerRadius);
+
+    let startLine = {innerPoint: startInnerPoint, outerPoint: startOuterPoint};
+    let endLine = {innerPoint: endInnerPoint, outerPoint: endOuterPoint};
+
+    let rectangleSides = [
+        // Top side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y},
+        // Bottom side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y + rectangle.height, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        // Right side of the rectangle
+        {x1: rectangle.x + rectangle.width, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        // Left side of the rectangle
+        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height}
+    ]
+
+    let intersections = [];
+
+    // Concatenation of the intersection array's results into one
+    intersections = intersections.concat(utilityCalculator.checkIfRectangleSidesIntersectLine(startLine, rectangleSides));
+    intersections = intersections.concat(utilityCalculator.checkIfRectangleSidesIntersectLine(endLine, rectangleSides));
+
+    // If the length of the intersections array is > 0, then it means we found at least one intersection between the lines and the rectangle
+    return intersections.length > 0;
 }
