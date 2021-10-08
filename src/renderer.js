@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
+import {roundNumber} from "./utility"
 
 /**
  * @param {object} donutState
@@ -54,6 +55,10 @@ export async function render(donutState) {
         })
         .on("mouseleave", function () {
             donutState.modControls.tooltip.hide();
+            d3.select(this).style("stroke", "none")
+        })
+        .on("mouseover", function (){
+            d3.select(this).style("stroke", donutState.context.styling.general.font.color)
         })
         .attr("fill", () => "transparent");
 
@@ -63,7 +68,7 @@ export async function render(donutState) {
         .attr("class", "sector")
         .transition()
         .duration(animationDuration)
-        .attr("value", (d) => (calculatePercentageValue(d)))
+        .attr("value", (d) => (d.data.absPercentage))
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
@@ -78,11 +83,13 @@ export async function render(donutState) {
             (enter) => {
                 return enter
                     .append("text")
-                    .attr("fill", donutState.context.styling.general.font.color)
-                    .style("opacity", 1)
+                    .style("opacity", 0)
                     .attr("dy", "0.35em")
+                    .attr("fill", donutState.context.styling.general.font.color)
+                    .attr("font-family", donutState.context.styling.general.font.fontFamily)
+                    .attr("font-weight", donutState.context.styling.general.font.fontWeight)
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
-                    .text((d) => (calculatePercentageValue(d) + "%"))
+                    .text((d) => (d.data.absPercentage + "%"))
                     .attr("text-anchor", "middle")
                     .attr("overflow", "visible")
                     .call((enter) =>
@@ -99,21 +106,29 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => (calculatePercentageValue(d) + "%"))
+                        .text((d) => (d.data.absPercentage + "%"))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.context.styling.general.font.color)
 
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-
         );
+
+    d3
+        .select("#centertext")
+        .text("Sum: " + calculateMiddleText(donutState.data))
+        .attr("fill", donutState.context.styling.general.font.color)
+        .attr("font-family", donutState.context.styling.general.font.fontFamily)
+        .attr("font-weight", donutState.context.styling.general.font.fontWeight)
+        .attr("font-size", donutState.context.styling.general.font.fontSize)
+
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
         this.__prev = elem;
 
-        var i = d3.interpolate(prevValue, newValue);
+        let i = d3.interpolate(prevValue, newValue);
 
         return function (value) {
             return arc(i(value));
@@ -130,12 +145,13 @@ export async function render(donutState) {
 
     }
 
-    // Calculates the percentage value for the specific data and returns it
-    // with a set "decimalPlaces" accuracy
-    //http://www.jacklmoore.com/notes/rounding-in-javascript/
-    function calculatePercentageValue(d) {
-        let decimalPlaces = 1;
-        return Number(Math.round(parseFloat((d.data.absValue / donutState.sumOfValues * 100) + 'e' + decimalPlaces)) + 'e-' + decimalPlaces);
+
+    function calculateMiddleText(data) {
+        let middleText = 0;
+        for (let i = 0; i < data.length; i++) {
+            middleText+= data[i].absValue;
+        }
+        return roundNumber(middleText, 2);
     }
 
     marker.drawRectangularSelection(donutState);

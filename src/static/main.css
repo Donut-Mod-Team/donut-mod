@@ -81,3 +81,17 @@ form {
     stroke-opacity: 0;
     stroke-width: 7px;
 }
+
+#center {
+    position: absolute;
+    margin: 0 43%;
+    height: 20%;
+    width: 14%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#center #centertext {
+    white-space: nowrap;
+}

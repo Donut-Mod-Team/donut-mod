@@ -1,7 +1,7 @@
 {
     "apiVersion": "1.2",
     "version": "1.0",
-    "name": "Donut Mod",
+    "name": "Donut Chart",
     "id": "donut-modnp",
     "icon": "icon.svg",
     "properties": [
@@ -28,7 +28,7 @@
             {
                 "name": "Y",
                 "mode": "continuous",
-                "placement": "left"
+                "placement": "none"
             }
         ]
     },
