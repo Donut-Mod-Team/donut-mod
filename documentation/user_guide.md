@@ -18,9 +18,9 @@ To run the mod and install the necessary dependencies, [Node.js](https://nodejs.
 
 To install this mod:
 
-Option 1 latest release mod file: You first need to download the latest released mod file from the GitHub repository homepage where on the front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting the .mod file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file in Spotfire canvas.
+Option 1 latest release mod file: You first need to download the latest released mod file from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the under the releases tag, and, once on the release page, selecting the .mod file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file in Spotfire canvas.
 
-Option 2 latest release: You first need to download the latest released repository from the GitHub repository homepage where on the front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
+Option 2 latest release: You first need to download the latest released repository from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
 Once you have the repository downloaded and extracted, you navigate inside the folder using the command line.
 
 Option 3 latest development: You first need to download the repository from the GitHub repository homepage where on the front page by pressing the Code button and selecting one of the download options.
