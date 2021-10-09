@@ -96,7 +96,7 @@ export async function render(donutState) {
         .attr("d", function (d) {
             return outerArcNegativeValues(d);
         })
-        .attr("fill", "red")
+        .attr("class", "outerSectorArc")
         .style("opacity", getOpacityForOuterSide);
 
     // Define behavior on transition
@@ -106,7 +106,7 @@ export async function render(donutState) {
         .attr("d", function (d) {
             return outerArcNegativeValues(d);
         })
-        .attr("fill", "red")
+        .attr("class", "outerSectorArc")
         .style("opacity", getOpacityForOuterSide);
 
     outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
