@@ -16,6 +16,7 @@ export async function render(donutState) {
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
+    const padding = 0.1 / donutState.data.length;
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -29,11 +30,14 @@ export async function render(donutState) {
 
     const pie = d3.pie().value((d) => d.absValue);
 
-    const arc = d3
+    const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
+
+    // Used for the outer side showing negative values
+    let outerArcNegativeValues = d3
         .arc()
-        .padAngle(0.1 / donutState.data.length)
-        .innerRadius(innerRadius)
-        .outerRadius(radius);
+        .padAngle(padding)
+        .innerRadius(radius + 2) // makes the outer arc bigger than the original
+        .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
     // Join new data
     const sectors = svg
@@ -42,13 +46,6 @@ export async function render(donutState) {
         .data(pie(donutState.data), (d) => {
             return d.data.id;
         });
-
-    // Used for the outer side showing negative values
-    let outerArcNegativeValues = d3
-        .arc()
-        .padAngle(0.1 / donutState.data.length)
-        .innerRadius(radius + 2) // makes the outer arc bigger than the original
-        .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
     let newSectors = sectors
         .enter()
