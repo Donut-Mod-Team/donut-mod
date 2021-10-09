@@ -56,7 +56,7 @@ Congratulations! You should now be able to see the Donut Chart!
 
 ## How to use the mod:
 
-### Functionality
+### Functionality and Features
 
 #### Marking:
 - Select/Mark a data-set/slice by clicking(mouse left) on a sub-set of the donut.
