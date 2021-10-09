@@ -47,7 +47,7 @@ Congratulations! You should now be able to see the Donut Chart!
 
 ### Functionality
 
-####Marking:
+#### Marking:
 - Select by clicking(mouse left) on a sub-set of the donut.
 
 - Select and add to selection set by holding left-clicking and holding CTRL.
@@ -57,5 +57,8 @@ Congratulations! You should now be able to see the Donut Chart!
 - Adding to selection with CTRL working with rectangle selection.
 
 - Unselect by clicking on the background(within the mod canvas.
+
+#### Negative values
+- Visualize chart data-slices containing negative values in the data set by adding a red outline to the corresponding data slice
 
 
