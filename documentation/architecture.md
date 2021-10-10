@@ -4,7 +4,7 @@ This document gives a high level overview of the structural and behavioral archi
 
 ## Architectural drivers
 
-The main architectural driver that is being considered during development is usability. The team wants to make sure that the end-user does not have any major issues while operating the mode. Therefore the team is looking into other Spotfire and their behavior and functionality( in particular the Pie-chart) in order to make sure that the end-user does not get confuse but also that the Donut-Chart provides the functionality, behavior and look the end-user is used to expect from a Spotfire chart.
+The main architectural driver that is being considered during development is usability. The team wants to make sure that the end-user does not have any major issues while operating the mod. Therefore, the team is looking into other Spotfire mods, their behavior and functionality (in particular the Pie Chart), in order to ensure that the end-user does not get confused; but also that the Donut Chart provides the functionality, behavior and look the end-user expects from a Spotfire Visualization.
 ## Diagrams
 
 Overview of the system.
