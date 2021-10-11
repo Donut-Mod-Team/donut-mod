@@ -16,24 +16,37 @@ To run the mod and install the necessary dependencies, [Node.js](https://nodejs.
 
 <!--Describe the prerequisites and how to use the add-on mode, as well as data compatibility.-->
 
-To install this mod:
+### Option 1: Download and import the .mod file of a released version
+You first need to download the latest released mod file from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the under the releases tag, and, once on the release page, selecting the `Donut.Chart.v*.mod` file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file into the Spotfire canvas.
 
-Option 1 latest release mod file: You first need to download the latest released mod file from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the under the releases tag, and, once on the release page, selecting the .mod file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file into the Spotfire canvas.
-
-Option 2 latest release: You first need to download the latest released repository from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
+### Option 2: Download a released instance of the project's repository
+You first download the latest released repository from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
 Once you have the repository downloaded and extracted, you navigate inside the folder using the command line.
 
-Option 3 latest development: You first need to download the repository from the GitHub repository homepage where on the front page by pressing the Code button and selecting one of the download options.
-Once you have the repository downloaded and extracted, you navigate inside the folder using the command line.
+### Option 3: Get the latest version of the project's repository 
+You first need to clone or download the repository from the project's GitHub repository homepage, by pressing the `Code` button and selecting one of the cloning or download options.
+Once you have the repository downloaded and extracted, you navigate inside the folder using the command line. Alternatively, you can clone it via:
 
-For option 2 and 3 follow the steps bellow.
+>git clone https://github.com/Donut-Mod-Team/donut-mod.git
 
-Run:
+## Run the mod locally
 
->npm start
+### Working with a development server
 
-Followed by:
->npm run server
+- Open a couple of terminal instances inside the directory of the preferred version you want to run
+- In the first one, run `npm start`, which executes `npm install && npm run build-watch` in order to install all the tools and dependencies of this mod. In addition, it enables the tracking of any changes in the code, while continuously running until it is forced to stop.
+- In the other terminal instance, run `npm run server` that initiates the development server.
+
+### Working without a development server
+
+#### Using the repository's version from installation steps 2 and/or 3:
+- Run `npm install`, in order to install all the needed tools that this project depends on for its operation.
+- Run `npm run build`, which creates the `dist` folder, containing all the minimized and optimized output files of the build process (`bundle.js` and `mod-manifest.json` along with the rest of the static files that shall be loaded)
+- Open the desktop version of Spotfire, and by following the steps explained in the [official documentation](https://tibcosoftware.github.io/spotfire-mods/docs/getting-started) point to the `mod-manifest.json` that exists in the `dist` folder, which got created in the previous step.
+
+#### Having the `Donut.Chart.v*.mod` downloaded:
+- Enable `Editing` mode in Spotfire's top-right drop-down menu that was initially set to `Viewing`
+- Since you have the `Donut.Chart.v*.mod` file downloaded and stored locally, you can simply drag and drop it to Spotfire's application window
 
 Your mod should now be up and running, and all that is left is to connect it to Spotfire!
 
