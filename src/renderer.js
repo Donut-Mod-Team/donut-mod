@@ -151,8 +151,6 @@ export async function render(donutState) {
     function calculateTextVisibility(data) {
         if (data.data.absPercentage >= 5) {
             return data.data.absPercentage + "%";
-        } else {
-            return null;
         }
     }
     marker.drawRectangularSelection(donutState);
