@@ -2,7 +2,7 @@
 
 ## Dependencies
 
-To begin using this mod, there are a couple things you will need to install first, as discussed in [this article written by TIBCO Software](https://tibcosoftware.github.io/spotfire-mods/docs/getting-started/).
+To begin using this mod, there are a couple of things you will need to install first, as discussed in [this article written by TIBCO Software](https://tibcosoftware.github.io/spotfire-mods/docs/getting-started/).
 
 1. Spotfire:
 
@@ -89,9 +89,9 @@ Congratulations! You should now be able to see the Donut Chart!
 
 #### Hover
 
-- Black colour effect on the edges of the donut-slice shown when hovering over the slice
+- Black/White colour effect (depending on if it's a light or dark mode) on the edges of the donut-slice shown when hovering over the slice
 
 #### Labels
 
 - Labels displayed on each data slice showing the ratio/percentage of that slice
-- The colours of the labels changes depending if it's a light or dark mode
+- The colours of the labels changes depending on if it's a light or dark mode
