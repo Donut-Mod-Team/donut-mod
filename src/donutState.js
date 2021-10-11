@@ -1,4 +1,4 @@
-import {roundNumber} from "./utility";
+import { roundNumber } from "./utility";
 
 /**
  * Render the visualization
@@ -15,6 +15,7 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
+    const yAxisName = "Sector size by:";
 
     /**
      * Check for any errors.
@@ -39,16 +40,16 @@ export async function createDonutState(mod) {
         return;
     }
 
-    let dataViewYAxis = await dataView.continuousAxis("Y");
+    let dataViewYAxis = await dataView.continuousAxis(yAxisName);
     if (dataViewYAxis == null) {
-        mod.controls.errorOverlay.show("No data on y axis.", "y");
+        mod.controls.errorOverlay.show("No data on y axis.", yAxisName);
         return;
     } else {
-        mod.controls.errorOverlay.hide("y");
+        mod.controls.errorOverlay.hide(yAxisName);
     }
 
     // Awaiting and retrieving the Color and Y axis from the mod.
-    let yAxis = await mod.visualization.axis("Y");
+    let yAxis = await mod.visualization.axis(yAxisName);
     const colorAxisMeta = await mod.visualization.axis("Color");
 
     // Hide tooltip
@@ -56,10 +57,10 @@ export async function createDonutState(mod) {
 
     let colorLeaves = colorRoot.leaves();
 
-    let totalYSum = calculateTotalYSum(colorLeaves);
+    let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
-        let yValue =  sumValue(rows, "Y");
+        let yValue = sumValue(rows, yAxisName);
         let percentage = calculatePercentageValue(yValue, totalYSum);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
@@ -72,9 +73,20 @@ export async function createDonutState(mod) {
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
                 to get the corresponding leaf data onto the tooltip. */
-                return "Ratio: " + percentage + "%" + "\n" +
-                        yAxis.parts[0].displayName + ": " + roundNumber(yValue, 2) + "\n" +
-                        colorAxisMeta.parts[0].displayName + ": " + leaf.formattedValue() + "\n";
+                return (
+                    "Ratio: " +
+                    percentage +
+                    "%" +
+                    "\n" +
+                    yAxis.parts[0].displayName +
+                    ": " +
+                    roundNumber(yValue, 2) +
+                    "\n" +
+                    colorAxisMeta.parts[0].displayName +
+                    ": " +
+                    leaf.formattedValue() +
+                    "\n"
+                );
             }
         };
     });
@@ -103,18 +115,18 @@ function sumValue(rows, axis) {
     return rows.reduce((p, c) => +c.continuous(axis).value() + p, 0);
 }
 
-
 /** Function sums the values of each leaf in the data
  * @param {leaves} leaves
+ * @param {string} yAxisName
  * @return {Number} sumOfValues
  * */
-function calculateTotalYSum(leaves) {
+function calculateTotalYSum(leaves, yAxisName) {
     let sumOfValues = 0;
     leaves.map((leaf) => {
         let rows = leaf.rows();
-        let yValue = sumValue(rows, "Y");
+        let yValue = sumValue(rows, yAxisName);
         sumOfValues += Math.abs(yValue);
-    })
+    });
     return sumOfValues;
 }
 
@@ -124,6 +136,5 @@ function calculateTotalYSum(leaves) {
  * @return {Number}
  */
 function calculatePercentageValue(value, totalYSum) {
-    return roundNumber(value / totalYSum * 100, 1);
+    return roundNumber((value / totalYSum) * 100, 1);
 }
-
