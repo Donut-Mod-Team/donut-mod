@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import {roundNumber} from "./utility"
+import { roundNumber } from "./utility";
 
 /**
  * @param {object} donutState
@@ -29,18 +29,19 @@ export async function render(donutState) {
 
     const pie = d3.pie().value((d) => d.absValue);
 
-
     const arc = d3
         .arc()
         .padAngle(0.1 / donutState.data.length)
         .innerRadius(innerRadius)
         .outerRadius(radius);
 
-
     // Join new data
-    const sectors = svg.select("g#sectors").selectAll("path").data(pie(donutState.data), (d) => {
-        return d.data.id;
-    });
+    const sectors = svg
+        .select("g#sectors")
+        .selectAll("path")
+        .data(pie(donutState.data), (d) => {
+            return d.data.id;
+        });
 
     let newSectors = sectors
         .enter()
@@ -55,20 +56,19 @@ export async function render(donutState) {
         })
         .on("mouseleave", function () {
             donutState.modControls.tooltip.hide();
-            d3.select(this).style("stroke", "none")
+            d3.select(this).style("stroke", "none");
         })
-        .on("mouseover", function (){
-            d3.select(this).style("stroke", donutState.context.styling.general.font.color)
+        .on("mouseover", function () {
+            d3.select(this).style("stroke", donutState.context.styling.general.font.color);
         })
         .attr("fill", () => "transparent");
-
 
     sectors
         .merge(newSectors)
         .attr("class", "sector")
         .transition()
         .duration(animationDuration)
-        .attr("value", (d) => (d.data.absPercentage))
+        .attr("value", (d) => d.data.absPercentage)
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
@@ -89,9 +89,8 @@ export async function render(donutState) {
                     .attr("font-family", donutState.context.styling.general.font.fontFamily)
                     .attr("font-weight", donutState.context.styling.general.font.fontWeight)
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
-                    .text((d) => (d.data.absPercentage + "%"))
+                    .text((d) => calculateTextVisibility(d))
                     .attr("text-anchor", "middle")
-                    .attr("overflow", "visible")
                     .call((enter) =>
                         enter
                             .transition("add labels")
@@ -106,22 +105,19 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => (d.data.absPercentage + "%"))
+                        .text((d) => calculateTextVisibility(d))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.context.styling.general.font.color)
-
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
-    d3
-        .select("#centertext")
+    d3.select("#centertext")
         .text("Sum: " + calculateMiddleText(donutState.data))
         .attr("fill", donutState.context.styling.general.font.color)
         .attr("font-family", donutState.context.styling.general.font.fontFamily)
         .attr("font-weight", donutState.context.styling.general.font.fontWeight)
-        .attr("font-size", donutState.context.styling.general.font.fontSize)
-
+        .attr("font-size", donutState.context.styling.general.font.fontSize);
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
@@ -135,25 +131,30 @@ export async function render(donutState) {
         };
     }
 
-    function calculateLabelPosition(data){
-        let centeringFactor = radius * 0.75
-        let centroid = arc.centroid(data)
-        let x = centroid[0]
-        let y = centroid[1]
+    function calculateLabelPosition(data) {
+        let centeringFactor = radius * 0.75;
+        let centroid = arc.centroid(data);
+        let x = centroid[0];
+        let y = centroid[1];
         let h = Math.sqrt(x * x + y * y);
-        return "translate(" + (x/h * centeringFactor) +  ',' + (y/h * centeringFactor) +  ")";
-
+        return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
-
 
     function calculateMiddleText(data) {
         let middleText = 0;
         for (let i = 0; i < data.length; i++) {
-            middleText+= data[i].absValue;
+            middleText += data[i].absValue;
         }
         return roundNumber(middleText, 2);
     }
 
+    function calculateTextVisibility(data) {
+        if (data.data.absPercentage >= 5) {
+            return data.data.absPercentage + "%";
+        } else {
+            return null;
+        }
+    }
     marker.drawRectangularSelection(donutState);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
