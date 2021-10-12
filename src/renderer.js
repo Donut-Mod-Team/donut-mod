@@ -149,7 +149,9 @@ export async function render(donutState) {
     }
 
     function calculateTextVisibility(data) {
-        if (data.data.absPercentage >= 5) {
+        const minWidth = 126;
+        const minHeight = 126;
+        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
             return data.data.absPercentage + "%";
         }
     }
