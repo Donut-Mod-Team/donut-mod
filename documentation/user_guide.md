@@ -91,6 +91,10 @@ Congratulations! You should now be able to see the Donut Chart!
 
 - Black/White colour effect (depending on if it's a light or dark mode) on the edges of the donut-slice shown when hovering over the slice
 
+#### Negative values
+
+- Visualize chart data-slices containing negative values in the data set by adding a red outline to the corresponding data slice
+
 #### Labels
 
 - Labels displayed on each data slice showing the ratio/percentage of that slice
