@@ -16,6 +16,7 @@ export async function render(donutState) {
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
+    const padding = 0.1 / donutState.data.length;
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -29,11 +30,14 @@ export async function render(donutState) {
 
     const pie = d3.pie().value((d) => d.absValue);
 
-    const arc = d3
+    const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
+
+    // Used for the outer side showing negative values
+    let outerArcNegativeValues = d3
         .arc()
-        .padAngle(0.1 / donutState.data.length)
-        .innerRadius(innerRadius)
-        .outerRadius(radius);
+        .padAngle(padding)
+        .innerRadius(radius + 2) // makes the outer arc bigger than the original
+        .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
     // Join new data
     const sectors = svg
@@ -73,6 +77,37 @@ export async function render(donutState) {
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
 
+    // Define the outer arc paths and data
+    let outerSectorsNegativeValues = svg
+        .select("g#outer-sectors")
+        .attr("pointer-events", "none")
+        .selectAll("path")
+        .data(pie(donutState.data), (d) => {
+            return d.data.id;
+        });
+
+    // Initial rendering
+    outerSectorsNegativeValues
+        .enter()
+        .append("path")
+        .attr("d", function (d) {
+            return outerArcNegativeValues(d);
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    // Define behavior on transition
+    outerSectorsNegativeValues
+        .transition()
+        .duration(animationDuration)
+        .attr("d", function (d) {
+            return outerArcNegativeValues(d);
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     svg.select("g#labels")
@@ -89,7 +124,7 @@ export async function render(donutState) {
                     .attr("font-family", donutState.context.styling.general.font.fontFamily)
                     .attr("font-weight", donutState.context.styling.general.font.fontWeight)
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
-                    .text((d) => calculateTextVisibility(d))
+                    .text((d) => d.data.absPercentage + "%")
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
@@ -105,7 +140,7 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => calculateTextVisibility(d))
+                        .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.context.styling.general.font.color)
                 ),
@@ -148,13 +183,15 @@ export async function render(donutState) {
         return roundNumber(middleText, 2);
     }
 
-    function calculateTextVisibility(data) {
-        const minWidth = 126;
-        const minHeight = 126;
-        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
-            return data.data.absPercentage + "%";
-        }
+
+    /** Function check if a data-set contains negative values and returns the opacity
+     * @param {data} d
+     * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
+     * */
+    function getOpacityForOuterSide(d) {
+        return d.data.value < 0 ? "0.8" : "0";
     }
+
     marker.drawRectangularSelection(donutState);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();

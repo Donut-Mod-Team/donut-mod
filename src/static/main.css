@@ -37,6 +37,10 @@ form {
     stroke-width: 2;
 }
 
+.outerSectorArc {
+    fill: #db4d37;
+}
+
 .selection {
     visibility: hidden;
     pointer-events: none;
