@@ -100,9 +100,9 @@ export async function render(donutState) {
     outerSectorsNegativeValues
         .transition()
         .duration(animationDuration)
-        .attrTween("d", function (elem) {
+        .attrTween("d", function (d) {
             return function () {
-                return outerArcNegativeValues(elem);
+                return outerArcNegativeValues(d);
             };
         })
         .attr("class", "outerSectorArc")
