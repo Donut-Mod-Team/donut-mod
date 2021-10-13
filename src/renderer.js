@@ -126,7 +126,6 @@ export async function render(donutState) {
                     .attr("font-size", donutState.context.styling.general.font.fontSize)
                     .text((d) => d.data.absPercentage + "%")
                     .attr("text-anchor", "middle")
-                    .attr("overflow", "visible")
                     .call((enter) =>
                         enter
                             .transition("add labels")
@@ -183,6 +182,7 @@ export async function render(donutState) {
         }
         return roundNumber(middleText, 2);
     }
+
 
     /** Function check if a data-set contains negative values and returns the opacity
      * @param {data} d

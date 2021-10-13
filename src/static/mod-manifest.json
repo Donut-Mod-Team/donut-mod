@@ -2,20 +2,8 @@
     "apiVersion": "1.2",
     "version": "1.0",
     "name": "Donut Chart",
-    "id": "donut-modnp",
+    "id": "donut-chart",
     "icon": "icon.svg",
-    "properties": [
-        {
-            "name": "y-axis-mode",
-            "type": "string",
-            "defaultValue": "numeric"
-        },
-        {
-            "name": "split-bars",
-            "type": "boolean",
-            "defaultValue": true
-        }
-    ],
     "dataViewDefinition": {
         "colorAxis": {
             "mode": "categorical",
@@ -26,7 +14,7 @@
         },
         "axes": [
             {
-                "name": "Y",
+                "name": "Sector size by:",
                 "mode": "continuous",
                 "placement": "none"
             }
