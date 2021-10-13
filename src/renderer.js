@@ -89,9 +89,8 @@ export async function render(donutState) {
                     .attr("font-family", donutState.styles.fontFamily)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => d.data.absPercentage + "%")
+                    .text((d) => calculateTextVisibility(d))
                     .attr("text-anchor", "middle")
-                    .attr("overflow", "visible")
                     .call((enter) =>
                         enter
                             .transition("add labels")
@@ -106,9 +105,9 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => d.data.absPercentage + "%")
-                        .attr("transform", calculateLabelPosition)
+                        .text((d) => calculateTextVisibility(d))
                         .attr("fill", donutState.styles.fontColor)
+
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
@@ -149,6 +148,13 @@ export async function render(donutState) {
         return roundNumber(middleText, 2);
     }
 
+    function calculateTextVisibility(data) {
+        const minWidth = 126;
+        const minHeight = 126;
+        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
+            return data.data.absPercentage + "%";
+        }
+    }
     marker.drawRectangularSelection(donutState);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
