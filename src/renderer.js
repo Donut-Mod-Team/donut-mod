@@ -10,7 +10,7 @@ export async function render(donutState) {
     const sizeModifier = 10;
     // D3 animation duration used for svg shapes
 
-    const animationDuration = 100;
+    const animationDuration = 250;
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
