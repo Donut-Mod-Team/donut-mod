@@ -16,6 +16,7 @@ export async function createDonutState(mod) {
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
     const yAxisName = "Sector size by:";
+    const centerAxisName = "Center value by:";
 
     /**
      * Check for any errors.

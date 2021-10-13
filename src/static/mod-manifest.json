@@ -17,6 +17,11 @@
                 "name": "Sector size by:",
                 "mode": "continuous",
                 "placement": "none"
+            },
+            {
+                "name": "Center value by:",
+                "mode": "continuous",
+                "placement": "none"
             }
         ]
     },
