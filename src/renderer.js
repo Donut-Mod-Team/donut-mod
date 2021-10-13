@@ -141,6 +141,7 @@ export async function render(donutState) {
                         .duration(animationDuration)
                         .style("opacity", 1)
                         .text((d) => calculateTextVisibility(d))
+                        .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
@@ -181,7 +182,7 @@ export async function render(donutState) {
         }
         return roundNumber(middleText, 2);
     }
-  
+
     function calculateTextVisibility(data) {
         const minWidth = 126;
         const minHeight = 126;
@@ -189,7 +190,6 @@ export async function render(donutState) {
             return data.data.absPercentage + "%";
         }
     }
-
 
     /** Function check if a data-set contains negative values and returns the opacity
      * @param {data} d
