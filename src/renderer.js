@@ -63,7 +63,7 @@ export async function render(donutState) {
             d3.select(this).style("stroke", "none");
         })
         .on("mouseover", function () {
-            d3.select(this).style("stroke", donutState.context.styling.general.font.color);
+            d3.select(this).style("stroke", donutState.styles.fontColor);
         })
         .attr("fill", () => "transparent");
 
@@ -120,11 +120,11 @@ export async function render(donutState) {
                     .append("text")
                     .style("opacity", 0)
                     .attr("dy", "0.35em")
-                    .attr("fill", donutState.context.styling.general.font.color)
-                    .attr("font-family", donutState.context.styling.general.font.fontFamily)
-                    .attr("font-weight", donutState.context.styling.general.font.fontWeight)
-                    .attr("font-size", donutState.context.styling.general.font.fontSize)
-                    .text((d) => d.data.absPercentage + "%")
+                    .attr("fill", donutState.styles.fontColor)
+                    .attr("font-family", donutState.styles.fontFamily)
+                    .attr("font-weight", donutState.styles.fontWeight)
+                    .attr("font-size", donutState.styles.fontSize)
+                    .text((d) => calculateTextVisibility(d))
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
@@ -140,19 +140,19 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", 1)
-                        .text((d) => d.data.absPercentage + "%")
+                        .text((d) => calculateTextVisibility(d))
                         .attr("transform", calculateLabelPosition)
-                        .attr("fill", donutState.context.styling.general.font.color)
+                        .attr("fill", donutState.styles.fontColor)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
     d3.select("#centertext")
         .text("Sum: " + calculateMiddleText(donutState.data))
-        .attr("fill", donutState.context.styling.general.font.color)
-        .attr("font-family", donutState.context.styling.general.font.fontFamily)
-        .attr("font-weight", donutState.context.styling.general.font.fontWeight)
-        .attr("font-size", donutState.context.styling.general.font.fontSize);
+        .attr("fill", donutState.styles.fontColor)
+        .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-weight", donutState.styles.fontWeight)
+        .attr("font-size", donutState.styles.fontSize);
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
@@ -183,6 +183,13 @@ export async function render(donutState) {
         return roundNumber(middleText, 2);
     }
 
+    function calculateTextVisibility(data) {
+        const minWidth = 126;
+        const minHeight = 126;
+        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
+            return data.data.absPercentage + "%";
+        }
+    }
 
     /** Function check if a data-set contains negative values and returns the opacity
      * @param {data} d

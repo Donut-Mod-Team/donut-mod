@@ -100,7 +100,13 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        clearMarking: () => dataView.clearMarking()
+        clearMarking: () => dataView.clearMarking(),
+        styles: {
+            fontColor: context.styling.general.font.color,
+            fontFamily: context.styling.general.font.fontFamily,
+            fontWeight: context.styling.general.font.fontWeight,
+            fontSize: context.styling.general.font.fontSize
+        }
     };
 
     return donutState;
