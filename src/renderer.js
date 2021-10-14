@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import { roundNumber } from "./utility";
+import { calculatePercentageValue } from "./utility";
 
 /**
  * @param {object} donutState
@@ -148,8 +148,12 @@ export async function render(donutState) {
         );
 
     d3.select("#centertext")
-        .text("Sum: " + calculateMiddleText(donutState.data))
+        .text(donutState.centerAxisTitle + ": " + donutState.centerValue)
         .attr("fill", donutState.styles.fontColor)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("height", `${calculateCenterTextSpace()}%`)
+        .style("max-height", `${calculateCenterTextSpace()}%`)
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
@@ -175,14 +179,6 @@ export async function render(donutState) {
         return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
 
-    function calculateMiddleText(data) {
-        let middleText = 0;
-        for (let i = 0; i < data.length; i++) {
-            middleText += data[i].absValue;
-        }
-        return roundNumber(middleText, 2);
-    }
-
     function calculateTextVisibility(data) {
         const minWidth = 126;
         const minHeight = 126;
@@ -191,6 +187,12 @@ export async function render(donutState) {
         }
     }
 
+    function calculateCenterTextSpace() {
+        console.log("yep");
+        return calculatePercentageValue(innerRadius, width, 0) < calculatePercentageValue(radius, height, 0)
+            ? calculatePercentageValue(innerRadius, width, 0)
+            : calculatePercentageValue(innerRadius, height, 0);
+    }
     /** Function check if a data-set contains negative values and returns the opacity
      * @param {data} d
      * @returns {string} string containing a value for opacity positive for negative value and zero if positive value

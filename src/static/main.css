@@ -87,15 +87,18 @@ form {
 }
 
 #center {
-    position: absolute;
-    margin: 0 43%;
-    height: 20%;
-    width: 14%;
+    position: relative;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-#center #centertext {
-    white-space: nowrap;
+#centertext {
+    display: flex;
+    word-wrap: anywhere;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }

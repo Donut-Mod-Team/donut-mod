@@ -14,12 +14,12 @@
         },
         "axes": [
             {
-                "name": "Sector size by:",
+                "name": "Sector size by",
                 "mode": "continuous",
                 "placement": "none"
             },
             {
-                "name": "Center value by:",
+                "name": "Center value by",
                 "mode": "continuous",
                 "placement": "none"
             }

@@ -1,4 +1,4 @@
-import { roundNumber } from "./utility";
+import { roundNumber, calculatePercentageValue } from "./utility";
 
 /**
  * Render the visualization
@@ -15,8 +15,8 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
-    const yAxisName = "Sector size by:";
-    const centerAxisName = "Center value by:";
+    const yAxisName = "Sector size by";
+    const centerAxisName = "Center value by";
 
     /**
      * Check for any errors.
@@ -49,20 +49,30 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide(yAxisName);
     }
 
+    let dataViewCenterAxis = await dataView.continuousAxis(centerAxisName);
+    if (dataViewCenterAxis == null) {
+        mod.controls.errorOverlay.show("No data on center axis.", centerAxisName);
+        return;
+    } else {
+        mod.controls.errorOverlay.hide(yAxisName);
+    }
     // Awaiting and retrieving the Color and Y axis from the mod.
     let yAxis = await mod.visualization.axis(yAxisName);
     const colorAxisMeta = await mod.visualization.axis("Color");
+    let centerAxis = await mod.visualization.axis(centerAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
 
+    let totalCenterSum = calculateTotalYSum(colorLeaves, centerAxisName);
     let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
+
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum);
+        let percentage = calculatePercentageValue(yValue, totalYSum, 1);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: yValue,
@@ -91,6 +101,7 @@ export async function createDonutState(mod) {
             }
         };
     });
+    //console.log(data.centerSum);
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
@@ -101,6 +112,8 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
+        centerAxisTitle: centerAxis.parts[0].displayName,
+        centerValue: roundNumber(totalCenterSum, 2),
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
@@ -142,6 +155,3 @@ function calculateTotalYSum(leaves, yAxisName) {
  * @param {Number} totalYSum
  * @return {Number}
  */
-function calculatePercentageValue(value, totalYSum) {
-    return roundNumber((value / totalYSum) * 100, 1);
-}
