@@ -1,4 +1,5 @@
 import { roundNumber } from "./utility";
+import { resources } from "./resources";
 
 /**
  * Render the visualization
@@ -15,7 +16,6 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
-    const yAxisName = "Sector size by:";
 
     /**
      * Check for any errors.
@@ -31,7 +31,7 @@ export async function createDonutState(mod) {
 
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
     // render the chart.
-    let colorHierarchy = await dataView.hierarchy("Color");
+    let colorHierarchy = await dataView.hierarchy(resources.colorAxisName);
     let colorRoot = await colorHierarchy.root();
     if (colorRoot == null) {
         // Return and wait for next call to render when reading data was aborted.
@@ -40,27 +40,27 @@ export async function createDonutState(mod) {
         return;
     }
 
-    let dataViewYAxis = await dataView.continuousAxis(yAxisName);
+    let dataViewYAxis = await dataView.continuousAxis(resources.yAxisName);
     if (dataViewYAxis == null) {
-        mod.controls.errorOverlay.show("No data on y axis.", yAxisName);
+        mod.controls.errorOverlay.show(resources.errorNoDataOnAxis(resources.yAxisName), resources.yAxisName);
         return;
     } else {
-        mod.controls.errorOverlay.hide(yAxisName);
+        mod.controls.errorOverlay.hide(resources.yAxisName);
     }
 
     // Awaiting and retrieving the Color and Y axis from the mod.
-    let yAxis = await mod.visualization.axis(yAxisName);
-    const colorAxisMeta = await mod.visualization.axis("Color");
+    let yAxis = await mod.visualization.axis(resources.yAxisName);
+    const colorAxisMeta = await mod.visualization.axis(resources.colorAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
 
-    let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
+    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
-        let yValue = sumValue(rows, yAxisName);
+        let yValue = sumValue(rows, resources.yAxisName);
         let percentage = calculatePercentageValue(yValue, totalYSum);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
@@ -113,7 +113,7 @@ export async function createDonutState(mod) {
 }
 
 /**
- * Calculate the total value for an axis from a set of rows. Null values are treated a 0.
+ * Calculate the total value for an axis from a set of rows. Null values are treated as 0.
  * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
  * @param {string} axis Name of Axis to use to calculate the value.
  */
