@@ -126,7 +126,7 @@ export async function render(donutState) {
                     .attr("font-family", donutState.styles.fontFamily)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => calculateTextVisibility(d))
+                    .text((d) => d.data.absPercentage + "%")
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
@@ -142,19 +142,21 @@ export async function render(donutState) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", calculateTextOpacity)
-                        .text((d) => calculateTextVisibility(d))
+                        .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
-    function calculateTextOpacity() {
+    function calculateTextOpacity(data) {
         let box = this.getBoundingClientRect();
         let labelWidth = box.right - box.left;
         let labelHeight = box.bottom - box.top;
         let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
-        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound ? "1" : "0";
+        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound && data.data.absPercentage >= 5
+            ? "1"
+            : "0";
     }
 
     d3.select("#centertext")
@@ -191,14 +193,6 @@ export async function render(donutState) {
             middleText += data[i].absValue;
         }
         return roundNumber(middleText, 2);
-    }
-
-    function calculateTextVisibility(data) {
-        if (data.data.absPercentage >= 5) {
-            return data.data.absPercentage + "%";
-        } else {
-            return "";
-        }
     }
 
     /** Function check if a data-set contains negative values and returns the opacity
