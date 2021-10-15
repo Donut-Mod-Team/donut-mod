@@ -95,10 +95,13 @@ form {
     justify-content: center;
     align-items: center;
 }
-#centertext {
+#center-text-title, #center-text, #center-color{
     display: flex;
-    word-wrap: anywhere;
+    word-wrap: initial;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+}
+#center-text {
+    font-weight: bold;
 }

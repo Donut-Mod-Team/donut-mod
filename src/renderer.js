@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import { calculatePercentageValue } from "./utility";
+import { calculatePercentageValue, roundNumber } from "./utility";
 
 /**
  * @param {object} donutState
@@ -61,9 +61,14 @@ export async function render(donutState) {
         .on("mouseleave", function () {
             donutState.modControls.tooltip.hide();
             d3.select(this).style("stroke", "none");
+            d3.select("#center").style("opacity", 0);
         })
-        .on("mouseover", function () {
+        .on("mouseover", function (d) {
             d3.select(this).style("stroke", donutState.styles.fontColor);
+            d3.select("#center").style("opacity", 1);
+            d3.select("#center-text").text(roundNumber(d.data.centerValue, 2));
+            d3.select("#center-text-title").text(d.data.centerTitle);
+            d3.select("#center-color").text(d.data.colorValue);
         })
         .attr("fill", () => "transparent");
 
@@ -147,13 +152,10 @@ export async function render(donutState) {
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
-    d3.select("#centertext")
-        .text(donutState.centerAxisTitle + ": " + donutState.centerValue)
+    d3.selectAll("#center-text-title, #center-text, #center-color")
         .attr("fill", donutState.styles.fontColor)
         .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
-        .style("height", `${calculateCenterTextSpace()}%`)
-        .style("max-height", `${calculateCenterTextSpace()}%`)
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
@@ -188,7 +190,6 @@ export async function render(donutState) {
     }
 
     function calculateCenterTextSpace() {
-        console.log("yep");
         return calculatePercentageValue(innerRadius, width, 0) < calculatePercentageValue(radius, height, 0)
             ? calculatePercentageValue(innerRadius, width, 0)
             : calculatePercentageValue(innerRadius, height, 0);

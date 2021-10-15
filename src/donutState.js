@@ -66,12 +66,11 @@ export async function createDonutState(mod) {
 
     let colorLeaves = colorRoot.leaves();
 
-    let totalCenterSum = calculateTotalYSum(colorLeaves, centerAxisName);
     let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
-
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
+        let centerValue = sumValue(rows, centerAxisName);
         let percentage = calculatePercentageValue(yValue, totalYSum, 1);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
@@ -80,6 +79,9 @@ export async function createDonutState(mod) {
             id: leaf.key,
             percentage: percentage,
             absPercentage: Math.abs(percentage),
+            centerValue: centerValue,
+            centerTitle: centerAxis.parts[0].displayName,
+            colorValue: leaf.formattedValue(),
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
@@ -113,7 +115,6 @@ export async function createDonutState(mod) {
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
         centerAxisTitle: centerAxis.parts[0].displayName,
-        centerValue: roundNumber(totalCenterSum, 2),
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
