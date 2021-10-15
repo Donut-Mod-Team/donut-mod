@@ -132,7 +132,7 @@ export async function render(donutState) {
                         enter
                             .transition("add labels")
                             .duration(animationDuration)
-                            .style("opacity", 1)
+                            .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
                     );
             },
@@ -141,13 +141,21 @@ export async function render(donutState) {
                     update
                         .transition("update labels")
                         .duration(animationDuration)
-                        .style("opacity", 1)
+                        .style("opacity", calculateTextOpacity)
                         .text((d) => calculateTextVisibility(d))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    function calculateTextOpacity() {
+        let box = this.getBoundingClientRect();
+        let labelWidth = box.right - box.left;
+        let labelHeight = box.bottom - box.top;
+        let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
+        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound ? "1" : "0";
+    }
 
     d3.select("#centertext")
         .text("Sum: " + calculateMiddleText(donutState.data))
@@ -186,10 +194,10 @@ export async function render(donutState) {
     }
 
     function calculateTextVisibility(data) {
-        const minWidth = 126;
-        const minHeight = 126;
-        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
+        if (data.data.absPercentage >= 5) {
             return data.data.absPercentage + "%";
+        } else {
+            return "";
         }
     }
 

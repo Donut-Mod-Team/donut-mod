@@ -67,8 +67,8 @@ export async function createDonutState(mod) {
             value: yValue,
             absValue: Math.abs(yValue),
             id: leaf.key,
-            percentage: percentage,
-            absPercentage: Math.abs(percentage),
+            percentage: percentage.toFixed(1),
+            absPercentage: Math.abs(percentage).toFixed(1),
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
