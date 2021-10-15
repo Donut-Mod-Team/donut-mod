@@ -126,13 +126,13 @@ export async function render(donutState) {
                     .attr("font-family", donutState.styles.fontFamily)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => calculateTextVisibility(d))
+                    .text((d) => d.data.absPercentage + "%")
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
                             .transition("add labels")
                             .duration(animationDuration)
-                            .style("opacity", 1)
+                            .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
                     );
             },
@@ -141,13 +141,23 @@ export async function render(donutState) {
                     update
                         .transition("update labels")
                         .duration(animationDuration)
-                        .style("opacity", 1)
-                        .text((d) => calculateTextVisibility(d))
+                        .style("opacity", calculateTextOpacity)
+                        .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    function calculateTextOpacity(data) {
+        let box = this.getBoundingClientRect();
+        let labelWidth = box.right - box.left;
+        let labelHeight = box.bottom - box.top;
+        let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
+        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound && data.data.absPercentage >= 5
+            ? "1"
+            : "0";
+    }
 
     d3.select("#centertext")
         .text("Sum: " + calculateMiddleText(donutState.data))
@@ -183,14 +193,6 @@ export async function render(donutState) {
             middleText += data[i].absValue;
         }
         return roundNumber(middleText, 2);
-    }
-
-    function calculateTextVisibility(data) {
-        const minWidth = 126;
-        const minHeight = 126;
-        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
-            return data.data.absPercentage + "%";
-        }
     }
 
     /** Function check if a data-set contains negative values and returns the opacity
