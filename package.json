@@ -7,7 +7,9 @@
         "server": "mods-dev-server dist",
         "build": "webpack --mode production --devtool false",
         "build-watch": "webpack --watch",
-        "start": "npm install && npm run build-watch"
+        "start": "npm install && npm run build-watch",
+        "cypress:open": "cypress open",
+        "cypress:run": "cypress run"
     },
     "keywords": [],
     "author": "Krasen Anatoliev Parvanov, Clementine Jensen, Eemil Jeskanen, Chrysostomos Tsagkidis",
@@ -20,6 +22,7 @@
         "babel-loader": "^8.2.2",
         "copy-webpack-plugin": "^6.0.3",
         "core-js": "^3.18.0",
+        "cypress": "^8.6.0",
         "d3": "^5.14.2",
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
