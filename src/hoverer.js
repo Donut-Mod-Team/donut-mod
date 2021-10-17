@@ -25,6 +25,7 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
         })
         .attr("class", "line-hover")
         .attr("stroke", donutState.styles.fontColor)
+        .style("stroke-width", "1px")
         .style("opacity", "0");
 
     highlightedSectors
@@ -37,7 +38,8 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
             };
         })
         .attr("class", "line-hover")
-        .attr("stroke", donutState.styles.fontColor);
+        .attr("stroke", donutState.styles.fontColor)
+        .style("stroke-width", "1px");
 
     highlightedSectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }

@@ -64,8 +64,8 @@ export async function render(donutState) {
                 .duration(animationDuration)
                 .style("opacity", "1");
         })
-        .attr("fill", () => "transparent");
-
+        .attr("fill", () => "transparent")
+        .attr("stroke", (d) => (d.data.markedRowCount() > 0 ? donutState.styles.fontColor : "none"));
     sectors
         .merge(newSectors)
         .transition()
@@ -73,7 +73,7 @@ export async function render(donutState) {
         .attr("value", (d) => d.data.absPercentage)
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
-        .attr("stroke", "none");
+        .attr("stroke", (d) => (d.data.markedRowCount() > 0 ? donutState.styles.fontColor : "none"));
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
