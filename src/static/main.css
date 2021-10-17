@@ -62,28 +62,11 @@ form {
     bottom: 0;
     right: 0;
 }
+
 .line-hover {
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.line-hover-fill {
-    pointer-events: none;
-    stroke: #fff;
-    stroke-width: 5px;
-}
-
-.line-hover-casing {
-    pointer-events: none;
-    stroke: #333;
-    stroke-width: 7px;
-}
-
-.line-hover-bg {
-    stroke: #333;
-    stroke-opacity: 0;
-    stroke-width: 7px;
+    fill: transparent;
+    stroke:  #333;
+    opacity: 0.8;
 }
 
 #center {

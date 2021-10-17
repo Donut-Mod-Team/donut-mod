@@ -58,18 +58,23 @@ export async function render(donutState) {
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
         })
-        .on("mouseleave", function () {
+        .on("mouseleave", function (d) {
             donutState.modControls.tooltip.hide();
-            d3.select(this).style("stroke", "none");
+            d3.select("path#" + d.data.id)
+                .transition()
+                .duration(animationDuration)
+                .style("opacity", "0");
         })
-        .on("mouseover", function () {
-            d3.select(this).style("stroke", donutState.styles.fontColor);
+        .on("mouseover", function (d) {
+            d3.select("path#" + d.data.id)
+                .transition()
+                .duration(animationDuration)
+                .style("opacity", "1");
         })
         .attr("fill", () => "transparent");
 
     sectors
         .merge(newSectors)
-        .attr("class", "sector")
         .transition()
         .duration(animationDuration)
         .attr("value", (d) => d.data.absPercentage)
@@ -204,8 +209,48 @@ export async function render(donutState) {
     }
 
     marker.drawRectangularSelection(donutState);
-
+    hoverEffect(pie, donutState, animationDuration);
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     donutState.context.signalRenderComplete();
+}
+
+function hoverEffect(pie, donutState, animationDuration) {
+    const highlightArc = d3
+        .arc()
+        .innerRadius(donutState.donutCircle.innerRadius - 3.5)
+        .outerRadius(donutState.donutCircle.radius + 4.5);
+
+    let highlightedSectors = d3
+        .select("g#highlight-sector")
+        .attr("pointer-events", "none")
+        .selectAll("path")
+        .data(pie(donutState.data), (d) => {
+            return d.data.id;
+        });
+    highlightedSectors
+        .enter()
+        .append("path")
+        .attr("id", function (d) {
+            return d.data.id;
+        })
+        .attr("d", function (d) {
+            highlightArc.startAngle(d.startAngle - 0.01).endAngle(d.endAngle + 0.01);
+            return highlightArc(d);
+        })
+        .attr("class", "line-hover")
+        .style("opacity", "0");
+
+    highlightedSectors
+        .transition()
+        .duration(animationDuration)
+        .attrTween("d", function (d) {
+            return function () {
+                highlightArc.startAngle(d.startAngle - 0.01).endAngle(d.endAngle + 0.01);
+                return highlightArc(d);
+            };
+        })
+        .attr("class", "line-hover");
+
+    highlightedSectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }
