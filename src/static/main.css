@@ -24,11 +24,7 @@ body,
 svg {
     display: block;
 }
-form {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-}
+
 .rectangle {
     fill: #add8e6;
     stroke: #add8e6;
@@ -41,31 +37,8 @@ form {
     fill: #db4d37;
 }
 
-.selection {
-    visibility: hidden;
-    pointer-events: none;
-    position: absolute;
-    border: 1px solid #677085;
-    background-color: rgba(0, 90, 230, 0.17);
-    width: 0;
-    height: 0;
-    top: 0;
-    left: 0;
-}
-
-.selection-bg {
-    visibility: hidden;
-    position: absolute;
-    background-color: rgba(200, 90, 230, 0);
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-}
-
 .line-hover {
     fill: transparent;
-    stroke:  #333;
     opacity: 0.8;
 }
 

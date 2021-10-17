@@ -105,7 +105,11 @@ export async function createDonutState(mod) {
             fontColor: context.styling.general.font.color,
             fontFamily: context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
-            fontSize: context.styling.general.font.fontSize
+            fontSize: context.styling.general.font.fontSize,
+            fontStyle: context.styling.general.font.fontStyle,
+            backgroundColor: context.styling.general.backgroundColor,
+            lineStroke: context.styling.scales.line.stroke,
+            tick: context.styling.scales.tick.stroke
         }
     };
 
