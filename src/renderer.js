@@ -33,13 +33,6 @@ export async function render(donutState) {
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
-    // Used for the outer side showing negative values
-    let outerArcNegativeValues = d3
-        .arc()
-        .padAngle(padding)
-        .innerRadius(radius + 2) // makes the outer arc bigger than the original
-        .outerRadius(radius + 3); // defines the size of the outer arc as 1
-
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -81,39 +74,6 @@ export async function render(donutState) {
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
         .attr("stroke", "none");
-
-    // Define the outer arc paths and data
-    let outerSectorsNegativeValues = svg
-        .select("g#outer-sectors")
-        .attr("pointer-events", "none")
-        .selectAll("path")
-        .data(pie(donutState.data), (d) => {
-            return d.data.id;
-        });
-
-    // Initial rendering
-    outerSectorsNegativeValues
-        .enter()
-        .append("path")
-        .attr("d", function (d) {
-            return outerArcNegativeValues(d);
-        })
-        .attr("class", "outerSectorArc")
-        .style("opacity", getOpacityForOuterSide);
-
-    // Define behavior on transition
-    outerSectorsNegativeValues
-        .transition()
-        .duration(animationDuration)
-        .attrTween("d", function (d) {
-            return function () {
-                return outerArcNegativeValues(d);
-            };
-        })
-        .attr("class", "outerSectorArc")
-        .style("opacity", getOpacityForOuterSide);
-
-    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
@@ -211,17 +171,59 @@ export async function render(donutState) {
         return roundNumber(middleText, 2);
     }
 
-    /** Function check if a data-set contains negative values and returns the opacity
-     * @param {data} d
-     * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
-     * */
-    function getOpacityForOuterSide(d) {
-        return d.data.value < 0 ? "0.8" : "0";
-    }
-
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
+    drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg);
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     donutState.context.signalRenderComplete();
+}
+
+function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg) {
+    // Used for the outer side showing negative values
+    let outerArcNegativeValues = d3
+        .arc()
+        .padAngle(padding)
+        .innerRadius(donutState.donutCircle.radius + 2) // makes the outer arc bigger than the original
+        .outerRadius(donutState.donutCircle.radius + 3); // defines the size of the outer arc as 1
+    // Define the outer arc paths and data
+    let outerSectorsNegativeValues = svg
+        .select("g#outer-sectors")
+        .attr("pointer-events", "none")
+        .selectAll("path")
+        .data(pie(donutState.data), (d) => {
+            return d.data.id;
+        });
+
+    // Initial rendering
+    outerSectorsNegativeValues
+        .enter()
+        .append("path")
+        .attr("d", function (d) {
+            return outerArcNegativeValues(d);
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    // Define behavior on transition
+    outerSectorsNegativeValues
+        .transition()
+        .duration(animationDuration)
+        .attrTween("d", function (d) {
+            return function () {
+                return outerArcNegativeValues(d);
+            };
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+}
+
+/** Function check if a data-set contains negative values and returns the opacity
+ * @param {data} d
+ * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
+ * */
+function getOpacityForOuterSide(d) {
+    return d.data.value < 0 ? "0.8" : "0";
 }

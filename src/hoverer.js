@@ -20,7 +20,7 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
             return "hoverID_" + d.data.id;
         })
         .attr("d", function (d) {
-            highlightArc.startAngle(d.startAngle - 0.01).endAngle(d.endAngle + 0.01);
+            highlightArc.startAngle(d.startAngle - 0.03).endAngle(d.endAngle + 0.03);
             return highlightArc(d);
         })
         .attr("class", "line-hover")
