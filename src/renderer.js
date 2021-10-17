@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
 import { roundNumber } from "./utility";
+import { applyHoverEffect } from "./hoverer";
 
 /**
  * @param {object} donutState
@@ -50,7 +51,6 @@ export async function render(donutState) {
     let newSectors = sectors
         .enter()
         .append("svg:path")
-        .attr("class", "sector")
         .on("click", function (d) {
             marker.select(d);
             d3.event.stopPropagation();
@@ -60,13 +60,13 @@ export async function render(donutState) {
         })
         .on("mouseleave", function (d) {
             donutState.modControls.tooltip.hide();
-            d3.select("path#" + d.data.id)
+            d3.select("path#hoverID_" + d.data.id)
                 .transition()
                 .duration(animationDuration)
                 .style("opacity", "0");
         })
         .on("mouseover", function (d) {
-            d3.select("path#" + d.data.id)
+            d3.select("path#hoverID_" + d.data.id)
                 .transition()
                 .duration(animationDuration)
                 .style("opacity", "1");
@@ -129,6 +129,7 @@ export async function render(donutState) {
                     .attr("dy", "0.35em")
                     .attr("fill", donutState.styles.fontColor)
                     .attr("font-family", donutState.styles.fontFamily)
+                    .attr("font-style", donutState.styles.fontStyle)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
                     .text((d) => d.data.absPercentage + "%")
@@ -139,6 +140,11 @@ export async function render(donutState) {
                             .duration(animationDuration)
                             .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
+                            .attr("fill", donutState.styles.fontColor)
+                            .attr("font-family", donutState.styles.fontFamily)
+                            .attr("font-style", donutState.styles.fontStyle)
+                            .attr("font-weight", donutState.styles.fontWeight)
+                            .attr("font-size", donutState.styles.fontSize)
                     );
             },
             (update) =>
@@ -150,6 +156,10 @@ export async function render(donutState) {
                         .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
+                        .attr("font-family", donutState.styles.fontFamily)
+                        .attr("font-style", donutState.styles.fontStyle)
+                        .attr("font-weight", donutState.styles.fontWeight)
+                        .attr("font-size", donutState.styles.fontSize)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
@@ -168,6 +178,7 @@ export async function render(donutState) {
         .text("Sum: " + calculateMiddleText(donutState.data))
         .attr("fill", donutState.styles.fontColor)
         .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-style", donutState.styles.fontStyle)
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
 
@@ -209,48 +220,8 @@ export async function render(donutState) {
     }
 
     marker.drawRectangularSelection(donutState);
-    hoverEffect(pie, donutState, animationDuration);
+    applyHoverEffect(pie, donutState, animationDuration);
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     donutState.context.signalRenderComplete();
-}
-
-function hoverEffect(pie, donutState, animationDuration) {
-    const highlightArc = d3
-        .arc()
-        .innerRadius(donutState.donutCircle.innerRadius - 3.5)
-        .outerRadius(donutState.donutCircle.radius + 4.5);
-
-    let highlightedSectors = d3
-        .select("g#highlight-sector")
-        .attr("pointer-events", "none")
-        .selectAll("path")
-        .data(pie(donutState.data), (d) => {
-            return d.data.id;
-        });
-    highlightedSectors
-        .enter()
-        .append("path")
-        .attr("id", function (d) {
-            return d.data.id;
-        })
-        .attr("d", function (d) {
-            highlightArc.startAngle(d.startAngle - 0.01).endAngle(d.endAngle + 0.01);
-            return highlightArc(d);
-        })
-        .attr("class", "line-hover")
-        .style("opacity", "0");
-
-    highlightedSectors
-        .transition()
-        .duration(animationDuration)
-        .attrTween("d", function (d) {
-            return function () {
-                highlightArc.startAngle(d.startAngle - 0.01).endAngle(d.endAngle + 0.01);
-                return highlightArc(d);
-            };
-        })
-        .attr("class", "line-hover");
-
-    highlightedSectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 }
