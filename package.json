@@ -9,7 +9,7 @@
         "build-watch": "webpack --watch",
         "start": "npm install && npm run build-watch",
         "cypress:open": "cypress open",
-        "cypress:run": "cypress run"
+        "cypress:run": "mods-dev-server dist & npm run build-watch & cypress run --browser chrome"
     },
     "keywords": [],
     "author": "Krasen Anatoliev Parvanov, Clementine Jensen, Eemil Jeskanen, Chrysostomos Tsagkidis",
