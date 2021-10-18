@@ -32,6 +32,13 @@ export async function createDonutState(mod) {
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
     // render the chart.
     let colorHierarchy = await dataView.hierarchy(resources.colorAxisName);
+    if (colorHierarchy == null) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
+
     let colorRoot = await colorHierarchy.root();
     if (colorRoot == null) {
         // Return and wait for next call to render when reading data was aborted.
@@ -56,6 +63,12 @@ export async function createDonutState(mod) {
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
+    if (colorLeaves == null) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
 
     let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
     let data = colorLeaves.map((leaf) => {
