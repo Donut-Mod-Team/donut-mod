@@ -145,6 +145,9 @@ export async function render(donutState) {
                         .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
+                        .attr("font-family", donutState.styles.fontFamily)
+                        .attr("font-weight", donutState.styles.fontWeight)
+                        .attr("font-size", donutState.styles.fontSize)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
