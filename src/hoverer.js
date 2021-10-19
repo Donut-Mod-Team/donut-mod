@@ -11,7 +11,7 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
     // Define the highlight arc for hovering
     const highlightArc = d3
         .arc()
-        .innerRadius(donutState.donutCircle.innerRadius - 3)
+        .innerRadius(donutState.donutCircle.innerRadius - 2.5)
         .outerRadius(donutState.donutCircle.radius + 4);
 
     // Define the sectors to be shown when hovering over
