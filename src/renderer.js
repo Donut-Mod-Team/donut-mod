@@ -223,7 +223,7 @@ export async function render(donutState) {
         for (let i = 0; i < data.length; i++) {
             data[i].centerTotal = centerTotal;
         }
-        if (centerTotal > 0) {
+        if (markedSectors.length > 0) {
             centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
         }
         if (markedSectors.length === 1) {
