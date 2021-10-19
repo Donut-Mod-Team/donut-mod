@@ -7,12 +7,12 @@ import * as d3 from "d3";
  * @param {number} animationDuration
  * */
 export function applyHoverEffect(pie, donutState, animationDuration) {
-    const angleOffset = 0.03;
+    const angleOffset = 0.02;
     // Define the highlight arc for hovering
     const highlightArc = d3
         .arc()
-        .innerRadius(donutState.donutCircle.innerRadius - 3.5)
-        .outerRadius(donutState.donutCircle.radius + 4.5);
+        .innerRadius(donutState.donutCircle.innerRadius - 3.25)
+        .outerRadius(donutState.donutCircle.radius + 4.25);
 
     // Define the sectors to be shown when hovering over
     let highlightedSectors = d3
