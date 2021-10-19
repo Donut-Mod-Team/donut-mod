@@ -41,21 +41,21 @@ export async function render(donutState) {
 
     let centerColorText = d3
         .selectAll("#center-color")
-        .attr("fill", donutState.styles.fontColor)
+        .style("fill", donutState.styles.fontColor)
         .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
-        .attr("font-family", donutState.styles.fontFamily)
-        .attr("font-weight", donutState.styles.fontWeight)
-        .attr("font-size", donutState.styles.fontSize);
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-weight", donutState.styles.fontWeight)
+        .style("font-size", donutState.styles.fontSize);
 
     let centerText = d3
         .selectAll("#center-text")
-        .attr("fill", donutState.styles.fontColor)
+        .style("fill", donutState.styles.fontColor)
         .style("opacity", 0)
         .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
-        .attr("font-family", donutState.styles.fontFamily)
-        .attr("font-size", donutState.styles.fontSize);
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-size", donutState.styles.fontSize);
 
     calculateMarkedCenterText(donutState.data);
 
@@ -235,7 +235,6 @@ export async function render(donutState) {
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
         d3.select(this).style("stroke", "none");
-        console.log(d.data.centerTotal);
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
             centerText.style("opacity", 0);
             centerColorText.style("opacity", 0);
