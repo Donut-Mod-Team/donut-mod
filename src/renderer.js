@@ -173,12 +173,21 @@ export async function render(donutState) {
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
+
     drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg);
+
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     donutState.context.signalRenderComplete();
 }
-
+/**
+ * Function is creating and drawing the outlines for sectors with negative values
+ * @param {d3.pie} pie
+ * @param {donutState} donutState
+ * @param {number} animationDuration
+ * @param {number} padding
+ * @param {d3.svg} svg
+ * */
 function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg) {
     // Used for the outer side showing negative values
     let outerArcNegativeValues = d3
