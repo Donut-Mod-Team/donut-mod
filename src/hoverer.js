@@ -7,7 +7,6 @@ import * as d3 from "d3";
  * @param {number} animationDuration
  * */
 export function applyHoverEffect(pie, donutState, animationDuration) {
-
     const angleOffset = 0.03;
     // Define the highlight arc for hovering
     const highlightArc = d3
@@ -28,7 +27,7 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
         .enter()
         .append("path")
         .attr("id", function (d) {
-            return "hoverID_" + d.data.id;
+            return "hoverID_" + d.data.renderID;
         })
         .attr("d", function (d) {
             highlightArc.startAngle(d.startAngle - angleOffset).endAngle(d.endAngle + angleOffset);

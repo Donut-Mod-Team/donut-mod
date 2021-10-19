@@ -53,13 +53,13 @@ export async function render(donutState) {
         })
         .on("mouseleave", function (d) {
             donutState.modControls.tooltip.hide();
-            d3.select("path#hoverID_" + d.data.id)
+            d3.select("path#hoverID_" + d.data.renderID)
                 .transition()
                 .duration(animationDuration)
                 .style("opacity", "0");
         })
         .on("mouseover", function (d) {
-            d3.select("path#hoverID_" + d.data.id)
+            d3.select("path#hoverID_" + d.data.renderID)
                 .transition()
                 .duration(animationDuration)
                 .style("opacity", "1");
