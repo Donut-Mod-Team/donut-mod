@@ -104,7 +104,10 @@ export async function createDonutState(mod) {
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
-            fontFamily: context.styling.general.font.fontFamily,
+            fontFamily:
+                context.styling.general.font.fontFamily.indexOf(",") > -1
+                    ? context.styling.general.font.fontFamily.split(",")[0]
+                    : context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
             fontSize: context.styling.general.font.fontSize,
             fontStyle: context.styling.general.font.fontStyle,
