@@ -15,7 +15,7 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
-    const yAxisName = "Sector size by:";
+    const yAxisName = "Sector size by";
 
     /**
      * Check for any errors.
