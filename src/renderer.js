@@ -16,7 +16,7 @@ export async function render(donutState) {
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
-    const padding = 0.1 / donutState.data.length;
+    const padding = 0.05 / donutState.data.length;
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -115,8 +115,10 @@ export async function render(donutState) {
     outerSectorsNegativeValues
         .transition()
         .duration(animationDuration)
-        .attr("d", function (d) {
-            return outerArcNegativeValues(d);
+        .attrTween("d", function (d) {
+            return function () {
+                return outerArcNegativeValues(d);
+            };
         })
         .attr("class", "outerSectorArc")
         .style("opacity", getOpacityForOuterSide);
@@ -139,13 +141,13 @@ export async function render(donutState) {
                     .attr("font-family", donutState.styles.fontFamily)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => calculateTextVisibility(d))
+                    .text((d) => d.data.absPercentage + "%")
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
                             .transition("add labels")
                             .duration(animationDuration)
-                            .style("opacity", 1)
+                            .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
                     );
             },
@@ -154,13 +156,26 @@ export async function render(donutState) {
                     update
                         .transition("update labels")
                         .duration(animationDuration)
-                        .style("opacity", 1)
-                        .text((d) => calculateTextVisibility(d))
+                        .style("opacity", calculateTextOpacity)
+                        .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
+                        .attr("font-family", donutState.styles.fontFamily)
+                        .attr("font-weight", donutState.styles.fontWeight)
+                        .attr("font-size", donutState.styles.fontSize)
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    function calculateTextOpacity(data) {
+        let box = this.getBoundingClientRect();
+        let labelWidth = box.right - box.left;
+        let labelHeight = box.bottom - box.top;
+        let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
+        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound && data.data.absPercentage >= 5
+            ? "1"
+            : "0";
+    }
 
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
@@ -181,14 +196,6 @@ export async function render(donutState) {
         let y = centroid[1];
         let h = Math.sqrt(x * x + y * y);
         return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
-    }
-
-    function calculateTextVisibility(data) {
-        const minWidth = 126;
-        const minHeight = 126;
-        if (data.data.absPercentage >= 5 && width >= minWidth && height >= minHeight) {
-            return data.data.absPercentage + "%";
-        }
     }
 
     function calculateCenterTextSpace() {

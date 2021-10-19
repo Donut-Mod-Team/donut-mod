@@ -19,6 +19,7 @@ body,
     justify-self: center;
     align-items: center;
     overflow-y: auto;
+    font-family: sans-serif;
 }
 
 svg {

@@ -59,7 +59,6 @@ export async function createDonutState(mod) {
     // Awaiting and retrieving the Color and Y axis from the mod.
     let yAxis = await mod.visualization.axis(yAxisName);
     const colorAxisMeta = await mod.visualization.axis("Color");
-    let centerAxis = await mod.visualization.axis(centerAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
@@ -78,18 +77,12 @@ export async function createDonutState(mod) {
             value: yValue,
             absValue: Math.abs(yValue),
             id: leaf.key,
-            percentage: percentage,
-            absPercentage: Math.abs(percentage),
+            percentage: percentage.toFixed(1),
+            absPercentage: Math.abs(percentage).toFixed(1),
             centerSum: centerSum,
             colorValue: leaf.formattedValue(),
             centerTotal: 0,
-            mark: (m) => {
-                if (m) {
-                    leaf.mark(m);
-                } else {
-                    leaf.mark();
-                }
-            },
+            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             markedRowCount: () => leaf.markedRowCount(),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
@@ -121,13 +114,13 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        centerAxisTitle: centerAxis.parts[0].displayName,
-        clearMarking: () => {
-            dataView.clearMarking();
-        },
+        clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
-            fontFamily: context.styling.general.font.fontFamily,
+            fontFamily:
+                context.styling.general.font.fontFamily.indexOf(",") > -1
+                    ? context.styling.general.font.fontFamily.split(",")[0]
+                    : context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
             fontSize: context.styling.general.font.fontSize
         }
@@ -159,9 +152,3 @@ function calculateTotalYSum(leaves, yAxisName) {
     });
     return sumOfValues;
 }
-
-/** Function calculates the percentage value of two given params
- * @param {Number} value
- * @param {Number} totalYSum
- * @return {Number}
- */
