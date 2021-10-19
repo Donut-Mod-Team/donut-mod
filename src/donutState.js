@@ -67,9 +67,11 @@ export async function createDonutState(mod) {
             value: yValue,
             absValue: Math.abs(yValue),
             id: leaf.key,
+            renderID: leaf.leafIndex,
             percentage: percentage.toFixed(1),
             absPercentage: Math.abs(percentage).toFixed(1),
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+            markedRowCount: () => leaf.markedRowCount(),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
                 to get the corresponding leaf data onto the tooltip. */
@@ -108,7 +110,11 @@ export async function createDonutState(mod) {
                     ? context.styling.general.font.fontFamily.split(",")[0]
                     : context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
-            fontSize: context.styling.general.font.fontSize
+            fontSize: context.styling.general.font.fontSize,
+            fontStyle: context.styling.general.font.fontStyle,
+            backgroundColor: context.styling.general.backgroundColor,
+            lineStroke: context.styling.scales.line.stroke,
+            tick: context.styling.scales.tick.stroke
         }
     };
 
