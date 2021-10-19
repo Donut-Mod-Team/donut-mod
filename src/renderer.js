@@ -16,7 +16,16 @@ export async function render(donutState) {
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
-    const padding = 0.05 / donutState.data.length;
+
+    let padding = 0;
+    // The padding threshold is set to 6 because this is the amount of sectors where the padding becomes too small.
+    const paddingThreshold = 6;
+    
+    if(donutState.data.length < paddingThreshold) {
+        padding = 0.02 / donutState.data.length;
+    } else {
+        padding = 0.05 / donutState.data.length;
+    }
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
