@@ -97,7 +97,6 @@ form {
 }
 #center-text, #center-color{
     display: flex;
-    word-wrap: initial;
     justify-content: center;
     align-items: center;
     overflow: hidden;

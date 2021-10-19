@@ -17,7 +17,6 @@ export async function render(donutState) {
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
     const padding = 0.1 / donutState.data.length;
-    let centerTotal = 0;
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -40,7 +39,7 @@ export async function render(donutState) {
         .innerRadius(radius + 2) // makes the outer arc bigger than the original
         .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
-    let centerColor = d3
+    let centerColorText = d3
         .selectAll("#center-color")
         .attr("fill", donutState.styles.fontColor)
         .style("width", `${calculateCenterTextSpace()}%`)
@@ -58,6 +57,8 @@ export async function render(donutState) {
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-size", donutState.styles.fontSize);
 
+    calculateMarkedCenterText(donutState.data);
+
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -65,8 +66,6 @@ export async function render(donutState) {
         .data(pie(donutState.data), (d) => {
             return d.data.id;
         });
-    centerTotal = calculateMarkedCenterText();
-    console.log(centerTotal);
 
     let newSectors = sectors
         .enter()
@@ -80,16 +79,7 @@ export async function render(donutState) {
             donutState.modControls.tooltip.show(d.data.tooltip());
         })
         .on("mouseleave", onMouseLeave)
-        .on("mouseover", function (d) {
-            d3.select(this).style("stroke", donutState.styles.fontColor);
-            if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
-                donutState.centerValue = d.data.centerSum;
-                centerText.text(roundNumber(donutState.centerValue, 2));
-                centerText.style("opacity", 1);
-                centerColor.style("opacity", 1);
-                centerColor.text(d.data.colorValue);
-            }
-        })
+        .on("mouseover", onMouseOver)
         .attr("fill", () => "transparent");
 
     sectors
@@ -202,7 +192,7 @@ export async function render(donutState) {
     }
 
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(innerRadius, width, 0) < calculatePercentageValue(radius, height, 0)
+        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
             ? calculatePercentageValue(innerRadius, width, 0)
             : calculatePercentageValue(innerRadius, height, 0);
     }
@@ -214,25 +204,44 @@ export async function render(donutState) {
         return d.data.value < 0 ? "0.8" : "0";
     }
 
-    function calculateMarkedCenterText() {
-        for (let i = 0; i < donutState.data.length; i++) {
-            if (donutState.data[i].markedRowCount() > 0) {
-                centerTotal += donutState.data[i].centerSum;
+    function calculateMarkedCenterText(data) {
+        let centerTotal = 0;
+        let markedSectors = [];
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].markedRowCount() > 0) {
+                centerTotal += data[i].centerSum;
+                markedSectors.push(i);
             }
         }
-        if (centerTotal > 0) {
-            centerText.text(centerTotal);
-            centerText.style("opacity", 1);
+        for (let i = 0; i < data.length; i++) {
+            data[i].centerTotal = centerTotal;
         }
-        return centerTotal;
+        if (centerTotal > 0) {
+            centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+        }
+        if (markedSectors.length === 1) {
+            centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
+        } else {
+            centerColorText.style("opacity", 0);
+        }
     }
-    function onMouseLeave() {
+    function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
         d3.select(this).style("stroke", "none");
-        console.log(centerTotal);
-        if (centerText.style("opacity") === "1" && centerTotal === 0) {
+        console.log(d.data.centerTotal);
+        if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
             centerText.style("opacity", 0);
-            centerColor.style("opacity", 0);
+            centerColorText.style("opacity", 0);
+        }
+    }
+
+    function onMouseOver(d) {
+        d3.select(this).style("stroke", donutState.styles.fontColor);
+        if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
+            centerText.text(roundNumber(d.data.centerSum, 2));
+            centerText.style("opacity", 1);
+            centerColorText.style("opacity", 1);
+            centerColorText.text(d.data.colorValue);
         }
     }
 

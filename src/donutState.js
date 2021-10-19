@@ -82,6 +82,7 @@ export async function createDonutState(mod) {
             absPercentage: Math.abs(percentage),
             centerSum: centerSum,
             colorValue: leaf.formattedValue(),
+            centerTotal: 0,
             mark: (m) => {
                 if (m) {
                     leaf.mark(m);
@@ -113,7 +114,6 @@ export async function createDonutState(mod) {
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
-    console.log("Reran");
     let donutState = {
         data: data,
         size: size,
@@ -122,7 +122,6 @@ export async function createDonutState(mod) {
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
         centerAxisTitle: centerAxis.parts[0].displayName,
-        markedSectors: [],
         clearMarking: () => {
             dataView.clearMarking();
         },
