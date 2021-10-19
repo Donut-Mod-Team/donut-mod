@@ -214,7 +214,12 @@ function calculateGamma(line, rectangleLine, denominator) {
 export function roundNumber(value, decimals) {
     return Number(Math.round(parseFloat(value + "e" + decimals)) + "e-" + decimals);
 }
-
+/** Function calculates the percentage value of two given params, rounding by given decimals
+ * @param {Number} value
+ * @param {Number} denominator
+ * @param {Number} decimals
+ * @return {Number}
+ */
 export function calculatePercentageValue(value, denominator, decimals) {
     return roundNumber((value / denominator) * 100, decimals);
 }
