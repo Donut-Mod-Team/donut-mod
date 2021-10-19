@@ -67,10 +67,11 @@ export async function createDonutState(mod) {
     let colorLeaves = colorRoot.leaves();
 
     let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
+
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        let centerValue = sumValue(rows, centerAxisName);
+        let centerSum = sumValue(rows, centerAxisName);
         let percentage = calculatePercentageValue(yValue, totalYSum, 1);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
@@ -79,10 +80,16 @@ export async function createDonutState(mod) {
             id: leaf.key,
             percentage: percentage,
             absPercentage: Math.abs(percentage),
-            centerValue: centerValue,
-            centerTitle: centerAxis.parts[0].displayName,
+            centerSum: centerSum,
             colorValue: leaf.formattedValue(),
-            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+            mark: (m) => {
+                if (m) {
+                    leaf.mark(m);
+                } else {
+                    leaf.mark();
+                }
+            },
+            markedRowCount: () => leaf.markedRowCount(),
             tooltip: () => {
                 /* Adding the display name from the colorAxis and yAxis to the tooltip,
                 to get the corresponding leaf data onto the tooltip. */
@@ -103,10 +110,10 @@ export async function createDonutState(mod) {
             }
         };
     });
-    //console.log(data.centerSum);
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
+    console.log("Reran");
     let donutState = {
         data: data,
         size: size,
@@ -115,7 +122,10 @@ export async function createDonutState(mod) {
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
         centerAxisTitle: centerAxis.parts[0].displayName,
-        clearMarking: () => dataView.clearMarking(),
+        markedSectors: [],
+        clearMarking: () => {
+            dataView.clearMarking();
+        },
         styles: {
             fontColor: context.styling.general.font.color,
             fontFamily: context.styling.general.font.fontFamily,

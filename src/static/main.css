@@ -95,7 +95,7 @@ form {
     justify-content: center;
     align-items: center;
 }
-#center-text-title, #center-text, #center-color{
+#center-text, #center-color{
     display: flex;
     word-wrap: initial;
     justify-content: center;

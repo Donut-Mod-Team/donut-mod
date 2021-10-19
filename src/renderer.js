@@ -17,6 +17,7 @@ export async function render(donutState) {
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
     const padding = 0.1 / donutState.data.length;
+    let centerTotal = 0;
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -39,6 +40,24 @@ export async function render(donutState) {
         .innerRadius(radius + 2) // makes the outer arc bigger than the original
         .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
+    let centerColor = d3
+        .selectAll("#center-color")
+        .attr("fill", donutState.styles.fontColor)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-weight", donutState.styles.fontWeight)
+        .attr("font-size", donutState.styles.fontSize);
+
+    let centerText = d3
+        .selectAll("#center-text")
+        .attr("fill", donutState.styles.fontColor)
+        .style("opacity", 0)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-size", donutState.styles.fontSize);
+
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -46,6 +65,8 @@ export async function render(donutState) {
         .data(pie(donutState.data), (d) => {
             return d.data.id;
         });
+    centerTotal = calculateMarkedCenterText();
+    console.log(centerTotal);
 
     let newSectors = sectors
         .enter()
@@ -58,17 +79,16 @@ export async function render(donutState) {
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
         })
-        .on("mouseleave", function () {
-            donutState.modControls.tooltip.hide();
-            d3.select(this).style("stroke", "none");
-            d3.select("#center").style("opacity", 0);
-        })
+        .on("mouseleave", onMouseLeave)
         .on("mouseover", function (d) {
             d3.select(this).style("stroke", donutState.styles.fontColor);
-            d3.select("#center").style("opacity", 1);
-            d3.select("#center-text").text(roundNumber(d.data.centerValue, 2));
-            d3.select("#center-text-title").text(d.data.centerTitle);
-            d3.select("#center-color").text(d.data.colorValue);
+            if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
+                donutState.centerValue = d.data.centerSum;
+                centerText.text(roundNumber(donutState.centerValue, 2));
+                centerText.style("opacity", 1);
+                centerColor.style("opacity", 1);
+                centerColor.text(d.data.colorValue);
+            }
         })
         .attr("fill", () => "transparent");
 
@@ -152,14 +172,6 @@ export async function render(donutState) {
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
-    d3.selectAll("#center-text-title, #center-text, #center-color")
-        .attr("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
-        .style("max-width", `${calculateCenterTextSpace()}%`)
-        .attr("font-family", donutState.styles.fontFamily)
-        .attr("font-weight", donutState.styles.fontWeight)
-        .attr("font-size", donutState.styles.fontSize);
-
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
@@ -200,6 +212,28 @@ export async function render(donutState) {
      * */
     function getOpacityForOuterSide(d) {
         return d.data.value < 0 ? "0.8" : "0";
+    }
+
+    function calculateMarkedCenterText() {
+        for (let i = 0; i < donutState.data.length; i++) {
+            if (donutState.data[i].markedRowCount() > 0) {
+                centerTotal += donutState.data[i].centerSum;
+            }
+        }
+        if (centerTotal > 0) {
+            centerText.text(centerTotal);
+            centerText.style("opacity", 1);
+        }
+        return centerTotal;
+    }
+    function onMouseLeave() {
+        donutState.modControls.tooltip.hide();
+        d3.select(this).style("stroke", "none");
+        console.log(centerTotal);
+        if (centerText.style("opacity") === "1" && centerTotal === 0) {
+            centerText.style("opacity", 0);
+            centerColor.style("opacity", 0);
+        }
     }
 
     marker.drawRectangularSelection(donutState);
