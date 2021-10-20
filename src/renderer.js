@@ -15,6 +15,11 @@ export async function render(donutState) {
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
+
+    if (height <= 0 || width <= 0) {
+        return;
+    }
+
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
 

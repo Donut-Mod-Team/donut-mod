@@ -1,3 +1,4 @@
+import { resources } from "./resources";
 import { roundNumber, calculatePercentageValue } from "./utility";
 
 /**
@@ -15,24 +16,29 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
-    const yAxisName = "Sector size by";
-    const centerAxisName = "Center value by";
 
     /**
      * Check for any errors.
      */
     let errors = await dataView.getErrors();
     if (errors.length > 0) {
-        mod.controls.errorOverlay.show(errors, "dataView");
+        mod.controls.errorOverlay.show(errors, resources.errorOverlayCategoryDataView);
         // TODO clear DOM
         return;
     }
 
-    mod.controls.errorOverlay.hide("dataView");
+    mod.controls.errorOverlay.hide(resources.errorOverlayCategoryDataView);
 
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
     // render the chart.
-    let colorHierarchy = await dataView.hierarchy("Color");
+    let colorHierarchy = await dataView.hierarchy(resources.colorAxisName);
+    if (colorHierarchy == null) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
+
     let colorRoot = await colorHierarchy.root();
     if (colorRoot == null) {
         // Return and wait for next call to render when reading data was aborted.
@@ -41,70 +47,83 @@ export async function createDonutState(mod) {
         return;
     }
 
-    let dataViewYAxis = await dataView.continuousAxis(yAxisName);
+    let dataViewYAxis = await dataView.continuousAxis(resources.yAxisName);
     if (dataViewYAxis == null) {
-        mod.controls.errorOverlay.show("No data on y axis.", yAxisName);
+        mod.controls.errorOverlay.show(resources.errorNoDataOnAxis(resources.yAxisName), resources.yAxisName);
         return;
     } else {
-        mod.controls.errorOverlay.hide(yAxisName);
+        mod.controls.errorOverlay.hide(resources.yAxisName);
     }
 
-    let dataViewCenterAxis = await dataView.continuousAxis(centerAxisName);
+    let dataViewCenterAxis = await dataView.continuousAxis(resources.centerAxisName);
     if (dataViewCenterAxis == null) {
-        mod.controls.errorOverlay.show("No data on center axis.", centerAxisName);
+        mod.controls.errorOverlay.show("No data on center axis.", resources.centerAxisName);
         return;
     } else {
-        mod.controls.errorOverlay.hide(yAxisName);
+        mod.controls.errorOverlay.hide(resources.yAxisName);
     }
     // Awaiting and retrieving the Color and Y axis from the mod.
-    let yAxis = await mod.visualization.axis(yAxisName);
-    const colorAxisMeta = await mod.visualization.axis("Color");
+    let yAxis = await mod.visualization.axis(resources.yAxisName);
+    const colorAxisMeta = await mod.visualization.axis(resources.colorAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
+    if (colorLeaves.length === 0) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
 
-    let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
+    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
 
-    let data = colorLeaves.map((leaf) => {
-        let rows = leaf.rows();
-        let yValue = sumValue(rows, yAxisName);
-        let centerSum = sumValue(rows, centerAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum, 1);
-        return {
-            color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: yValue,
-            absValue: Math.abs(yValue),
-            id: leaf.key,
-            renderID: leaf.leafIndex,
-            percentage: percentage.toFixed(1),
-            absPercentage: Math.abs(percentage).toFixed(1),
-            centerSum: centerSum,
-            colorValue: leaf.formattedValue(),
-            centerTotal: 0,
-            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
-            markedRowCount: () => leaf.markedRowCount(),
-            tooltip: () => {
-                /* Adding the display name from the colorAxis and yAxis to the tooltip,
-                to get the corresponding leaf data onto the tooltip. */
-                return (
-                    "Ratio: " +
-                    percentage +
-                    "%" +
-                    "\n" +
-                    yAxis.parts[0].displayName +
-                    ": " +
-                    roundNumber(yValue, 2) +
-                    "\n" +
-                    colorAxisMeta.parts[0].displayName +
-                    ": " +
-                    leaf.formattedValue() +
-                    "\n"
-                );
-            }
-        };
-    });
+    let data;
+    try {
+        data = colorLeaves.map((leaf) => {
+            let rows = leaf.rows();
+            let yValue = sumValue(rows, resources.yAxisName);
+            let centerSum = sumValue(rows, resources.centerAxisName);
+            let percentage = calculatePercentageValue(yValue, totalYSum, 1);
+            return {
+                color: rows.length ? rows[0].color().hexCode : "transparent",
+                value: yValue,
+                absValue: Math.abs(yValue),
+                id: leaf.key,
+                renderID: leaf.leafIndex,
+                percentage: percentage.toFixed(1),
+                absPercentage: Math.abs(percentage).toFixed(1),
+                centerSum: centerSum,
+                colorValue: leaf.formattedValue(),
+                centerTotal: 0,
+                mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+                markedRowCount: () => leaf.markedRowCount(),
+                tooltip: () => {
+                    /* Adding the display name from the colorAxis and yAxis to the tooltip,
+                    to get the corresponding leaf data onto the tooltip. */
+                    return (
+                        "Ratio: " +
+                        percentage +
+                        "%" +
+                        "\n" +
+                        yAxis.parts[0].displayName +
+                        ": " +
+                        roundNumber(yValue, 2) +
+                        "\n" +
+                        colorAxisMeta.parts[0].displayName +
+                        ": " +
+                        leaf.formattedValue() +
+                        "\n"
+                    );
+                }
+            };
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
@@ -135,7 +154,7 @@ export async function createDonutState(mod) {
 }
 
 /**
- * Calculate the total value for an axis from a set of rows. Null values are treated a 0.
+ * Calculate the total value for an axis from a set of rows. Null values are treated as 0.
  * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
  * @param {string} axis Name of Axis to use to calculate the value.
  */
