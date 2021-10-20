@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import { roundNumber } from "./utility";
+import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 
 /**
@@ -21,7 +21,7 @@ export async function render(donutState) {
     let padding = 0;
     // The padding threshold is set to 6 because this is the amount of sectors where the padding becomes too small.
     const paddingThreshold = 6;
-    
+
     if(donutState.data.length < paddingThreshold) {
         padding = 0.02 / donutState.data.length;
     } else {
@@ -42,6 +42,26 @@ export async function render(donutState) {
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
+    let centerColorText = d3
+        .selectAll("#center-color")
+        .style("fill", donutState.styles.fontColor)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-weight", donutState.styles.fontWeight)
+        .style("font-size", donutState.styles.fontSize);
+
+    let centerText = d3
+        .selectAll("#center-text")
+        .style("fill", donutState.styles.fontColor)
+        .style("opacity", 0)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-size", donutState.styles.fontSize);
+
+    calculateMarkedCenterText(donutState.data);
+
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -60,21 +80,11 @@ export async function render(donutState) {
         .on("mouseenter", function (d) {
             donutState.modControls.tooltip.show(d.data.tooltip());
         })
-        .on("mouseleave", function (d) {
-            donutState.modControls.tooltip.hide();
-            d3.select("path#hoverID_" + d.data.renderID)
-                .transition()
-                .duration(animationDuration)
-                .style("opacity", "0");
-        })
-        .on("mouseover", function (d) {
-            d3.select("path#hoverID_" + d.data.renderID)
-                .transition()
-                .duration(animationDuration)
-                .style("opacity", "1");
-        })
+        .on("mouseleave", onMouseLeave)
+        .on("mouseover", onMouseOver)
         .attr("fill", () => "transparent")
         .attr("stroke", (d) => (d.data.markedRowCount() > 0 ? donutState.styles.fontColor : "none"));
+
     sectors
         .merge(newSectors)
         .transition()
@@ -143,14 +153,6 @@ export async function render(donutState) {
             : "0";
     }
 
-    d3.select("#centertext")
-        .text("Sum: " + calculateMiddleText(donutState.data))
-        .attr("fill", donutState.styles.fontColor)
-        .attr("font-family", donutState.styles.fontFamily)
-        .attr("font-style", donutState.styles.fontStyle)
-        .attr("font-weight", donutState.styles.fontWeight)
-        .attr("font-size", donutState.styles.fontSize);
-
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
@@ -172,12 +174,56 @@ export async function render(donutState) {
         return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
 
-    function calculateMiddleText(data) {
-        let middleText = 0;
+    function calculateCenterTextSpace() {
+        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
+            ? calculatePercentageValue(innerRadius, width, 0)
+            : calculatePercentageValue(innerRadius, height, 0);
+    }
+
+    function calculateMarkedCenterText(data) {
+        let centerTotal = 0;
+        let markedSectors = [];
         for (let i = 0; i < data.length; i++) {
-            middleText += data[i].absValue;
+            if (data[i].markedRowCount() > 0) {
+                centerTotal += data[i].centerSum;
+                markedSectors.push(i);
+            }
         }
-        return roundNumber(middleText, 2);
+        for (let i = 0; i < data.length; i++) {
+            data[i].centerTotal = centerTotal;
+        }
+        if (markedSectors.length > 0) {
+            centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+        }
+        if (markedSectors.length === 1) {
+            centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
+        } else {
+            centerColorText.style("opacity", 0);
+        }
+    }
+    function onMouseLeave(d) {
+        donutState.modControls.tooltip.hide();
+        d3.select("path#hoverID_" + d.data.renderID)
+            .transition()
+            .duration(animationDuration)
+            .style("opacity", "0");
+        if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
+            centerText.style("opacity", 0);
+            centerColorText.style("opacity", 0);
+        }
+    }
+
+    function onMouseOver(d) {
+        d3.select("path#hoverID_" + d.data.renderID)
+            .transition()
+            .duration(animationDuration)
+            .style("opacity", "1");
+        if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
+            centerText.text(roundNumber(d.data.centerSum, 2));
+            centerText.style("opacity", 1);
+            centerColorText.style("opacity", 1);
+            centerColorText.text(d.data.colorValue);
+        }
     }
 
     marker.drawRectangularSelection(donutState);
@@ -189,6 +235,7 @@ export async function render(donutState) {
 
     donutState.context.signalRenderComplete();
 }
+
 /**
  * Function is creating and drawing the outlines for sectors with negative values
  * @param {d3.pie} pie

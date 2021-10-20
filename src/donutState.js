@@ -1,4 +1,4 @@
-import { roundNumber } from "./utility";
+import { roundNumber, calculatePercentageValue } from "./utility";
 
 /**
  * Render the visualization
@@ -16,6 +16,7 @@ export async function createDonutState(mod) {
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
     const yAxisName = "Sector size by";
+    const centerAxisName = "Center value by";
 
     /**
      * Check for any errors.
@@ -48,6 +49,13 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide(yAxisName);
     }
 
+    let dataViewCenterAxis = await dataView.continuousAxis(centerAxisName);
+    if (dataViewCenterAxis == null) {
+        mod.controls.errorOverlay.show("No data on center axis.", centerAxisName);
+        return;
+    } else {
+        mod.controls.errorOverlay.hide(yAxisName);
+    }
     // Awaiting and retrieving the Color and Y axis from the mod.
     let yAxis = await mod.visualization.axis(yAxisName);
     const colorAxisMeta = await mod.visualization.axis("Color");
@@ -58,10 +66,12 @@ export async function createDonutState(mod) {
     let colorLeaves = colorRoot.leaves();
 
     let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
+
     let data = colorLeaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum);
+        let centerSum = sumValue(rows, centerAxisName);
+        let percentage = calculatePercentageValue(yValue, totalYSum, 1);
         return {
             color: rows.length ? rows[0].color().hexCode : "transparent",
             value: yValue,
@@ -70,6 +80,9 @@ export async function createDonutState(mod) {
             renderID: leaf.leafIndex,
             percentage: percentage.toFixed(1),
             absPercentage: Math.abs(percentage).toFixed(1),
+            centerSum: centerSum,
+            colorValue: leaf.formattedValue(),
+            centerTotal: 0,
             mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
             markedRowCount: () => leaf.markedRowCount(),
             tooltip: () => {
@@ -143,13 +156,4 @@ function calculateTotalYSum(leaves, yAxisName) {
         sumOfValues += Math.abs(yValue);
     });
     return sumOfValues;
-}
-
-/** Function calculates the percentage value of two given params
- * @param {Number} value
- * @param {Number} totalYSum
- * @return {Number}
- */
-function calculatePercentageValue(value, totalYSum) {
-    return roundNumber((value / totalYSum) * 100, 1);
 }
