@@ -17,8 +17,6 @@ export async function createDonutState(mod) {
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
 
-    const centerAxisName = "Center value by";
-
     /**
      * Check for any errors.
      */
@@ -57,9 +55,9 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide(resources.yAxisName);
     }
 
-    let dataViewCenterAxis = await dataView.continuousAxis(centerAxisName);
+    let dataViewCenterAxis = await dataView.continuousAxis(resources.centerAxisName);
     if (dataViewCenterAxis == null) {
-        mod.controls.errorOverlay.show("No data on center axis.", centerAxisName);
+        mod.controls.errorOverlay.show("No data on center axis.", resources.centerAxisName);
         return;
     } else {
         mod.controls.errorOverlay.hide(resources.yAxisName);
@@ -86,15 +84,21 @@ export async function createDonutState(mod) {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let percentage = calculatePercentageValue(yValue, totalYSum);
+            let centerSum = sumValue(rows, resources.centerAxisName);
+            let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
                 absValue: Math.abs(yValue),
                 id: leaf.key,
-                percentage: percentage,
-                absPercentage: Math.abs(percentage),
+                renderID: leaf.leafIndex,
+                percentage: percentage.toFixed(1),
+                absPercentage: Math.abs(percentage).toFixed(1),
+                centerSum: centerSum,
+                colorValue: leaf.formattedValue(),
+                centerTotal: 0,
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+                markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
                     /* Adding the display name from the colorAxis and yAxis to the tooltip,
                     to get the corresponding leaf data onto the tooltip. */
@@ -119,47 +123,6 @@ export async function createDonutState(mod) {
         console.error(error);
     }
 
-
-    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
-
-    let data = colorLeaves.map((leaf) => {
-        let rows = leaf.rows();
-        let yValue = sumValue(rows, resources.yAxisName);
-        let centerSum = sumValue(rows, centerAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum, 1);
-        return {
-            color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: yValue,
-            absValue: Math.abs(yValue),
-            id: leaf.key,
-            renderID: leaf.leafIndex,
-            percentage: percentage.toFixed(1),
-            absPercentage: Math.abs(percentage).toFixed(1),
-            centerSum: centerSum,
-            colorValue: leaf.formattedValue(),
-            centerTotal: 0,
-            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
-            markedRowCount: () => leaf.markedRowCount(),
-            tooltip: () => {
-                /* Adding the display name from the colorAxis and yAxis to the tooltip,
-                to get the corresponding leaf data onto the tooltip. */
-                return (
-                    "Ratio: " +
-                    percentage +
-                    "%" +
-                    "\n" +
-                    yAxis.parts[0].displayName +
-                    ": " +
-                    roundNumber(yValue, 2) +
-                    "\n" +
-                    colorAxisMeta.parts[0].displayName +
-                    ": " +
-                    leaf.formattedValue() +
-                    "\n"
-                );
-            }
-        };
-    });
 
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
