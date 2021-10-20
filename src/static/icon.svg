@@ -13,13 +13,13 @@
 <path d="M1.34566 14.7359C0.841892 12.7741 0.889572 10.7112 1.48344 8.77478C2.07732 6.83833 3.19432 5.10344 4.71133 3.76135L7.85618 7.31608C6.99371 8.0791 6.35866 9.06544 6.02103 10.1664C5.68339 11.2673 5.65628 12.4401 5.94269 13.5554L1.34566 14.7359Z" stroke="url(#paint2_linear)" stroke-width="8" mask="url(#path-3-inside-3)"/>
 <defs>
 <linearGradient id="paint0_linear" x1="12" y1="1" x2="12" y2="23" gradientUnits="userSpaceOnUse">
-<stop offset="0.472727" stop-color="#9EB6FF"/>
+<stop offset="0.472727" stop-color="#6489FA"/>
 </linearGradient>
 <linearGradient id="paint1_linear" x1="12" y1="1" x2="12" y2="23" gradientUnits="userSpaceOnUse">
-<stop offset="0.472727" stop-color="#FFEC9E"/>
+<stop offset="0.472727" stop-color="#FA7864"/>
 </linearGradient>
 <linearGradient id="paint2_linear" x1="12" y1="1" x2="12" y2="23" gradientUnits="userSpaceOnUse">
-<stop offset="0.472727" stop-color="#FFAB9E"/>
+<stop offset="0.472727" stop-color="#FAA264"/>
 </linearGradient>
 </defs>
 </svg>

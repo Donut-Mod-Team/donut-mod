@@ -29,4 +29,4 @@ A complete guide to installation and getting started using mod can be found [her
 
 ## Licence
 
-TBD
+Donut Mod is available under the [MIT license](LICENSE).

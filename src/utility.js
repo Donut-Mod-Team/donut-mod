@@ -136,7 +136,7 @@ export function getPointFromCircle(centerPoint, angle, radius) {
     let xStart = centerPoint.x + radius * Math.sin((angle - Math.PI) * -1);
     let yStart = centerPoint.y + radius * Math.cos((angle - Math.PI) * -1);
 
-    return {x: xStart, y: yStart}
+    return { x: xStart, y: yStart };
 }
 
 /**
@@ -147,14 +147,14 @@ export function getPointFromCircle(centerPoint, angle, radius) {
  *  */
 export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
     let intersections = [];
-    for (let i = 0; i < rectangleSides.length; i++){
+    for (let i = 0; i < rectangleSides.length; i++) {
         let denominator = calculateDenominator(line, rectangleSides[i]);
 
         if (denominator !== 0) {
             let gamma = calculateGamma(line, rectangleSides[i], denominator);
             let lambda = calculateLambda(line, rectangleSides[i], denominator);
 
-            if ((0 < lambda && lambda < 1) && (0 < gamma && gamma < 1)) {
+            if (0 < lambda && lambda < 1 && 0 < gamma && gamma < 1) {
                 intersections.push(true);
             }
         }
@@ -169,8 +169,10 @@ export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
  * @returns {number}
  *  */
 function calculateDenominator(line, rectangleLine) {
-    return ((line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - rectangleLine.y1) -
-        (rectangleLine.x2 - rectangleLine.x1) * (line.outerPoint.y - line.innerPoint.y));
+    return (
+        (line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - rectangleLine.y1) -
+        (rectangleLine.x2 - rectangleLine.x1) * (line.outerPoint.y - line.innerPoint.y)
+    );
 }
 
 /**
@@ -181,8 +183,11 @@ function calculateDenominator(line, rectangleLine) {
  * @returns {number}
  *  */
 function calculateLambda(line, rectangleLine, denominator) {
-    return denominator !== 0 ? ((rectangleLine.y2 - rectangleLine.y1) * (rectangleLine.x2 - line.innerPoint.x)
-        + (rectangleLine.x1 - rectangleLine.x2) * (rectangleLine.y2 - line.innerPoint.y)) / denominator : 0;
+    return denominator !== 0
+        ? ((rectangleLine.y2 - rectangleLine.y1) * (rectangleLine.x2 - line.innerPoint.x) +
+              (rectangleLine.x1 - rectangleLine.x2) * (rectangleLine.y2 - line.innerPoint.y)) /
+              denominator
+        : 0;
 }
 
 /**
@@ -193,8 +198,11 @@ function calculateLambda(line, rectangleLine, denominator) {
  * @returns {number}
  *  */
 function calculateGamma(line, rectangleLine, denominator) {
-    return denominator !== 0 ? ((line.innerPoint.y - line.outerPoint.y) * (rectangleLine.x2 - line.innerPoint.x)
-        + (line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - line.innerPoint.y)) / denominator : 0;
+    return denominator !== 0
+        ? ((line.innerPoint.y - line.outerPoint.y) * (rectangleLine.x2 - line.innerPoint.x) +
+              (line.outerPoint.x - line.innerPoint.x) * (rectangleLine.y2 - line.innerPoint.y)) /
+              denominator
+        : 0;
 }
 
 /** Function takes a float value and returns it with
@@ -204,5 +212,14 @@ function calculateGamma(line, rectangleLine, denominator) {
  * @return {Number}
  */
 export function roundNumber(value, decimals) {
-    return Number(Math.round(parseFloat( value + 'e' + decimals)) + 'e-' + decimals);
+    return Number(Math.round(parseFloat(value + "e" + decimals)) + "e-" + decimals);
+}
+/** Function calculates the percentage value of two given params, rounding by given decimals
+ * @param {Number} value
+ * @param {Number} denominator
+ * @param {Number} decimals
+ * @return {Number}
+ */
+export function calculatePercentageValue(value, denominator, decimals) {
+    return roundNumber((value / denominator) * 100, decimals);
 }
