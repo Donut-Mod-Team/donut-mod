@@ -1,5 +1,5 @@
-import { roundNumber } from "./utility";
 import { resources } from "./resources";
+import { roundNumber, calculatePercentageValue } from "./utility";
 
 /**
  * Render the visualization
@@ -16,6 +16,8 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
+
+    const centerAxisName = "Center value by";
 
     /**
      * Check for any errors.
@@ -55,6 +57,13 @@ export async function createDonutState(mod) {
         mod.controls.errorOverlay.hide(resources.yAxisName);
     }
 
+    let dataViewCenterAxis = await dataView.continuousAxis(centerAxisName);
+    if (dataViewCenterAxis == null) {
+        mod.controls.errorOverlay.show("No data on center axis.", centerAxisName);
+        return;
+    } else {
+        mod.controls.errorOverlay.hide(resources.yAxisName);
+    }
     // Awaiting and retrieving the Color and Y axis from the mod.
     let yAxis = await mod.visualization.axis(resources.yAxisName);
     const colorAxisMeta = await mod.visualization.axis(resources.colorAxisName);
@@ -110,6 +119,48 @@ export async function createDonutState(mod) {
         console.error(error);
     }
 
+
+    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
+
+    let data = colorLeaves.map((leaf) => {
+        let rows = leaf.rows();
+        let yValue = sumValue(rows, resources.yAxisName);
+        let centerSum = sumValue(rows, centerAxisName);
+        let percentage = calculatePercentageValue(yValue, totalYSum, 1);
+        return {
+            color: rows.length ? rows[0].color().hexCode : "transparent",
+            value: yValue,
+            absValue: Math.abs(yValue),
+            id: leaf.key,
+            renderID: leaf.leafIndex,
+            percentage: percentage.toFixed(1),
+            absPercentage: Math.abs(percentage).toFixed(1),
+            centerSum: centerSum,
+            colorValue: leaf.formattedValue(),
+            centerTotal: 0,
+            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+            markedRowCount: () => leaf.markedRowCount(),
+            tooltip: () => {
+                /* Adding the display name from the colorAxis and yAxis to the tooltip,
+                to get the corresponding leaf data onto the tooltip. */
+                return (
+                    "Ratio: " +
+                    percentage +
+                    "%" +
+                    "\n" +
+                    yAxis.parts[0].displayName +
+                    ": " +
+                    roundNumber(yValue, 2) +
+                    "\n" +
+                    colorAxisMeta.parts[0].displayName +
+                    ": " +
+                    leaf.formattedValue() +
+                    "\n"
+                );
+            }
+        };
+    });
+
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
@@ -123,9 +174,16 @@ export async function createDonutState(mod) {
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
-            fontFamily: context.styling.general.font.fontFamily,
+            fontFamily:
+                context.styling.general.font.fontFamily.indexOf(",") > -1
+                    ? context.styling.general.font.fontFamily.split(",")[0]
+                    : context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
-            fontSize: context.styling.general.font.fontSize
+            fontSize: context.styling.general.font.fontSize,
+            fontStyle: context.styling.general.font.fontStyle,
+            backgroundColor: context.styling.general.backgroundColor,
+            lineStroke: context.styling.scales.line.stroke,
+            tick: context.styling.scales.tick.stroke
         }
     };
 
@@ -154,13 +212,4 @@ function calculateTotalYSum(leaves, yAxisName) {
         sumOfValues += Math.abs(yValue);
     });
     return sumOfValues;
-}
-
-/** Function calculates the percentage value of two given params
- * @param {Number} value
- * @param {Number} totalYSum
- * @return {Number}
- */
-function calculatePercentageValue(value, totalYSum) {
-    return roundNumber((value / totalYSum) * 100, 1);
 }
