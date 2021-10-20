@@ -63,7 +63,7 @@ export async function createDonutState(mod) {
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
-    if (colorLeaves == null) {
+    if (colorLeaves.length === 0) {
         // Return and wait for next call to render when reading data was aborted.
         // Last rendered data view is still valid from a users perspective since
         // a document modification was made during a progress indication.
