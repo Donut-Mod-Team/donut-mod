@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
+import { applyHoverEffect } from "./hoverer";
 
 /**
  * @param {object} donutState
@@ -16,7 +17,16 @@ export async function render(donutState) {
     const height = donutState.size.height - sizeModifier;
     const radius = Math.min(width, height) / 2 - sizeModifier;
     const innerRadius = radius * 0.5;
-    const padding = 0.05 / donutState.data.length;
+
+    let padding = 0;
+    // The padding threshold is set to 6 because this is the amount of sectors where the padding becomes too small.
+    const paddingThreshold = 6;
+
+    if(donutState.data.length < paddingThreshold) {
+        padding = 0.02 / donutState.data.length;
+    } else {
+        padding = 0.05 / donutState.data.length;
+    }
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -31,13 +41,6 @@ export async function render(donutState) {
     const pie = d3.pie().value((d) => d.absValue);
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
-
-    // Used for the outer side showing negative values
-    let outerArcNegativeValues = d3
-        .arc()
-        .padAngle(padding)
-        .innerRadius(radius + 2) // makes the outer arc bigger than the original
-        .outerRadius(radius + 3); // defines the size of the outer arc as 1
 
     let centerColorText = d3
         .selectAll("#center-color")
@@ -70,7 +73,6 @@ export async function render(donutState) {
     let newSectors = sectors
         .enter()
         .append("svg:path")
-        .attr("class", "sector")
         .on("click", function (d) {
             marker.select(d);
             d3.event.stopPropagation();
@@ -80,50 +82,17 @@ export async function render(donutState) {
         })
         .on("mouseleave", onMouseLeave)
         .on("mouseover", onMouseOver)
-        .attr("fill", () => "transparent");
+        .attr("fill", () => "transparent")
+        .attr("stroke", (d) => (d.data.markedRowCount() > 0 ? donutState.styles.fontColor : "none"));
 
     sectors
         .merge(newSectors)
-        .attr("class", "sector")
         .transition()
         .duration(animationDuration)
         .attr("value", (d) => d.data.absPercentage)
         .attr("fill", (d) => d.data.color)
         .attrTween("d", tweenArc)
-        .attr("stroke", "none");
-
-    // Define the outer arc paths and data
-    let outerSectorsNegativeValues = svg
-        .select("g#outer-sectors")
-        .attr("pointer-events", "none")
-        .selectAll("path")
-        .data(pie(donutState.data), (d) => {
-            return d.data.id;
-        });
-
-    // Initial rendering
-    outerSectorsNegativeValues
-        .enter()
-        .append("path")
-        .attr("d", function (d) {
-            return outerArcNegativeValues(d);
-        })
-        .attr("class", "outerSectorArc")
-        .style("opacity", getOpacityForOuterSide);
-
-    // Define behavior on transition
-    outerSectorsNegativeValues
-        .transition()
-        .duration(animationDuration)
-        .attrTween("d", function (d) {
-            return function () {
-                return outerArcNegativeValues(d);
-            };
-        })
-        .attr("class", "outerSectorArc")
-        .style("opacity", getOpacityForOuterSide);
-
-    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+        .attr("stroke", (d) => (d.data.markedRowCount() > 0 ? donutState.styles.fontColor : "none"));
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
@@ -139,6 +108,7 @@ export async function render(donutState) {
                     .attr("dy", "0.35em")
                     .attr("fill", donutState.styles.fontColor)
                     .attr("font-family", donutState.styles.fontFamily)
+                    .attr("font-style", donutState.styles.fontStyle)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
                     .text((d) => d.data.absPercentage + "%")
@@ -149,6 +119,11 @@ export async function render(donutState) {
                             .duration(animationDuration)
                             .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
+                            .attr("fill", donutState.styles.fontColor)
+                            .attr("font-family", donutState.styles.fontFamily)
+                            .attr("font-style", donutState.styles.fontStyle)
+                            .attr("font-weight", donutState.styles.fontWeight)
+                            .attr("font-size", donutState.styles.fontSize)
                     );
             },
             (update) =>
@@ -161,6 +136,7 @@ export async function render(donutState) {
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                         .attr("font-family", donutState.styles.fontFamily)
+                        .attr("font-style", donutState.styles.fontStyle)
                         .attr("font-weight", donutState.styles.fontWeight)
                         .attr("font-size", donutState.styles.fontSize)
                 ),
@@ -203,13 +179,6 @@ export async function render(donutState) {
             ? calculatePercentageValue(innerRadius, width, 0)
             : calculatePercentageValue(innerRadius, height, 0);
     }
-    /** Function check if a data-set contains negative values and returns the opacity
-     * @param {data} d
-     * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
-     * */
-    function getOpacityForOuterSide(d) {
-        return d.data.value < 0 ? "0.8" : "0";
-    }
 
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
@@ -234,7 +203,10 @@ export async function render(donutState) {
     }
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
-        d3.select(this).style("stroke", "none");
+        d3.select("path#hoverID_" + d.data.renderID)
+            .transition()
+            .duration(animationDuration)
+            .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
             centerText.style("opacity", 0);
             centerColorText.style("opacity", 0);
@@ -242,7 +214,10 @@ export async function render(donutState) {
     }
 
     function onMouseOver(d) {
-        d3.select(this).style("stroke", donutState.styles.fontColor);
+        d3.select("path#hoverID_" + d.data.renderID)
+            .transition()
+            .duration(animationDuration)
+            .style("opacity", "1");
         if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
             centerText.text(roundNumber(d.data.centerSum, 2));
             centerText.style("opacity", 1);
@@ -252,8 +227,68 @@ export async function render(donutState) {
     }
 
     marker.drawRectangularSelection(donutState);
+    applyHoverEffect(pie, donutState, animationDuration);
+
+    drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
     donutState.context.signalRenderComplete();
+}
+
+/**
+ * Function is creating and drawing the outlines for sectors with negative values
+ * @param {d3.pie} pie
+ * @param {donutState} donutState
+ * @param {number} animationDuration
+ * @param {number} padding
+ * @param {d3.svg} svg
+ * */
+function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg) {
+    // Used for the outer side showing negative values
+    let outerArcNegativeValues = d3
+        .arc()
+        .padAngle(padding)
+        .innerRadius(donutState.donutCircle.radius + 2) // makes the outer arc bigger than the original
+        .outerRadius(donutState.donutCircle.radius + 3); // defines the size of the outer arc as 1
+    // Define the outer arc paths and data
+    let outerSectorsNegativeValues = svg
+        .select("g#outer-sectors")
+        .attr("pointer-events", "none")
+        .selectAll("path")
+        .data(pie(donutState.data), (d) => {
+            return d.data.id;
+        });
+
+    // Initial rendering
+    outerSectorsNegativeValues
+        .enter()
+        .append("path")
+        .attr("d", function (d) {
+            return outerArcNegativeValues(d);
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    // Define behavior on transition
+    outerSectorsNegativeValues
+        .transition()
+        .duration(animationDuration)
+        .attrTween("d", function (d) {
+            return function () {
+                return outerArcNegativeValues(d);
+            };
+        })
+        .attr("class", "outerSectorArc")
+        .style("opacity", getOpacityForOuterSide);
+
+    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+}
+
+/** Function check if a data-set contains negative values and returns the opacity
+ * @param {data} d
+ * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
+ * */
+function getOpacityForOuterSide(d) {
+    return d.data.value < 0 ? "0.8" : "0";
 }
