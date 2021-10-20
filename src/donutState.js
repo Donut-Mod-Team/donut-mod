@@ -22,12 +22,12 @@ export async function createDonutState(mod) {
      */
     let errors = await dataView.getErrors();
     if (errors.length > 0) {
-        mod.controls.errorOverlay.show(errors, "dataView");
+        mod.controls.errorOverlay.show(errors, resources.errorOverlayCategoryDataView);
         // TODO clear DOM
         return;
     }
 
-    mod.controls.errorOverlay.hide("dataView");
+    mod.controls.errorOverlay.hide(resources.errorOverlayCategoryDataView);
 
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
     // render the chart.
@@ -71,38 +71,45 @@ export async function createDonutState(mod) {
     }
 
     let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
-    let data = colorLeaves.map((leaf) => {
-        let rows = leaf.rows();
-        let yValue = sumValue(rows, resources.yAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum);
-        return {
-            color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: yValue,
-            absValue: Math.abs(yValue),
-            id: leaf.key,
-            percentage: percentage,
-            absPercentage: Math.abs(percentage),
-            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
-            tooltip: () => {
-                /* Adding the display name from the colorAxis and yAxis to the tooltip,
-                to get the corresponding leaf data onto the tooltip. */
-                return (
-                    "Ratio: " +
-                    percentage +
-                    "%" +
-                    "\n" +
-                    yAxis.parts[0].displayName +
-                    ": " +
-                    roundNumber(yValue, 2) +
-                    "\n" +
-                    colorAxisMeta.parts[0].displayName +
-                    ": " +
-                    leaf.formattedValue() +
-                    "\n"
-                );
-            }
-        };
-    });
+
+    let data;
+    try {
+        data = colorLeaves.map((leaf) => {
+            let rows = leaf.rows();
+            let yValue = sumValue(rows, resources.yAxisName);
+            let percentage = calculatePercentageValue(yValue, totalYSum);
+            return {
+                color: rows.length ? rows[0].color().hexCode : "transparent",
+                value: yValue,
+                absValue: Math.abs(yValue),
+                id: leaf.key,
+                percentage: percentage,
+                absPercentage: Math.abs(percentage),
+                mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+                tooltip: () => {
+                    /* Adding the display name from the colorAxis and yAxis to the tooltip,
+                    to get the corresponding leaf data onto the tooltip. */
+                    return (
+                        "Ratio: " +
+                        percentage +
+                        "%" +
+                        "\n" +
+                        yAxis.parts[0].displayName +
+                        ": " +
+                        roundNumber(yValue, 2) +
+                        "\n" +
+                        colorAxisMeta.parts[0].displayName +
+                        ": " +
+                        leaf.formattedValue() +
+                        "\n"
+                    );
+                }
+            };
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */

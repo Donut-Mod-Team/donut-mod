@@ -30,16 +30,24 @@ Spotfire.initialize(async (mod) => {
     reader.subscribe(async () => {
         let donutState = await createDonutState(mod);
 
-        if (donutState != null) {
-            if (errorOverlayVisualized) {
-                mod.controls.errorOverlay.hide();
-                errorOverlayVisualized = false;
-            }
-            render(donutState);
-        } else {
-            mod.controls.errorOverlay.show(resources.errorNullDonutState);
-            errorOverlayVisualized = true;
+        if (errorOverlayVisualized) {
+            mod.controls.errorOverlay.hide(resources.errorOverlayCategoryGeneral);
+            errorOverlayVisualized = false;
         }
 
+        if (donutState == null) {
+            console.error(resources.errorNullDonutState(donutState));
+            mod.controls.errorOverlay.show(resources.errorGeneralOverlay, resources.errorOverlayCategoryGeneral);
+            errorOverlayVisualized = true;
+            return;
+        }
+
+        try {
+            render(donutState);
+        } catch (error) {
+            console.error(error);
+            mod.controls.errorOverlay.show(resources.errorRendering, resources.errorOverlayCategoryGeneral);
+            errorOverlayVisualized = true;
+        }
     });
 });
