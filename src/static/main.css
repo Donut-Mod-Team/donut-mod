@@ -30,8 +30,8 @@ svg {
     fill: #85A2CB;
     stroke: #313336;
     fill-opacity: 0.5;
-    stroke-opacity: 0.5;
-    stroke-width: 0.1;
+    stroke-opacity: 1;
+    stroke-width: 0.5;
 }
 
 .outerSectorArc {
