@@ -5,6 +5,7 @@
     "id": "donut-chart",
     "icon": "icon.svg",
     "dataViewDefinition": {
+        "tooltip": {"enabled":  true},
         "colorAxis": {
             "mode": "categorical",
             "dropTarget": {
