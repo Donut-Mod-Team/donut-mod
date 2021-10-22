@@ -75,6 +75,12 @@ export async function render(donutState) {
             return d.data.id;
         });
 
+    const labelColorLuminance = luminance(
+        parseInt(donutState.styles.fontColor.substr(1,2),16),
+        parseInt(donutState.styles.fontColor.substr(3,2),16),
+        parseInt(donutState.styles.fontColor.substr(5,2),16)
+    );
+
     let newSectors = sectors
         .enter()
         .append("svg:path")
@@ -124,7 +130,7 @@ export async function render(donutState) {
                             .duration(animationDuration)
                             .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
-                            .attr("fill", donutState.styles.fontColor)
+                            .attr("fill", (d) => calculateTextColor(d.data.color))
                             .attr("font-family", donutState.styles.fontFamily)
                             .attr("font-style", donutState.styles.fontStyle)
                             .attr("font-weight", donutState.styles.fontWeight)
@@ -147,6 +153,33 @@ export async function render(donutState) {
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    function calculateTextColor(sectorColor) {
+        if (sectorColor === "transparent") {
+            return donutState.styles.fontColor;
+        }
+
+        return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : "#000000";
+    }
+
+    function contrastToLabelColor(sectorColor) {
+        let fillLuminance = luminance(
+            parseInt(sectorColor.substr(1,2),16),
+            parseInt(sectorColor.substr(3,2),16),
+            parseInt(sectorColor.substr(5,2),16)
+        );
+        let brightest = Math.max(fillLuminance, labelColorLuminance);
+        let darkest = Math.min(fillLuminance, labelColorLuminance);
+        return (brightest + 0.05) / (darkest + 0.05);
+    }
+
+    function luminance(r, g, b) {
+        var a = [r, g, b].map(function (v) {
+           v /= 255;
+           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
 
     function calculateTextOpacity(data) {
         let box = this.getBoundingClientRect();
