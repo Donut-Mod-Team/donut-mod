@@ -27,11 +27,11 @@ svg {
 }
 
 .rectangle {
-    fill: #add8e6;
-    stroke: #add8e6;
-    fill-opacity: 0.3;
-    stroke-opacity: 0.7;
-    stroke-width: 2;
+    fill: #85A2CB;
+    stroke: #313336;
+    fill-opacity: 0.5;
+    stroke-opacity: 1;
+    stroke-width: 0.5;
 }
 
 .outerSectorArc {
