@@ -145,7 +145,7 @@ export async function render(donutState) {
                         .style("opacity", calculateTextOpacity)
                         .text((d) => d.data.absPercentage + "%")
                         .attr("transform", calculateLabelPosition)
-                        .attr("fill", donutState.styles.fontColor)
+                        .attr("fill", (d) => calculateTextColor(d.data.color))
                         .attr("font-family", donutState.styles.fontFamily)
                         .attr("font-style", donutState.styles.fontStyle)
                         .attr("font-weight", donutState.styles.fontWeight)
