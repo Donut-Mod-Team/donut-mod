@@ -154,25 +154,48 @@ export async function render(donutState) {
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
 
+    /**
+     * This function gets the sector's color, and returns the corresponding color for the text
+     * of its label.
+     * @param sectorColor
+     * @returns {*}
+     */
     function calculateTextColor(sectorColor) {
         if (sectorColor === "transparent") {
             return donutState.styles.fontColor;
         }
 
-        return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : "#000000";
+        return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
     }
 
+    /**
+     * This function calculates the contrast ratio between the passed selector color,
+     * and the default one (labelColorLuminance).
+     * Further reading on the calculation part: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+     * @param sectorColor
+     * @returns {number}
+     */
     function contrastToLabelColor(sectorColor) {
         let fillLuminance = luminance(
             parseInt(sectorColor.substr(1,2),16),
             parseInt(sectorColor.substr(3,2),16),
             parseInt(sectorColor.substr(5,2),16)
         );
+        // Calculating the relative luminance for the brightest of the colors
         let brightest = Math.max(fillLuminance, labelColorLuminance);
+        // Calculating the relative luminance for the darkest of the colors
         let darkest = Math.min(fillLuminance, labelColorLuminance);
         return (brightest + 0.05) / (darkest + 0.05);
     }
 
+    /**
+     * This function gets the RGB values for a given sector's color, and calculates the corresponding luminance.
+     * Further reading on the calculations used: https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
+     * @param r
+     * @param g
+     * @param b
+     * @returns {number}
+     */
     function luminance(r, g, b) {
         var a = [r, g, b].map(function (v) {
            v /= 255;
