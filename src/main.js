@@ -6,7 +6,16 @@
 import { render } from "./renderer";
 import { createDonutState } from "./donutState";
 import { resources } from "./resources";
-
+/**
+ * @typedef {{
+                labelsPosition: labelsPosition,
+                sortedPlacement: sortedPlacement,
+                labelsVisible: labelsVisible,
+                labelsPercentage: labelsPercentage,
+                labelsValue: labelsValue,
+                labelsCategory: labelsCategory
+            }} modProperty
+ * */
 /**
  * Get access to the Spotfire Mod API by providing a callback to the initialize method.
  * @param {Spotfire.Mod} mod - mod api
@@ -25,7 +34,8 @@ Spotfire.initialize(async (mod) => {
         mod.property("labelsVisible"),
         mod.property("labelsPercentage"),
         mod.property("labelsValue"),
-        mod.property("labelsCategory")
+        mod.property("labelsCategory"),
+        mod.visualization.axis(resources.centerAxisName)
     );
 
     /** Flag to check if there was any error overlay messages printed during the previous execution,

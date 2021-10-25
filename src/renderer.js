@@ -2,11 +2,11 @@ import * as d3 from "d3";
 import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
-import { initializePopout } from "./popout";
+import { initializeSettingsPopout } from "./popout";
 
 /**
  * @param {object} donutState
- * @param {{labelsPosition: ModProperty<ModPropertyDataType>, labelsValue: ModProperty<ModPropertyDataType>, labelsCategory: ModProperty<ModPropertyDataType>, sortedPlacement: ModProperty<ModPropertyDataType>, labelsPercentage: ModProperty<ModPropertyDataType>, labelsVisible: ModProperty<ModPropertyDataType>}} modProperty
+ * @param {modProperty} modProperty
  */
 export async function render(donutState, modProperty) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
@@ -232,9 +232,14 @@ export async function render(donutState, modProperty) {
             centerColorText.text(d.data.colorValue);
         }
     }
-
+    // If editing mode is enabled initialize the setting-popout
     donutState.context.isEditing &&
-        initializePopout(donutState.modControls.popout, donutState.modControls.tooltip, animationDuration, modProperty);
+        initializeSettingsPopout(
+            donutState.modControls.popout,
+            donutState.modControls.tooltip,
+            animationDuration,
+            modProperty
+        );
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
