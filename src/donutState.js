@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { roundNumber, calculatePercentageValue } from "./utility";
+import { calculatePercentageValue } from "./utility";
 
 /**
  * Render the visualization
@@ -62,9 +62,6 @@ export async function createDonutState(mod) {
     } else {
         mod.controls.errorOverlay.hide(resources.yAxisName);
     }
-    // Awaiting and retrieving the Color and Y axis from the mod.
-    let yAxis = await mod.visualization.axis(resources.yAxisName);
-    const colorAxisMeta = await mod.visualization.axis(resources.colorAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
@@ -100,21 +97,8 @@ export async function createDonutState(mod) {
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
-                    /* Adding the display name from the colorAxis and yAxis to the tooltip,
-                    to get the corresponding leaf data onto the tooltip. */
                     return (
-                        "Ratio: " +
-                        percentage +
-                        "%" +
-                        "\n" +
-                        yAxis.parts[0].displayName +
-                        ": " +
-                        roundNumber(yValue, 2) +
-                        "\n" +
-                        colorAxisMeta.parts[0].displayName +
-                        ": " +
-                        leaf.formattedValue() +
-                        "\n"
+                        rows.length ? rows[0] : "N/A"
                     );
                 }
             };
