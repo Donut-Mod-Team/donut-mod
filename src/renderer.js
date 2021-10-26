@@ -81,6 +81,12 @@ export async function render(donutState) {
         parseInt(donutState.styles.fontColor.substr(5,2),16)
     );
 
+    const backgroundLuminance = luminance(
+        parseInt(donutState.styles.backgroundColor.substr(1,2),16),
+        parseInt(donutState.styles.backgroundColor.substr(3,2),16),
+        parseInt(donutState.styles.backgroundColor.substr(5,2),16)
+    );
+
     let newSectors = sectors
         .enter()
         .append("svg:path")
@@ -157,15 +163,20 @@ export async function render(donutState) {
     /**
      * This function gets the sector's color, and returns the corresponding color for the text
      * of its label.
-     * @param sectorColor
-     * @returns {*}
+     * @param {string} sectorColor
+     * @returns {string}
      */
     function calculateTextColor(sectorColor) {
         if (sectorColor === "transparent") {
             return donutState.styles.fontColor;
         }
 
-        return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        // Check if background luminance is closer to dark background color
+        if (backgroundLuminance < 0.5) {
+            return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        }
+
+        return contrastToLabelColor(sectorColor) > 2.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
     }
 
     /**
