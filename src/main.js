@@ -6,7 +6,16 @@
 import { render } from "./renderer";
 import { createDonutState } from "./donutState";
 import { resources } from "./resources";
-
+/**
+ * @typedef {{
+                labelsPosition: labelsPosition,
+                sortedPlacement: sortedPlacement,
+                labelsVisible: labelsVisible,
+                labelsPercentage: labelsPercentage,
+                labelsValue: labelsValue,
+                labelsCategory: labelsCategory
+            }} modProperty
+ * */
 /**
  * Get access to the Spotfire Mod API by providing a callback to the initialize method.
  * @param {Spotfire.Mod} mod - mod api
@@ -17,7 +26,17 @@ Spotfire.initialize(async (mod) => {
     /**
      * Create the read function.
      */
-    const reader = mod.createReader(mod.visualization.data(), mod.windowSize());
+    const reader = mod.createReader(
+        mod.visualization.data(),
+        mod.windowSize(),
+        mod.property("labelsPosition"),
+        mod.property("sortedPlacement"),
+        mod.property("labelsVisible"),
+        mod.property("labelsPercentage"),
+        mod.property("labelsValue"),
+        mod.property("labelsCategory"),
+        mod.visualization.axis(resources.centerAxisName)
+    );
 
     /** Flag to check if there was any error overlay messages printed during the previous execution,
      *  in order to skip redundant clear-related calls of the overlay.
@@ -27,28 +46,47 @@ Spotfire.initialize(async (mod) => {
     /**
      * Initiate the read loop
      */
-    reader.subscribe(async () => {
-        let donutState = await createDonutState(mod);
+    reader.subscribe(
+        async (
+            dataView,
+            size,
+            labelsPosition,
+            sortedPlacement,
+            labelsVisible,
+            labelsPercentage,
+            labelsValue,
+            labelsCategory
+        ) => {
+            let donutState = await createDonutState(mod);
 
-        if (errorOverlayVisualized) {
-            mod.controls.errorOverlay.hide(resources.errorOverlayCategoryGeneral);
-            errorOverlayVisualized = false;
-        }
+            if (errorOverlayVisualized) {
+                mod.controls.errorOverlay.hide(resources.errorOverlayCategoryGeneral);
+                errorOverlayVisualized = false;
+            }
 
-        if (donutState == null) {
-            console.error(resources.errorNullDonutState(donutState));
-            mod.controls.errorOverlay.show(resources.errorGeneralOverlay, resources.errorOverlayCategoryGeneral);
-            errorOverlayVisualized = true;
-            return;
-        }
+            if (donutState == null) {
+                console.error(resources.errorNullDonutState(donutState));
+                mod.controls.errorOverlay.show(resources.errorGeneralOverlay, resources.errorOverlayCategoryGeneral);
+                errorOverlayVisualized = true;
+                return;
+            }
 
-        try {
-            await render(donutState);
-        } catch (error) {
-            // TODO: Add checks depending on the type of error here (e.g. TypeError, RangeError etc)
-            console.error(error);
-            mod.controls.errorOverlay.show(resources.errorRendering, resources.errorOverlayCategoryGeneral);
-            errorOverlayVisualized = true;
+            let modProperty = {
+                labelsPosition: labelsPosition,
+                sortedPlacement: sortedPlacement,
+                labelsVisible: labelsVisible,
+                labelsPercentage: labelsPercentage,
+                labelsValue: labelsValue,
+                labelsCategory: labelsCategory
+            };
+            try {
+                await render(donutState, modProperty);
+            } catch (error) {
+                // TODO: Add checks depending on the type of error here (e.g. TypeError, RangeError etc)
+                console.error(error);
+                mod.controls.errorOverlay.show(resources.errorRendering, resources.errorOverlayCategoryGeneral);
+                errorOverlayVisualized = true;
+            }
         }
-    });
+    );
 });
