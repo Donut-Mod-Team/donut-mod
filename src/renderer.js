@@ -2,11 +2,13 @@ import * as d3 from "d3";
 import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
+import { initializeSettingsPopout } from "./popout";
 
 /**
  * @param {object} donutState
+ * @param {modProperty} modProperty
  */
-export async function render(donutState) {
+export async function render(donutState, modProperty) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
     const sizeModifier = 10;
     // D3 animation duration used for svg shapes
@@ -27,7 +29,7 @@ export async function render(donutState) {
     // The padding threshold is set to 6 because this is the amount of sectors where the padding becomes too small.
     const paddingThreshold = 6;
 
-    if(donutState.data.length < paddingThreshold) {
+    if (donutState.data.length < paddingThreshold) {
         padding = 0.02 / donutState.data.length;
     } else {
         padding = 0.05 / donutState.data.length;
@@ -230,6 +232,14 @@ export async function render(donutState) {
             centerColorText.text(d.data.colorValue);
         }
     }
+    // If editing mode is enabled initialize the setting-popout
+    donutState.context.isEditing &&
+        initializeSettingsPopout(
+            donutState.modControls.popout,
+            donutState.modControls.tooltip,
+            animationDuration,
+            modProperty
+        );
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
