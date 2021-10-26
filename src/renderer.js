@@ -118,7 +118,7 @@ export async function render(donutState, modProperty) {
                     .attr("font-style", donutState.styles.fontStyle)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => d.data.absPercentage + "%")
+                    .text((d) => d.data.getLabelText(modProperty))
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
@@ -139,7 +139,7 @@ export async function render(donutState, modProperty) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", calculateTextOpacity)
-                        .text((d) => d.data.absPercentage + "%")
+                        .text((d) => d.data.getLabelText(modProperty))
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                         .attr("font-family", donutState.styles.fontFamily)
