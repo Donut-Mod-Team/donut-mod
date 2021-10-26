@@ -95,25 +95,8 @@ export async function createDonutState(mod) {
                 centerSum: centerSum,
                 colorValue: leaf.formattedValue(),
                 centerTotal: 0,
-                getLabelText: (modProperty) => {
-                    let labelValues = [];
-                    let labelText = "";
-                    modProperty.labelsPercentage.value() && labelValues.push(absPercentage + "%");
-                    modProperty.labelsValue.value() && labelValues.push(yValue);
-                    modProperty.labelsCategory.value() && labelValues.push(leaf.formattedValue());
-                    if (labelValues.length === 0) {
-                        return labelText;
-                    } else if (labelValues.length === 1) {
-                        labelText = labelValues[0];
-                        return labelText;
-                    } else {
-                        labelText = labelValues[0];
-                        for (let i = 1; i < labelValues.length; i++) {
-                            labelText += ", " + labelValues[i];
-                        }
-                    }
-                    return labelText;
-                },
+                getLabelText: (modProperty) =>
+                    createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
@@ -176,4 +159,36 @@ function calculateTotalYSum(leaves, yAxisName) {
         sumOfValues += Math.abs(yValue);
     });
     return sumOfValues;
+}
+
+/**
+ * This function creates the sector's label text based on the provided modProperty
+ * @param {modProperty} modProperty
+ * @param {number} sectorPercentage
+ * @param {number} sectorValue
+ * @param {Spotfire.DataViewHierarchyNode.formattedValue} sectorCategory
+ * @returns {string} labelText
+ */
+function createLabelText(modProperty, sectorPercentage, sectorValue, sectorCategory) {
+    let labelValues = [];
+    let labelText = "";
+    // Assigning a value to the labelValue depending on the modProperty selected
+    modProperty.labelsPercentage.value() && labelValues.push(sectorPercentage + "%");
+    modProperty.labelsValue.value() && labelValues.push(sectorValue);
+    modProperty.labelsCategory.value() && labelValues.push(sectorCategory);
+
+    if (labelValues.length === 0) {
+        return labelText;
+    } else if (labelValues.length === 1) {
+        labelText = labelValues[0];
+        return labelText;
+    } else {
+        // The returned labelText follows the format of "Value, Category (Percentage), e.g.: "22, Large Cap (38.6)"
+        labelText += labelValues[1];
+        for (let i = 2; i < labelValues.length; i++) {
+            labelText += ", " + labelValues[i];
+        }
+        labelText += " (" + labelValues[0] + ")";
+    }
+    return labelText;
 }
