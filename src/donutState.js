@@ -83,6 +83,7 @@ export async function createDonutState(mod) {
             let yValue = sumValue(rows, resources.yAxisName);
             let centerSum = sumValue(rows, resources.centerAxisName);
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
+            let absPercentage = Math.abs(percentage).toFixed(1);
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -90,23 +91,39 @@ export async function createDonutState(mod) {
                 id: leaf.key,
                 renderID: leaf.leafIndex,
                 percentage: percentage.toFixed(1),
-                absPercentage: Math.abs(percentage).toFixed(1),
+                absPercentage: absPercentage,
                 centerSum: centerSum,
                 colorValue: leaf.formattedValue(),
                 centerTotal: 0,
+                getLabelText: (modProperty) => {
+                    let labelValues = [];
+                    let labelText = "";
+                    modProperty.labelsPercentage.value() && labelValues.push(absPercentage + "%");
+                    modProperty.labelsValue.value() && labelValues.push(yValue);
+                    modProperty.labelsCategory.value() && labelValues.push(leaf.formattedValue());
+                    if (labelValues.length === 0) {
+                        return labelText;
+                    } else if (labelValues.length === 1) {
+                        labelText = labelValues[0];
+                        return labelText;
+                    } else {
+                        labelText = labelValues[0];
+                        for (let i = 1; i < labelValues.length; i++) {
+                            labelText += ", " + labelValues[i];
+                        }
+                    }
+                    return labelText;
+                },
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
-                    return (
-                        rows.length ? rows[0] : "N/A"
-                    );
+                    return rows.length ? rows[0] : "N/A";
                 }
             };
         });
     } catch (error) {
         console.error(error);
     }
-
 
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
