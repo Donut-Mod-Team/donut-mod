@@ -29,11 +29,6 @@
             "name": "labelsCategory",
             "defaultValue": "false",
             "type": "boolean"
-        },
-        {
-            "name": "sortedPlacement",
-            "defaultValue": "false",
-            "type": "boolean"
         }
 
     ],

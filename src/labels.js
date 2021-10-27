@@ -13,57 +13,48 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         parseInt(donutState.styles.backgroundColor.substr(5, 2), 16)
     );
     const svg = d3.select("#mod-container svg g");
-    svg.select("g#labels")
+
+    let labels = svg
+        .select("g#labels")
         .attr("pointer-events", "none")
         .selectAll("text")
-        .data(pie(donutState.data), (d) => `label-${d.data.id}`)
-        .join(
-            (enter) => {
-                return enter
-                    .append("text")
-                    .style("opacity", 0)
-                    .attr("id", function (d) {
-                        return "labelID_" + d.data.renderID;
-                    })
-                    .attr("dy", "0.35em")
-                    .attr("fill", donutState.styles.fontColor)
-                    .attr("font-family", donutState.styles.fontFamily)
-                    .attr("font-style", donutState.styles.fontStyle)
-                    .attr("font-weight", donutState.styles.fontWeight)
-                    .attr("font-size", donutState.styles.fontSize)
-                    .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
-                    .attr("text-anchor", "middle")
-                    .call((enter) =>
-                        enter
-                            .transition("add labels")
-                            .duration(animationDuration)
-                            .attrTween("transform", calculateLabelPosition)
-                            .styleTween("text-anchor", getLabelAlignment)
-                            .attr("fill", (d) => calculateTextColor(d.data.color))
-                            .attr("opacity", calculateTextOpacity)
-                            .attr("font-family", donutState.styles.fontFamily)
-                            .attr("font-style", donutState.styles.fontStyle)
-                            .attr("font-weight", donutState.styles.fontWeight)
-                            .attr("font-size", donutState.styles.fontSize)
-                    );
-            },
-            (update) =>
-                update.call((update) =>
-                    update
-                        .transition("update labels")
-                        .duration(animationDuration)
-                        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
-                        .attrTween("transform", calculateLabelPosition)
-                        .styleTween("text-anchor", getLabelAlignment)
-                        .style("opacity", calculateTextOpacity)
-                        .attr("fill", (d) => calculateTextColor(d.data.color))
-                        .attr("font-family", donutState.styles.fontFamily)
-                        .attr("font-style", donutState.styles.fontStyle)
-                        .attr("font-weight", donutState.styles.fontWeight)
-                        .attr("font-size", donutState.styles.fontSize)
-                ),
-            (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-        );
+        .data(pie(donutState.data), (d) => `label-${d.data.id}`);
+
+    labels
+        .enter()
+        .append("text")
+        .attr("id", function (d) {
+            return "labelID_" + d.data.renderID;
+        })
+        .attr("fill", donutState.styles.fontColor)
+        .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-style", donutState.styles.fontStyle)
+        .attr("font-weight", donutState.styles.fontWeight)
+        .attr("font-size", donutState.styles.fontSize)
+        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
+        .attr("transform", calculateLabelPosition)
+        .style("text-anchor", getLabelAlignment)
+        .attr("fill", (d) => calculateTextColor(d.data.color))
+        .attr("opacity", calculateTextOpacity);
+
+    labels
+        .transition("update labels")
+        .duration(animationDuration)
+        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
+        .attrTween("transform", function (d) {
+            return function () {
+                return calculateLabelPosition(d);
+            };
+        })
+        .styleTween("text-anchor", getLabelAlignment)
+        .style("opacity", calculateTextOpacity)
+        .attr("fill", (d) => calculateTextColor(d.data.color))
+        .attr("font-family", donutState.styles.fontFamily)
+        .attr("font-style", donutState.styles.fontStyle)
+        .attr("font-weight", donutState.styles.fontWeight)
+        .attr("font-size", donutState.styles.fontSize);
+
+    labels.exit().transition("remove labels").duration(animationDuration).style("opacity", 0).remove();
 
     function getLabelAlignment(d) {
         if (modProperty.labelsPosition.value() === "inside") {
@@ -188,8 +179,6 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         let x = centroid[0];
         let y = centroid[1];
         let h = Math.sqrt(x * x + y * y);
-        return function () {
-            return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
-        };
+        return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
 }

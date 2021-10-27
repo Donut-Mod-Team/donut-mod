@@ -30,7 +30,6 @@ Spotfire.initialize(async (mod) => {
         mod.visualization.data(),
         mod.windowSize(),
         mod.property("labelsPosition"),
-        mod.property("sortedPlacement"),
         mod.property("labelsVisible"),
         mod.property("labelsPercentage"),
         mod.property("labelsValue"),
@@ -47,16 +46,7 @@ Spotfire.initialize(async (mod) => {
      * Initiate the read loop
      */
     reader.subscribe(
-        async (
-            dataView,
-            size,
-            labelsPosition,
-            sortedPlacement,
-            labelsVisible,
-            labelsPercentage,
-            labelsValue,
-            labelsCategory
-        ) => {
+        async (dataView, size, labelsPosition, labelsVisible, labelsPercentage, labelsValue, labelsCategory) => {
             let donutState = await createDonutState(mod);
 
             if (errorOverlayVisualized) {
@@ -73,7 +63,6 @@ Spotfire.initialize(async (mod) => {
 
             let modProperty = {
                 labelsPosition: labelsPosition,
-                sortedPlacement: sortedPlacement,
                 labelsVisible: labelsVisible,
                 labelsPercentage: labelsPercentage,
                 labelsValue: labelsValue,

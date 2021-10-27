@@ -39,7 +39,6 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                 onChange: (event) => {
                     const { name, value } = event;
                     name === modProperty.labelsPosition.name && modProperty.labelsPosition.set(value);
-                    name === modProperty.sortedPlacement.name && modProperty.sortedPlacement.set(value);
                     name === modProperty.labelsVisible.name && modProperty.labelsVisible.set(value);
                     name === modProperty.labelsPercentage.name && modProperty.labelsPercentage.set(value);
                     name === modProperty.labelsValue.name && modProperty.labelsValue.set(value);
@@ -118,19 +117,6 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     text: "Outside chart",
                     value: "outside",
                     checked: modProperty.labelsPosition.value() === "outside"
-                })
-            ]
-        }),
-        // Define sector for sorting checkbox
-        section({
-            heading: "Sorting",
-            children: [
-                checkbox({
-                    name: "sortedPlacement",
-                    text: "Sort sectors by size",
-                    enabled: true,
-                    tooltip: "Biggest sizes placed at the top-right",
-                    checked: modProperty.sortedPlacement.value() === true
                 })
             ]
         })
