@@ -78,15 +78,15 @@ export async function render(donutState, modProperty) {
         });
 
     const labelColorLuminance = calculateLuminance(
-        parseInt(donutState.styles.fontColor.substr(1,2),16),
-        parseInt(donutState.styles.fontColor.substr(3,2),16),
-        parseInt(donutState.styles.fontColor.substr(5,2),16)
+        parseInt(donutState.styles.fontColor.substr(1, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(3, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(5, 2), 16)
     );
 
     const backgroundLuminance = calculateLuminance(
-        parseInt(donutState.styles.backgroundColor.substr(1,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(3,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(5,2),16)
+        parseInt(donutState.styles.backgroundColor.substr(1, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(3, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(5, 2), 16)
     );
 
     let newSectors = sectors
@@ -137,7 +137,8 @@ export async function render(donutState, modProperty) {
                             .transition("add labels")
                             .duration(animationDuration)
                             .style("opacity", calculateTextOpacity)
-                            .attr("transform", calculateLabelPosition)
+                            .attrTween("transform", calculateLabelPosition)
+                            .styleTween("text-anchor", getLabelAlignment)
                             .attr("fill", (d) => calculateTextColor(d.data.color))
                             .attr("font-family", donutState.styles.fontFamily)
                             .attr("font-style", donutState.styles.fontStyle)
@@ -152,7 +153,8 @@ export async function render(donutState, modProperty) {
                         .duration(animationDuration)
                         .style("opacity", calculateTextOpacity)
                         .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
-                        .attr("transform", calculateLabelPosition)
+                        .attrTween("transform", calculateLabelPosition)
+                        .styleTween("text-anchor", getLabelAlignment)
                         .attr("fill", (d) => calculateTextColor(d.data.color))
                         .attr("font-family", donutState.styles.fontFamily)
                         .attr("font-style", donutState.styles.fontStyle)
@@ -161,6 +163,21 @@ export async function render(donutState, modProperty) {
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    function getLabelAlignment(d) {
+        if (modProperty.labelsPosition.value() === "inside") {
+            return function () {
+                return "middle";
+            };
+        }
+        this._current = this._current || d;
+        let interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return function (t) {
+            let d2 = interpolate(t);
+            return midAngle(d2) < Math.PI ? "start" : "end";
+        };
+    }
 
     /**
      * This function gets the sector's color, and returns the corresponding color for the text
@@ -172,13 +189,19 @@ export async function render(donutState, modProperty) {
         if (sectorColor === "transparent") {
             return donutState.styles.fontColor;
         }
-
+        if (modProperty.labelsPosition.value() === "outside") {
+            return donutState.styles.fontColor;
+        }
         // Check if background luminance is closer to dark background color
         if (backgroundLuminance < 0.5) {
-            return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+            return contrastToLabelColor(sectorColor) > 1.7
+                ? donutState.styles.fontColor
+                : donutState.styles.backgroundColor;
         }
 
-        return contrastToLabelColor(sectorColor) > 2.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        return contrastToLabelColor(sectorColor) > 2.7
+            ? donutState.styles.fontColor
+            : donutState.styles.backgroundColor;
     }
 
     /**
@@ -190,9 +213,9 @@ export async function render(donutState, modProperty) {
      */
     function contrastToLabelColor(sectorColor) {
         let fillLuminance = calculateLuminance(
-            parseInt(sectorColor.substr(1,2),16),
-            parseInt(sectorColor.substr(3,2),16),
-            parseInt(sectorColor.substr(5,2),16)
+            parseInt(sectorColor.substr(1, 2), 16),
+            parseInt(sectorColor.substr(3, 2), 16),
+            parseInt(sectorColor.substr(5, 2), 16)
         );
         // Calculating the relative luminance for the brightest of the colors
         let brightest = Math.max(fillLuminance, labelColorLuminance);
@@ -210,9 +233,9 @@ export async function render(donutState, modProperty) {
      * @returns {number}
      */
     function calculateLuminance(r, g, b) {
-        var a = [r, g, b].map(function (v) {
-           v /= 255;
-           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        let a = [r, g, b].map(function (v) {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
         });
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
@@ -252,14 +275,20 @@ export async function render(donutState, modProperty) {
         }
         return "";
     }
+    function midAngle(d) {
+        return d.startAngle + (d.endAngle - d.startAngle) / 2;
+    }
 
     function calculateLabelPosition(data) {
-        let centeringFactor = radius * 0.75;
+        let positionOffset = modProperty.labelsPosition.value() === "inside" ? 0.75 : 1.03;
+        let centeringFactor = radius * positionOffset;
         let centroid = arc.centroid(data);
         let x = centroid[0];
         let y = centroid[1];
         let h = Math.sqrt(x * x + y * y);
-        return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
+        return function () {
+            return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
+        };
     }
 
     function calculateCenterTextSpace() {
