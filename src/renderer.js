@@ -77,6 +77,18 @@ export async function render(donutState, modProperty) {
             return d.data.id;
         });
 
+    const labelColorLuminance = calculateLuminance(
+        parseInt(donutState.styles.fontColor.substr(1,2),16),
+        parseInt(donutState.styles.fontColor.substr(3,2),16),
+        parseInt(donutState.styles.fontColor.substr(5,2),16)
+    );
+
+    const backgroundLuminance = calculateLuminance(
+        parseInt(donutState.styles.backgroundColor.substr(1,2),16),
+        parseInt(donutState.styles.backgroundColor.substr(3,2),16),
+        parseInt(donutState.styles.backgroundColor.substr(5,2),16)
+    );
+
     let newSectors = sectors
         .enter()
         .append("svg:path")
@@ -126,7 +138,7 @@ export async function render(donutState, modProperty) {
                             .duration(animationDuration)
                             .style("opacity", calculateTextOpacity)
                             .attr("transform", calculateLabelPosition)
-                            .attr("fill", donutState.styles.fontColor)
+                            .attr("fill", (d) => calculateTextColor(d.data.color))
                             .attr("font-family", donutState.styles.fontFamily)
                             .attr("font-style", donutState.styles.fontStyle)
                             .attr("font-weight", donutState.styles.fontWeight)
@@ -141,7 +153,7 @@ export async function render(donutState, modProperty) {
                         .style("opacity", calculateTextOpacity)
                         .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
                         .attr("transform", calculateLabelPosition)
-                        .attr("fill", donutState.styles.fontColor)
+                        .attr("fill", (d) => calculateTextColor(d.data.color))
                         .attr("font-family", donutState.styles.fontFamily)
                         .attr("font-style", donutState.styles.fontStyle)
                         .attr("font-weight", donutState.styles.fontWeight)
@@ -149,6 +161,61 @@ export async function render(donutState, modProperty) {
                 ),
             (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
         );
+
+    /**
+     * This function gets the sector's color, and returns the corresponding color for the text
+     * of its label.
+     * @param {string} sectorColor
+     * @returns {string}
+     */
+    function calculateTextColor(sectorColor) {
+        if (sectorColor === "transparent") {
+            return donutState.styles.fontColor;
+        }
+
+        // Check if background luminance is closer to dark background color
+        if (backgroundLuminance < 0.5) {
+            return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        }
+
+        return contrastToLabelColor(sectorColor) > 2.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+    }
+
+    /**
+     * This function calculates the contrast ratio between the passed selector color,
+     * and the default one (labelColorLuminance).
+     * Further reading on the calculation part: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+     * @param sectorColor
+     * @returns {number}
+     */
+    function contrastToLabelColor(sectorColor) {
+        let fillLuminance = calculateLuminance(
+            parseInt(sectorColor.substr(1,2),16),
+            parseInt(sectorColor.substr(3,2),16),
+            parseInt(sectorColor.substr(5,2),16)
+        );
+        // Calculating the relative luminance for the brightest of the colors
+        let brightest = Math.max(fillLuminance, labelColorLuminance);
+        // Calculating the relative luminance for the darkest of the colors
+        let darkest = Math.min(fillLuminance, labelColorLuminance);
+        return (brightest + 0.05) / (darkest + 0.05);
+    }
+
+    /**
+     * This function gets the RGB values for a given sector's color, and calculates the corresponding luminance.
+     * Further reading on the calculations used: https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
+     * @param r
+     * @param g
+     * @param b
+     * @returns {number}
+     */
+    function calculateLuminance(r, g, b) {
+        var a = [r, g, b].map(function (v) {
+           v /= 255;
+           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
 
     function calculateTextOpacity(data) {
         let box = this.getBoundingClientRect();
