@@ -118,7 +118,7 @@ export async function render(donutState, modProperty) {
                     .attr("font-style", donutState.styles.fontStyle)
                     .attr("font-weight", donutState.styles.fontWeight)
                     .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => d.data.getLabelText(modProperty))
+                    .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
                     .attr("text-anchor", "middle")
                     .call((enter) =>
                         enter
@@ -139,7 +139,7 @@ export async function render(donutState, modProperty) {
                         .transition("update labels")
                         .duration(animationDuration)
                         .style("opacity", calculateTextOpacity)
-                        .text((d) => d.data.getLabelText(modProperty))
+                        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
                         .attr("transform", calculateLabelPosition)
                         .attr("fill", donutState.styles.fontColor)
                         .attr("font-family", donutState.styles.fontFamily)
@@ -170,6 +170,20 @@ export async function render(donutState, modProperty) {
         return function (value) {
             return arc(i(value));
         };
+    }
+
+    // Returns the function and/or empty string depending for the labels depending on the settings selected in popout(defined in the modProperty
+    function getLabelText() {
+        if (modProperty.labelsVisible.value() === "all") {
+            return (d) => d.data.getLabelText(modProperty);
+        } else if (modProperty.labelsVisible.value() === "marked") {
+            return (d) => {
+                if (d.data.markedRowCount() > 0) {
+                    return d.data.getLabelText(modProperty);
+                } else return "";
+            };
+        }
+        return "";
     }
 
     function calculateLabelPosition(data) {
