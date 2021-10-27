@@ -75,13 +75,13 @@ export async function render(donutState) {
             return d.data.id;
         });
 
-    const labelColorLuminance = luminance(
+    const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1,2),16),
         parseInt(donutState.styles.fontColor.substr(3,2),16),
         parseInt(donutState.styles.fontColor.substr(5,2),16)
     );
 
-    const backgroundLuminance = luminance(
+    const backgroundLuminance = calculateLuminance(
         parseInt(donutState.styles.backgroundColor.substr(1,2),16),
         parseInt(donutState.styles.backgroundColor.substr(3,2),16),
         parseInt(donutState.styles.backgroundColor.substr(5,2),16)
@@ -187,7 +187,7 @@ export async function render(donutState) {
      * @returns {number}
      */
     function contrastToLabelColor(sectorColor) {
-        let fillLuminance = luminance(
+        let fillLuminance = calculateLuminance(
             parseInt(sectorColor.substr(1,2),16),
             parseInt(sectorColor.substr(3,2),16),
             parseInt(sectorColor.substr(5,2),16)
@@ -207,7 +207,7 @@ export async function render(donutState) {
      * @param b
      * @returns {number}
      */
-    function luminance(r, g, b) {
+    function calculateLuminance(r, g, b) {
         var a = [r, g, b].map(function (v) {
            v /= 255;
            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
