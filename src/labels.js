@@ -26,6 +26,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("id", function (d) {
             return "labelID_" + d.data.renderID;
         })
+        .attr("dy", ".35em")
         .attr("fill", donutState.styles.fontColor)
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-style", donutState.styles.fontStyle)
@@ -33,9 +34,11 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-size", donutState.styles.fontSize)
         .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
         .attr("transform", calculateLabelPosition)
-        .style("text-anchor", getLabelAlignment)
+        .style("text-anchor", (d) =>
+            modProperty.labelsPosition.value() === "inside" ? "middle" : midAngle(d) < Math.PI ? "start" : "end"
+        )
         .attr("fill", (d) => calculateTextColor(d.data.color))
-        .attr("opacity", calculateTextOpacity);
+        .style("opacity", calculateTextOpacity);
 
     labels
         .transition("update labels")
@@ -54,7 +57,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
 
-    labels.exit().transition("remove labels").duration(animationDuration).style("opacity", 0).remove();
+    labels.exit().transition("remove labels").duration(animationDuration).attr("fill", "transparent").remove();
 
     function getLabelAlignment(d) {
         if (modProperty.labelsPosition.value() === "inside") {
