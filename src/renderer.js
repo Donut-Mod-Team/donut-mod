@@ -3,6 +3,7 @@ import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
+import { resources } from "./resources";
 
 /**
  * @param {object} donutState
@@ -17,6 +18,8 @@ export async function render(donutState, modProperty) {
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
+
+    const centerAxis = await donutState.dataView.continuousAxis(resources.centerAxisName);
 
     if (height <= 0 || width <= 0) {
         return;
@@ -67,7 +70,11 @@ export async function render(donutState, modProperty) {
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize);
 
-    calculateMarkedCenterText(donutState.data);
+    if (centerAxis != null) {
+        calculateMarkedCenterText(donutState.data);
+    } else {
+        centerColorText.text(resources.noSelectedCenterValue).style("opacity", 1);
+    }
 
     // Join new data
     const sectors = svg
