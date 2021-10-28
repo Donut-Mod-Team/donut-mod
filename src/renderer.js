@@ -35,6 +35,11 @@ export async function render(donutState, modProperty) {
         padding = 0.05 / donutState.data.length;
     }
 
+    let sortingEnabled = false;
+    if (modProperty.sortedPlacement.value() === true) {
+        sortingEnabled = true;
+    }
+
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
     donutState.donutCircle.y = height / 2;
@@ -45,7 +50,16 @@ export async function render(donutState, modProperty) {
 
     const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    const pie = d3.pie().value((d) => d.absValue);
+    const pie = d3
+        .pie()
+        .value((d) => d.absValue)
+        .sort(function (a, b) {
+            if (sortingEnabled) {
+                return b.value - a.value;
+            } else {
+                return null;
+            }
+        });
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
