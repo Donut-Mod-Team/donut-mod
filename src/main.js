@@ -10,6 +10,7 @@ import { resources } from "./resources";
  * @typedef {{
                 labelsPosition: labelsPosition,
                 sortedPlacement: sortedPlacement,
+                sortedPlacementOrder: sortedPlacementOrder,
                 labelsVisible: labelsVisible,
                 labelsPercentage: labelsPercentage,
                 labelsValue: labelsValue,
@@ -31,6 +32,7 @@ Spotfire.initialize(async (mod) => {
         mod.windowSize(),
         mod.property("labelsPosition"),
         mod.property("sortedPlacement"),
+        mod.property("sortedPlacementOrder"),
         mod.property("labelsVisible"),
         mod.property("labelsPercentage"),
         mod.property("labelsValue"),
@@ -52,6 +54,7 @@ Spotfire.initialize(async (mod) => {
             size,
             labelsPosition,
             sortedPlacement,
+            sortedPlacementOrder,
             labelsVisible,
             labelsPercentage,
             labelsValue,
@@ -74,6 +77,7 @@ Spotfire.initialize(async (mod) => {
             let modProperty = {
                 labelsPosition: labelsPosition,
                 sortedPlacement: sortedPlacement,
+                sortedPlacementOrder: sortedPlacementOrder,
                 labelsVisible: labelsVisible,
                 labelsPercentage: labelsPercentage,
                 labelsValue: labelsValue,
