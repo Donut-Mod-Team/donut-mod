@@ -75,13 +75,10 @@ export async function createDonutState(mod) {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let centerSum = 0;
+            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
 
-            if (dataViewCenterAxis != null) {
-                centerSum = sumValue(rows, resources.centerAxisName);
-            }
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,

@@ -3,7 +3,6 @@ import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
-import { resources } from "./resources";
 
 /**
  * @param {object} donutState
@@ -18,8 +17,6 @@ export async function render(donutState, modProperty) {
 
     const width = donutState.size.width - sizeModifier;
     const height = donutState.size.height - sizeModifier;
-
-    const centerAxis = await donutState.dataView.continuousAxis(resources.centerAxisName);
 
     if (height <= 0 || width <= 0) {
         return;
@@ -70,11 +67,7 @@ export async function render(donutState, modProperty) {
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize);
 
-    if (centerAxis != null) {
-        calculateMarkedCenterText(donutState.data);
-    } else {
-        centerColorText.text(resources.noSelectedCenterValue).style("opacity", 1);
-    }
+    calculateMarkedCenterText(donutState.data);
 
     // Join new data
     const sectors = svg
@@ -85,15 +78,15 @@ export async function render(donutState, modProperty) {
         });
 
     const labelColorLuminance = calculateLuminance(
-        parseInt(donutState.styles.fontColor.substr(1,2),16),
-        parseInt(donutState.styles.fontColor.substr(3,2),16),
-        parseInt(donutState.styles.fontColor.substr(5,2),16)
+        parseInt(donutState.styles.fontColor.substr(1, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(3, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(5, 2), 16)
     );
 
     const backgroundLuminance = calculateLuminance(
-        parseInt(donutState.styles.backgroundColor.substr(1,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(3,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(5,2),16)
+        parseInt(donutState.styles.backgroundColor.substr(1, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(3, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(5, 2), 16)
     );
 
     let newSectors = sectors
@@ -182,10 +175,14 @@ export async function render(donutState, modProperty) {
 
         // Check if background luminance is closer to dark background color
         if (backgroundLuminance < 0.5) {
-            return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+            return contrastToLabelColor(sectorColor) > 1.7
+                ? donutState.styles.fontColor
+                : donutState.styles.backgroundColor;
         }
 
-        return contrastToLabelColor(sectorColor) > 2.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        return contrastToLabelColor(sectorColor) > 2.7
+            ? donutState.styles.fontColor
+            : donutState.styles.backgroundColor;
     }
 
     /**
@@ -197,9 +194,9 @@ export async function render(donutState, modProperty) {
      */
     function contrastToLabelColor(sectorColor) {
         let fillLuminance = calculateLuminance(
-            parseInt(sectorColor.substr(1,2),16),
-            parseInt(sectorColor.substr(3,2),16),
-            parseInt(sectorColor.substr(5,2),16)
+            parseInt(sectorColor.substr(1, 2), 16),
+            parseInt(sectorColor.substr(3, 2), 16),
+            parseInt(sectorColor.substr(5, 2), 16)
         );
         // Calculating the relative luminance for the brightest of the colors
         let brightest = Math.max(fillLuminance, labelColorLuminance);
@@ -218,8 +215,8 @@ export async function render(donutState, modProperty) {
      */
     function calculateLuminance(r, g, b) {
         var a = [r, g, b].map(function (v) {
-           v /= 255;
-           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
         });
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
@@ -278,6 +275,13 @@ export async function render(donutState, modProperty) {
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
         let markedSectors = [];
+
+        if (data.length > 0 && data[0].centerSum === null) {
+            return;
+        } else if (data.length === 0) {
+            return;
+        }
+
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
                 centerTotal += data[i].centerSum;
@@ -314,10 +318,10 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "1");
         if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
-            centerText.text(roundNumber(d.data.centerSum, 2));
+            centerText.text(d.data.centerSum != null ? roundNumber(d.data.centerSum, 2) : "");
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
-            centerColorText.text(d.data.colorValue);
+            centerColorText.text(d.data.centerSum != null ? d.data.colorValue : "");
         }
     }
     // If editing mode is enabled initialize the setting-popout
