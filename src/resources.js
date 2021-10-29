@@ -16,5 +16,5 @@ export const resources = {
     // Axis-related
     yAxisName: "Sector size by",
     colorAxisName: "Color",
-    centerAxisName: "Center value by"
+    centerAxisName: "Center value"
 };
