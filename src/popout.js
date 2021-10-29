@@ -137,12 +137,14 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     name: modProperty.sortedPlacementOrder.name,
                     text: "Sort sectors ascending",
                     value: "ascending",
+                    enabled: modProperty.sortedPlacement.value() === true,
                     checked: modProperty.sortedPlacementOrder.value() === "ascending"
                 }),
                 radioButton({
                     name: modProperty.sortedPlacementOrder.name,
                     text: "Sort sectors descending",
                     value: "descending",
+                    enabled: modProperty.sortedPlacement.value() === true,
                     checked: modProperty.sortedPlacementOrder.value() === "descending"
                 })
             ]
