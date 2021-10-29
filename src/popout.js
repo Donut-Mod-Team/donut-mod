@@ -39,6 +39,8 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                 onChange: (event) => {
                     const { name, value } = event;
                     name === modProperty.labelsPosition.name && modProperty.labelsPosition.set(value);
+                    name === modProperty.sortedPlacement.name && modProperty.sortedPlacement.set(value);
+                    name === modProperty.sortedPlacementOrder.name && modProperty.sortedPlacementOrder.set(value);
                     name === modProperty.labelsVisible.name && modProperty.labelsVisible.set(value);
                     name === modProperty.labelsPercentage.name && modProperty.labelsPercentage.set(value);
                     name === modProperty.labelsValue.name && modProperty.labelsValue.set(value);
@@ -117,6 +119,33 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     text: "Outside chart",
                     value: "outside",
                     checked: modProperty.labelsPosition.value() === "outside"
+                })
+            ]
+        }),
+        // Define sorting options for the sectors' visualization
+        section({
+            heading: "Sorting",
+            children: [
+                checkbox({
+                    name: modProperty.sortedPlacement.name,
+                    text: "Sort sectors by size",
+                    enabled: true,
+                    tooltip: "Biggest sizes placed at the top-right",
+                    checked: modProperty.sortedPlacement.value() === true
+                }),
+                radioButton({
+                    name: modProperty.sortedPlacementOrder.name,
+                    text: "Sort sectors ascending",
+                    value: "ascending",
+                    enabled: modProperty.sortedPlacement.value() === true,
+                    checked: modProperty.sortedPlacementOrder.value() === "ascending"
+                }),
+                radioButton({
+                    name: modProperty.sortedPlacementOrder.name,
+                    text: "Sort sectors descending",
+                    value: "descending",
+                    enabled: modProperty.sortedPlacement.value() === true,
+                    checked: modProperty.sortedPlacementOrder.value() === "descending"
                 })
             ]
         })

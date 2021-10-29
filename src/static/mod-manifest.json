@@ -29,6 +29,16 @@
             "name": "labelsCategory",
             "defaultValue": "false",
             "type": "boolean"
+        },
+        {
+            "name": "sortedPlacement",
+            "defaultValue": "true",
+            "type": "boolean"
+        },
+        {
+            "name": "sortedPlacementOrder",
+            "defaultValue": "ascending",
+            "type": "string"
         }
 
     ],
