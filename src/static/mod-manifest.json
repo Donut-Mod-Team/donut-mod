@@ -32,8 +32,13 @@
         },
         {
             "name": "sortedPlacement",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "type": "boolean"
+        },
+        {
+            "name": "sortedPlacementOrder",
+            "defaultValue": "ascending",
+            "type": "string"
         }
 
     ],
