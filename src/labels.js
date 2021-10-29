@@ -38,7 +38,10 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
             modProperty.labelsPosition.value() === "inside" ? "middle" : midAngle(d) < Math.PI ? "start" : "end"
         )
         .attr("fill", (d) => calculateTextColor(d.data.color))
-        .style("opacity", calculateTextOpacity);
+        .attr("opacity", function (d) {
+            let that = this;
+            return calculateTextOpacity(d, that);
+        });
 
     labels
         .transition("update labels")
@@ -50,7 +53,12 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
             };
         })
         .styleTween("text-anchor", getLabelAlignment)
-        .style("opacity", calculateTextOpacity)
+        .styleTween("opacity", function (d) {
+            let that = this;
+            return function () {
+                return calculateTextOpacity(d, that);
+            };
+        })
         .attr("fill", (d) => calculateTextColor(d.data.color))
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-style", donutState.styles.fontStyle)
@@ -135,8 +143,8 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
 
-    function calculateTextOpacity(data) {
-        let labelBox = this.getBoundingClientRect();
+    function calculateTextOpacity(data, that) {
+        let labelBox = that.getBoundingClientRect();
         let labelWidth = labelBox.right - labelBox.left;
         let labelHeight = labelBox.bottom - labelBox.top;
         if (modProperty.labelsPosition.value() === "inside") {
