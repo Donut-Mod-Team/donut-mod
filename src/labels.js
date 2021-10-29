@@ -1,5 +1,13 @@
 import * as d3 from "d3";
 
+/**
+ * This function is respondible to generate the labels and handle their behavior
+ * @param {d3.arc} arc
+ * @param {d3.pie} pie
+ * @param {donutState} donutState
+ * @param {modProperty} modProperty
+ * @param {number} animationDuration
+ */
 export function addLabels(arc, pie, donutState, modProperty, animationDuration) {
     const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1, 2), 16),
@@ -67,6 +75,11 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
 
     labels.exit().transition("remove labels").duration(animationDuration).attr("fill", "transparent").remove();
 
+    /**
+     * This function returns the corresponding alignment for the label's text
+     * @param {donutState.data} d
+     * @returns {(function(): string)|(function(*=): string)} label's alignment
+     */
     function getLabelAlignment(d) {
         if (modProperty.labelsPosition.value() === "inside") {
             return function () {
@@ -143,6 +156,12 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
 
+    /**
+     * This function is responsible for managing the visualization of the labels (either shown or stay hidden)
+     * @param {donutState.data} data
+     * @param {this} that
+     * @returns {string} opacity value
+     */
     function calculateTextOpacity(data, that) {
         let labelBox = that.getBoundingClientRect();
         let labelWidth = labelBox.right - labelBox.left;
@@ -183,6 +202,11 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         return d.startAngle + (d.endAngle - d.startAngle) / 2;
     }
 
+    /**
+     * This function calculates the position of the labels, by taking into consideration the popout settings selection
+     * @param {donutState.data} data
+     * @returns {string} label position
+     */
     function calculateLabelPosition(data) {
         let positionOffset = modProperty.labelsPosition.value() === "inside" ? 0.75 : 1.03;
         let centeringFactor = donutState.donutCircle.radius * positionOffset;
