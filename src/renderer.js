@@ -96,7 +96,7 @@ export async function render(donutState, modProperty) {
         .style("font-family", donutState.styles.fontFamily)
         .style("font-weight", donutState.styles.fontWeight)
         .style("font-size", donutState.styles.fontSize)
-        .text(donutState.centerExpression)
+        .text(donutState.centerExpression);
 
     calculateMarkedCenterText(donutState.data);
 
