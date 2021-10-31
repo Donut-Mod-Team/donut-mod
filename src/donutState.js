@@ -74,7 +74,10 @@ export async function createDonutState(mod) {
         return;
     }
 
+    let centerAxis = await mod.visualization.axis(resources.centerAxisName);
+
     let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
+    let totalCenterSum = calculateTotalYSum(colorLeaves, resources.centerAxisName);
 
     let data;
     try {
@@ -118,6 +121,8 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
+        totalCenterSum: totalCenterSum,
+        centerExpression: centerAxis.parts[0].displayName,
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,

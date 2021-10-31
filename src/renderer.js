@@ -13,6 +13,9 @@ export async function render(donutState, modProperty) {
     const sizeModifier = 10;
     // D3 animation duration used for svg shapes
 
+    // Constant to be used for making the center value font size larger
+    const centerValueFontModifier = 1.2;
+
     const animationDuration = 250;
 
     const width = donutState.size.width - sizeModifier;
@@ -69,8 +72,8 @@ export async function render(donutState, modProperty) {
         .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-weight", donutState.styles.fontWeight)
-        .style("font-size", donutState.styles.fontSize);
+        .style("font-size", donutState.styles.fontSize)
+        .text("init");
 
     let centerText = d3
         .selectAll("#center-text")
@@ -79,7 +82,21 @@ export async function render(donutState, modProperty) {
         .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-size", donutState.styles.fontSize);
+        .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
+    if (donutState.data[0].centerTotal === 0) {
+        centerText.text(roundNumber(donutState.totalCenterSum, 2));
+        centerText.style("opacity", 1);
+    }
+
+    d3.selectAll("#center-expression")
+        .style("opacity", 1)
+        .style("fill", donutState.styles.fontColor)
+        .style("width", `${calculateCenterTextSpace()}%`)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-weight", donutState.styles.fontWeight)
+        .style("font-size", donutState.styles.fontSize)
+        .text(donutState.centerExpression)
 
     calculateMarkedCenterText(donutState.data);
 
@@ -92,15 +109,15 @@ export async function render(donutState, modProperty) {
         });
 
     const labelColorLuminance = calculateLuminance(
-        parseInt(donutState.styles.fontColor.substr(1,2),16),
-        parseInt(donutState.styles.fontColor.substr(3,2),16),
-        parseInt(donutState.styles.fontColor.substr(5,2),16)
+        parseInt(donutState.styles.fontColor.substr(1, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(3, 2), 16),
+        parseInt(donutState.styles.fontColor.substr(5, 2), 16)
     );
 
     const backgroundLuminance = calculateLuminance(
-        parseInt(donutState.styles.backgroundColor.substr(1,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(3,2),16),
-        parseInt(donutState.styles.backgroundColor.substr(5,2),16)
+        parseInt(donutState.styles.backgroundColor.substr(1, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(3, 2), 16),
+        parseInt(donutState.styles.backgroundColor.substr(5, 2), 16)
     );
 
     let newSectors = sectors
@@ -189,10 +206,14 @@ export async function render(donutState, modProperty) {
 
         // Check if background luminance is closer to dark background color
         if (backgroundLuminance < 0.5) {
-            return contrastToLabelColor(sectorColor) > 1.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+            return contrastToLabelColor(sectorColor) > 1.7
+                ? donutState.styles.fontColor
+                : donutState.styles.backgroundColor;
         }
 
-        return contrastToLabelColor(sectorColor) > 2.7 ? donutState.styles.fontColor : donutState.styles.backgroundColor;
+        return contrastToLabelColor(sectorColor) > 2.7
+            ? donutState.styles.fontColor
+            : donutState.styles.backgroundColor;
     }
 
     /**
@@ -204,9 +225,9 @@ export async function render(donutState, modProperty) {
      */
     function contrastToLabelColor(sectorColor) {
         let fillLuminance = calculateLuminance(
-            parseInt(sectorColor.substr(1,2),16),
-            parseInt(sectorColor.substr(3,2),16),
-            parseInt(sectorColor.substr(5,2),16)
+            parseInt(sectorColor.substr(1, 2), 16),
+            parseInt(sectorColor.substr(3, 2), 16),
+            parseInt(sectorColor.substr(5, 2), 16)
         );
         // Calculating the relative luminance for the brightest of the colors
         let brightest = Math.max(fillLuminance, labelColorLuminance);
@@ -225,8 +246,8 @@ export async function render(donutState, modProperty) {
      */
     function calculateLuminance(r, g, b) {
         var a = [r, g, b].map(function (v) {
-           v /= 255;
-           return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
         });
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
@@ -297,6 +318,7 @@ export async function render(donutState, modProperty) {
         if (markedSectors.length > 0) {
             centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
         }
+
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
         } else {
@@ -310,7 +332,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.style("opacity", 0);
+            centerText.text(roundNumber(donutState.totalCenterSum, 2));
             centerColorText.style("opacity", 0);
         }
     }
@@ -320,7 +342,7 @@ export async function render(donutState, modProperty) {
             .transition()
             .duration(animationDuration)
             .style("opacity", "1");
-        if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
+        if (d.data.centerTotal === 0) {
             centerText.text(roundNumber(d.data.centerSum, 2));
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
