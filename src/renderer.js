@@ -3,6 +3,7 @@ import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
+import { addLabels } from "./labels";
 
 /**
  * @param {object} donutState
@@ -35,6 +36,9 @@ export async function render(donutState, modProperty) {
         padding = 0.05 / donutState.data.length;
     }
 
+    let sortingEnabled = modProperty.sortedPlacement.value();
+    let sortingOrder = modProperty.sortedPlacementOrder.value();
+
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
     donutState.donutCircle.y = height / 2;
@@ -45,7 +49,18 @@ export async function render(donutState, modProperty) {
 
     const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    const pie = d3.pie().value((d) => d.absValue);
+    const pie = d3
+        .pie()
+        .value((d) => d.absValue)
+        .sort(function (a, b) {
+            if (sortingEnabled) {
+                if (sortingOrder === "ascending") {
+                    return b.value - a.value;
+                }
+                return a.value - b.value;
+            }
+            return null;
+        });
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
@@ -77,18 +92,6 @@ export async function render(donutState, modProperty) {
             return d.data.id;
         });
 
-    const labelColorLuminance = calculateLuminance(
-        parseInt(donutState.styles.fontColor.substr(1, 2), 16),
-        parseInt(donutState.styles.fontColor.substr(3, 2), 16),
-        parseInt(donutState.styles.fontColor.substr(5, 2), 16)
-    );
-
-    const backgroundLuminance = calculateLuminance(
-        parseInt(donutState.styles.backgroundColor.substr(1, 2), 16),
-        parseInt(donutState.styles.backgroundColor.substr(3, 2), 16),
-        parseInt(donutState.styles.backgroundColor.substr(5, 2), 16)
-    );
-
     let newSectors = sectors
         .enter()
         .append("svg:path")
@@ -115,122 +118,6 @@ export async function render(donutState, modProperty) {
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
-    svg.select("g#labels")
-        .attr("pointer-events", "none")
-        .selectAll("text")
-        .data(pie(donutState.data), (d) => `label-${d.data.id}`)
-        .join(
-            (enter) => {
-                return enter
-                    .append("text")
-                    .style("opacity", 0)
-                    .attr("dy", "0.35em")
-                    .attr("fill", donutState.styles.fontColor)
-                    .attr("font-family", donutState.styles.fontFamily)
-                    .attr("font-style", donutState.styles.fontStyle)
-                    .attr("font-weight", donutState.styles.fontWeight)
-                    .attr("font-size", donutState.styles.fontSize)
-                    .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
-                    .attr("text-anchor", "middle")
-                    .call((enter) =>
-                        enter
-                            .transition("add labels")
-                            .duration(animationDuration)
-                            .style("opacity", calculateTextOpacity)
-                            .attr("transform", calculateLabelPosition)
-                            .attr("fill", (d) => calculateTextColor(d.data.color))
-                            .attr("font-family", donutState.styles.fontFamily)
-                            .attr("font-style", donutState.styles.fontStyle)
-                            .attr("font-weight", donutState.styles.fontWeight)
-                            .attr("font-size", donutState.styles.fontSize)
-                    );
-            },
-            (update) =>
-                update.call((update) =>
-                    update
-                        .transition("update labels")
-                        .duration(animationDuration)
-                        .style("opacity", calculateTextOpacity)
-                        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
-                        .attr("transform", calculateLabelPosition)
-                        .attr("fill", (d) => calculateTextColor(d.data.color))
-                        .attr("font-family", donutState.styles.fontFamily)
-                        .attr("font-style", donutState.styles.fontStyle)
-                        .attr("font-weight", donutState.styles.fontWeight)
-                        .attr("font-size", donutState.styles.fontSize)
-                ),
-            (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-        );
-
-    /**
-     * This function gets the sector's color, and returns the corresponding color for the text
-     * of its label.
-     * @param {string} sectorColor
-     * @returns {string}
-     */
-    function calculateTextColor(sectorColor) {
-        if (sectorColor === "transparent") {
-            return donutState.styles.fontColor;
-        }
-
-        // Check if background luminance is closer to dark background color
-        if (backgroundLuminance < 0.5) {
-            return contrastToLabelColor(sectorColor) > 1.7
-                ? donutState.styles.fontColor
-                : donutState.styles.backgroundColor;
-        }
-
-        return contrastToLabelColor(sectorColor) > 2.7
-            ? donutState.styles.fontColor
-            : donutState.styles.backgroundColor;
-    }
-
-    /**
-     * This function calculates the contrast ratio between the passed selector color,
-     * and the default one (labelColorLuminance).
-     * Further reading on the calculation part: https://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
-     * @param sectorColor
-     * @returns {number}
-     */
-    function contrastToLabelColor(sectorColor) {
-        let fillLuminance = calculateLuminance(
-            parseInt(sectorColor.substr(1, 2), 16),
-            parseInt(sectorColor.substr(3, 2), 16),
-            parseInt(sectorColor.substr(5, 2), 16)
-        );
-        // Calculating the relative luminance for the brightest of the colors
-        let brightest = Math.max(fillLuminance, labelColorLuminance);
-        // Calculating the relative luminance for the darkest of the colors
-        let darkest = Math.min(fillLuminance, labelColorLuminance);
-        return (brightest + 0.05) / (darkest + 0.05);
-    }
-
-    /**
-     * This function gets the RGB values for a given sector's color, and calculates the corresponding luminance.
-     * Further reading on the calculations used: https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-procedure
-     * @param r
-     * @param g
-     * @param b
-     * @returns {number}
-     */
-    function calculateLuminance(r, g, b) {
-        var a = [r, g, b].map(function (v) {
-            v /= 255;
-            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-        });
-        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
-    }
-
-    function calculateTextOpacity(data) {
-        let box = this.getBoundingClientRect();
-        let labelWidth = box.right - box.left;
-        let labelHeight = box.bottom - box.top;
-        let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
-        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound && data.data.absPercentage >= 5
-            ? "1"
-            : "0";
-    }
-
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
@@ -241,29 +128,6 @@ export async function render(donutState, modProperty) {
         return function (value) {
             return arc(i(value));
         };
-    }
-
-    // Returns the function and/or empty string depending for the labels depending on the settings selected in popout(defined in the modProperty
-    function getLabelText() {
-        if (modProperty.labelsVisible.value() === "all") {
-            return (d) => d.data.getLabelText(modProperty);
-        } else if (modProperty.labelsVisible.value() === "marked") {
-            return (d) => {
-                if (d.data.markedRowCount() > 0) {
-                    return d.data.getLabelText(modProperty);
-                } else return "";
-            };
-        }
-        return "";
-    }
-
-    function calculateLabelPosition(data) {
-        let centeringFactor = radius * 0.75;
-        let centroid = arc.centroid(data);
-        let x = centroid[0];
-        let y = centroid[1];
-        let h = Math.sqrt(x * x + y * y);
-        return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
 
     function calculateCenterTextSpace() {
@@ -335,7 +199,7 @@ export async function render(donutState, modProperty) {
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
-
+    addLabels(arc, pie, donutState, modProperty, animationDuration);
     drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
