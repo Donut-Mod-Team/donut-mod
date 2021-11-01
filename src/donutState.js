@@ -98,6 +98,7 @@ export async function createDonutState(mod) {
                 centerSum: centerSum,
                 colorValue: leaf.formattedValue(),
                 centerTotal: 0,
+                totalCenterSum: totalCenterSum,
                 getLabelText: (modProperty) =>
                     createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
@@ -121,7 +122,6 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        totalCenterSum: totalCenterSum,
         centerExpression: centerAxis.parts[0].displayName,
         clearMarking: () => dataView.clearMarking(),
         styles: {
@@ -161,7 +161,7 @@ function calculateTotalYSum(leaves, yAxisName) {
     leaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        sumOfValues += Math.abs(yValue);
+        sumOfValues += yValue;
     });
     return sumOfValues;
 }

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import { calculatePercentageValue, roundNumber } from "./utility";
+import { calculatePercentageValue, checkIfRectangularIsInCircle, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
 
@@ -69,8 +69,7 @@ export async function render(donutState, modProperty) {
     let centerColorText = d3
         .selectAll("#center-color")
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
-        .style("max-width", `${calculateCenterTextSpace()}%`)
+        //.style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize)
         .text("init");
@@ -79,24 +78,51 @@ export async function render(donutState, modProperty) {
         .selectAll("#center-text")
         .style("fill", donutState.styles.fontColor)
         .style("opacity", 0)
-        .style("width", `${calculateCenterTextSpace()}%`)
-        .style("max-width", `${calculateCenterTextSpace()}%`)
+        //.style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
     if (donutState.data[0].centerTotal === 0) {
-        centerText.text(roundNumber(donutState.totalCenterSum, 2));
+        centerText.text(roundNumber(donutState.data[0].totalCenterSum, 2));
         centerText.style("opacity", 1);
     }
+    calcSpace(centerText, roundNumber(donutState.data[0].totalCenterSum, 2));
 
-    d3.selectAll("#center-expression")
+    let exp = d3
+        .selectAll("#center-expression")
         .style("opacity", 1)
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
-        .style("max-width", `${calculateCenterTextSpace()}%`)
+        //.style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-weight", donutState.styles.fontWeight)
         .style("font-size", donutState.styles.fontSize)
         .text(donutState.centerExpression);
+
+    calcSpace(exp, donutState.centerExpression);
+
+    function calcSpace(node, text) {
+        text = text.toString();
+        while (
+            !checkIfRectangularIsInCircle(node.node().getBoundingClientRect(), donutState.donutCircle, innerRadius)
+        ) {
+            if (text.length < 3) {
+                node.text("");
+                break;
+            }
+            text = text.slice(0, text.length - 1);
+            node.text(text);
+            console.log(
+                checkIfRectangularIsInCircle(node.node().getBoundingClientRect(), donutState.donutCircle, innerRadius)
+            );
+
+            if (
+                checkIfRectangularIsInCircle(node.node().getBoundingClientRect(), donutState.donutCircle, innerRadius)
+            ) {
+                text = text.slice(0, text.length - 2);
+                text = text + "...";
+                node.text(text);
+            }
+        }
+    }
 
     calculateMarkedCenterText(donutState.data);
 
@@ -297,11 +323,12 @@ export async function render(donutState, modProperty) {
         return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
     }
 
-    function calculateCenterTextSpace() {
-        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
-            ? calculatePercentageValue(innerRadius, width, 0)
-            : calculatePercentageValue(innerRadius, height, 0);
-    }
+    // function calculateCenterTextSpace() {
+    //     return calculatePercentageValue(innerRadius * 1.5, width, 0) <
+    //         calculatePercentageValue(innerRadius * 1.5, height, 0)
+    //         ? calculatePercentageValue(innerRadius * 1.5, width, 0)
+    //         : calculatePercentageValue(innerRadius * 1.5, height, 0);
+    // }
 
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
@@ -317,6 +344,7 @@ export async function render(donutState, modProperty) {
         }
         if (markedSectors.length > 0) {
             centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+            calcSpace(centerText, roundNumber(centerTotal, 2));
         }
 
         if (markedSectors.length === 1) {
@@ -332,7 +360,8 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.text(roundNumber(donutState.totalCenterSum, 2));
+            centerText.text(roundNumber(d.data.totalCenterSum, 2));
+            calcSpace(centerText, roundNumber(d.data.totalCenterSum, 2));
             centerColorText.style("opacity", 0);
         }
     }
@@ -347,6 +376,8 @@ export async function render(donutState, modProperty) {
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
             centerColorText.text(d.data.colorValue);
+            calcSpace(centerText, roundNumber(d.data.centerSum, 2));
+            calcSpace(centerColorText, d.data.colorValue);
         }
     }
     // If editing mode is enabled initialize the setting-popout
