@@ -56,12 +56,6 @@ export async function createDonutState(mod) {
     }
 
     let dataViewCenterAxis = await dataView.continuousAxis(resources.centerAxisName);
-    if (dataViewCenterAxis == null) {
-        mod.controls.errorOverlay.show("No data on center axis.", resources.centerAxisName);
-        return;
-    } else {
-        mod.controls.errorOverlay.hide(resources.yAxisName);
-    }
 
     // Hide tooltip
     mod.controls.tooltip.hide();
@@ -81,9 +75,10 @@ export async function createDonutState(mod) {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let centerSum = sumValue(rows, resources.centerAxisName);
+            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
+
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,

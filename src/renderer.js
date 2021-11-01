@@ -139,6 +139,13 @@ export async function render(donutState, modProperty) {
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
         let markedSectors = [];
+
+        if (data.length > 0 && data[0].centerSum === null) {
+            return;
+        } else if (data.length === 0) {
+            return;
+        }
+
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
                 centerTotal += data[i].centerSum;
@@ -175,10 +182,10 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "1");
         if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
-            centerText.text(roundNumber(d.data.centerSum, 2));
+            centerText.text(d.data.centerSum != null ? roundNumber(d.data.centerSum, 2) : "");
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
-            centerColorText.text(d.data.colorValue);
+            centerColorText.text(d.data.centerSum != null ? d.data.colorValue : "");
         }
     }
     // If editing mode is enabled initialize the setting-popout
