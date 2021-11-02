@@ -9,7 +9,8 @@
         "build-watch": "webpack --watch",
         "start": "npm install && npm run build-watch",
         "cypress:open": "cypress open",
-        "cypress:run": "mods-dev-server dist & npm run build-watch & cypress run --browser chrome"
+        "cypress:run": "mods-dev-server dist & npm run build-watch & cypress run --browser chrome",
+        "test": "jest"
     },
     "keywords": [],
     "author": "Krasen Anatoliev Parvanov, Clementine Jensen, Eemil Jeskanen, Chrysostomos Tsagkidis",
@@ -26,6 +27,7 @@
         "d3": "^5.14.2",
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
+        "jest": "^27.3.1",
         "prettier": "2.4.1",
         "webpack": "^4.43.0",
         "webpack-cli": "^3.3.12"
