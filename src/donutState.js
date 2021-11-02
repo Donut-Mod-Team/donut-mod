@@ -1,4 +1,5 @@
-import { roundNumber } from "./utility";
+import { resources } from "./resources";
+import { calculatePercentageValue } from "./utility";
 
 /**
  * Render the visualization
@@ -15,23 +16,29 @@ export async function createDonutState(mod) {
     const dataView = await mod.visualization.data();
     const size = await mod.windowSize();
     const context = await mod.getRenderContext();
-    const yAxisName = "Sector size by:";
 
     /**
      * Check for any errors.
      */
     let errors = await dataView.getErrors();
     if (errors.length > 0) {
-        mod.controls.errorOverlay.show(errors, "dataView");
+        mod.controls.errorOverlay.show(errors, resources.errorOverlayCategoryDataView);
         // TODO clear DOM
         return;
     }
 
-    mod.controls.errorOverlay.hide("dataView");
+    mod.controls.errorOverlay.hide(resources.errorOverlayCategoryDataView);
 
     // Get the leaf nodes for the x hierarchy. We will iterate over them to
     // render the chart.
-    let colorHierarchy = await dataView.hierarchy("Color");
+    let colorHierarchy = await dataView.hierarchy(resources.colorAxisName);
+    if (colorHierarchy == null) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
+
     let colorRoot = await colorHierarchy.root();
     if (colorRoot == null) {
         // Return and wait for next call to render when reading data was aborted.
@@ -40,56 +47,62 @@ export async function createDonutState(mod) {
         return;
     }
 
-    let dataViewYAxis = await dataView.continuousAxis(yAxisName);
+    let dataViewYAxis = await dataView.continuousAxis(resources.yAxisName);
     if (dataViewYAxis == null) {
-        mod.controls.errorOverlay.show("No data on y axis.", yAxisName);
+        mod.controls.errorOverlay.show(resources.errorNoDataOnAxis(resources.yAxisName), resources.yAxisName);
         return;
     } else {
-        mod.controls.errorOverlay.hide(yAxisName);
+        mod.controls.errorOverlay.hide(resources.yAxisName);
     }
 
-    // Awaiting and retrieving the Color and Y axis from the mod.
-    let yAxis = await mod.visualization.axis(yAxisName);
-    const colorAxisMeta = await mod.visualization.axis("Color");
+    let dataViewCenterAxis = await dataView.continuousAxis(resources.centerAxisName);
 
     // Hide tooltip
     mod.controls.tooltip.hide();
 
     let colorLeaves = colorRoot.leaves();
+    if (colorLeaves.length === 0) {
+        // Return and wait for next call to render when reading data was aborted.
+        // Last rendered data view is still valid from a users perspective since
+        // a document modification was made during a progress indication.
+        return;
+    }
 
-    let totalYSum = calculateTotalYSum(colorLeaves, yAxisName);
-    let data = colorLeaves.map((leaf) => {
-        let rows = leaf.rows();
-        let yValue = sumValue(rows, yAxisName);
-        let percentage = calculatePercentageValue(yValue, totalYSum);
-        return {
-            color: rows.length ? rows[0].color().hexCode : "transparent",
-            value: yValue,
-            absValue: Math.abs(yValue),
-            id: leaf.key,
-            percentage: percentage,
-            absPercentage: Math.abs(percentage),
-            mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
-            tooltip: () => {
-                /* Adding the display name from the colorAxis and yAxis to the tooltip,
-                to get the corresponding leaf data onto the tooltip. */
-                return (
-                    "Ratio: " +
-                    percentage +
-                    "%" +
-                    "\n" +
-                    yAxis.parts[0].displayName +
-                    ": " +
-                    roundNumber(yValue, 2) +
-                    "\n" +
-                    colorAxisMeta.parts[0].displayName +
-                    ": " +
-                    leaf.formattedValue() +
-                    "\n"
-                );
-            }
-        };
-    });
+    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
+
+    let data;
+    try {
+        data = colorLeaves.map((leaf) => {
+            let rows = leaf.rows();
+            let yValue = sumValue(rows, resources.yAxisName);
+            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
+            let percentage = calculatePercentageValue(yValue, totalYSum, 1);
+            let absPercentage = Math.abs(percentage).toFixed(1);
+
+            return {
+                color: rows.length ? rows[0].color().hexCode : "transparent",
+                value: yValue,
+                absValue: Math.abs(yValue),
+                id: leaf.key,
+                renderID: leaf.leafIndex,
+                percentage: percentage.toFixed(1),
+                absPercentage: absPercentage,
+                centerSum: centerSum,
+                colorValue: leaf.formattedValue(),
+                centerTotal: 0,
+                getLabelText: (modProperty) =>
+                    createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
+                mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
+                markedRowCount: () => leaf.markedRowCount(),
+                tooltip: () => {
+                    return rows.length ? rows[0] : "N/A";
+                }
+            };
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
@@ -103,9 +116,16 @@ export async function createDonutState(mod) {
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
-            fontFamily: context.styling.general.font.fontFamily,
+            fontFamily:
+                context.styling.general.font.fontFamily.indexOf(",") > -1
+                    ? context.styling.general.font.fontFamily.split(",")[0]
+                    : context.styling.general.font.fontFamily,
             fontWeight: context.styling.general.font.fontWeight,
-            fontSize: context.styling.general.font.fontSize
+            fontSize: context.styling.general.font.fontSize,
+            fontStyle: context.styling.general.font.fontStyle,
+            backgroundColor: context.styling.general.backgroundColor,
+            lineStroke: context.styling.scales.line.stroke,
+            tick: context.styling.scales.tick.stroke
         }
     };
 
@@ -113,7 +133,7 @@ export async function createDonutState(mod) {
 }
 
 /**
- * Calculate the total value for an axis from a set of rows. Null values are treated a 0.
+ * Calculate the total value for an axis from a set of rows. Null values are treated as 0.
  * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
  * @param {string} axis Name of Axis to use to calculate the value.
  */
@@ -136,11 +156,34 @@ function calculateTotalYSum(leaves, yAxisName) {
     return sumOfValues;
 }
 
-/** Function calculates the percentage value of two given params
- * @param {Number} value
- * @param {Number} totalYSum
- * @return {Number}
+/**
+ * This function creates the sector's label text based on the provided modProperty
+ * @param {modProperty} modProperty
+ * @param {number} sectorPercentage
+ * @param {number} sectorValue
+ * @param {Spotfire.DataViewHierarchyNode.formattedValue} sectorCategory
+ * @returns {string} labelText
  */
-function calculatePercentageValue(value, totalYSum) {
-    return roundNumber((value / totalYSum) * 100, 1);
+function createLabelText(modProperty, sectorPercentage, sectorValue, sectorCategory) {
+    let labelValues = [];
+    let labelText = "";
+    // Assigning a value to the labelValue depending on the modProperty selected
+    modProperty.labelsPercentage.value() && labelValues.push(sectorPercentage + "%");
+    modProperty.labelsValue.value() && labelValues.push(sectorValue);
+    modProperty.labelsCategory.value() && labelValues.push(sectorCategory);
+
+    if (labelValues.length === 0) {
+        return labelText;
+    } else if (labelValues.length === 1) {
+        labelText = labelValues[0];
+        return labelText;
+    } else {
+        // The returned labelText follows the format of "Value, Category (Percentage), e.g.: "22, Large Cap (38.6)"
+        labelText += labelValues[1];
+        for (let i = 2; i < labelValues.length; i++) {
+            labelText += ", " + labelValues[i];
+        }
+        labelText += " (" + labelValues[0] + ")";
+    }
+    return labelText;
 }
