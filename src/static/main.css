@@ -52,13 +52,14 @@ svg {
     justify-content: center;
     align-items: center;
 }
-#center-text, #center-color{
+#center-text, #center-color, #center-expression{
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     overflow: hidden;
+    white-space: nowrap;
 }
-#center-text {
+#center-text, #center-color {
     font-weight: bold;
 }
 #settings-icon {
