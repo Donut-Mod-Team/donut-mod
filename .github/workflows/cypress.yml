@@ -20,4 +20,3 @@ jobs:
           start: bash cypress_ci.sh
           browser: chrome
           headless: true
-      - run: cypress run
