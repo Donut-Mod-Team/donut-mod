@@ -58,7 +58,7 @@
                 "placement": "none"
             },
             {
-                "name": "Center value by",
+                "name": "Center value",
                 "mode": "continuous",
                 "placement": "none"
             }

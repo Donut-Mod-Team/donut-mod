@@ -56,12 +56,6 @@ export async function createDonutState(mod) {
     }
 
     let dataViewCenterAxis = await dataView.continuousAxis(resources.centerAxisName);
-    if (dataViewCenterAxis == null) {
-        mod.controls.errorOverlay.show("No data on center axis.", resources.centerAxisName);
-        return;
-    } else {
-        mod.controls.errorOverlay.hide(resources.yAxisName);
-    }
 
     // Hide tooltip
     mod.controls.tooltip.hide();
@@ -77,16 +71,17 @@ export async function createDonutState(mod) {
     let centerAxis = await mod.visualization.axis(resources.centerAxisName);
 
     let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
-    let totalCenterSum = calculateTotalYSum(colorLeaves, resources.centerAxisName);
+    let totalCenterSum = dataViewCenterAxis != null ? calculateTotalYSum(colorLeaves, resources.centerAxisName) : null;
 
     let data;
     try {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let centerSum = sumValue(rows, resources.centerAxisName);
+            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
+
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -97,8 +92,8 @@ export async function createDonutState(mod) {
                 absPercentage: absPercentage,
                 centerSum: centerSum,
                 colorValue: leaf.formattedValue(),
-                centerTotal: 0,
                 totalCenterSum: totalCenterSum,
+                centerTotal: 0,
                 getLabelText: (modProperty) =>
                     createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
@@ -122,7 +117,7 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        centerExpression: centerAxis.parts[0].displayName,
+        centerExpression: centerAxis.parts[0] != null ? centerAxis.parts[0].displayName : "",
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,
