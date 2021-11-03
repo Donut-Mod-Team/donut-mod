@@ -14,6 +14,9 @@ export async function render(donutState, modProperty) {
     const sizeModifier = 10;
     // D3 animation duration used for svg shapes
 
+    // Constant to be used for making the center value font size larger
+    const centerValueFontModifier = 1.2;
+
     const animationDuration = 250;
 
     const width = donutState.size.width - sizeModifier;
@@ -67,20 +70,31 @@ export async function render(donutState, modProperty) {
     let centerColorText = d3
         .selectAll("#center-color")
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-weight", donutState.styles.fontWeight)
         .style("font-size", donutState.styles.fontSize);
+    //.text("init");
 
     let centerText = d3
         .selectAll("#center-text")
         .style("fill", donutState.styles.fontColor)
         .style("opacity", 0)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-size", donutState.styles.fontSize);
+        .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
+    if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSum != null) {
+        centerText.text(roundNumber(donutState.data[0].totalCenterSum, 2));
+        centerText.style("opacity", 1);
+    }
+
+    d3.selectAll("#center-expression")
+        .style("opacity", 1)
+        .style("fill", donutState.styles.fontColor)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-weight", donutState.styles.fontWeight)
+        .style("font-size", donutState.styles.fontSize)
+        .text(donutState.centerExpression);
 
     calculateMarkedCenterText(donutState.data);
 
@@ -171,7 +185,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.style("opacity", 0);
+            centerText.text(d.data.totalCenterSum != null ? roundNumber(d.data.totalCenterSum, 2) : "");
             centerColorText.style("opacity", 0);
         }
     }
@@ -181,7 +195,7 @@ export async function render(donutState, modProperty) {
             .transition()
             .duration(animationDuration)
             .style("opacity", "1");
-        if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
+        if (d.data.centerTotal === 0) {
             centerText.text(d.data.centerSum != null ? roundNumber(d.data.centerSum, 2) : "");
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
