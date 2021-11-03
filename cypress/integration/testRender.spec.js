@@ -1,6 +1,6 @@
 import { render } from "../../src/renderer";
 
-describe("My First Test", () => {
+describe("Test if the Donut Chart is rendering", () => {
     let donutState = {
         data: [
             {
