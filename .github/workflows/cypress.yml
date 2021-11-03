@@ -1,6 +1,6 @@
 # This workflow will trigger automated tests of the UI using the Cypress framework
 
-name: Chrome headless
+name: Cypress CI
 
 on: [push]
 
@@ -19,4 +19,4 @@ jobs:
         with:
           browser: chrome
           headless: true
-      - run: npm run cypress:run
+      - run: npm run cypress:ci
