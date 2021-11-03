@@ -1,0 +1,22 @@
+# This workflow will trigger automated tests of the UI using the Cypress framework
+
+name: Chrome headless
+
+on: [push]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm install
+      - uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          headless: true
+      - run: npm run cypress:run
