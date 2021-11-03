@@ -17,6 +17,7 @@ jobs:
       - run: npm install
       - uses: cypress-io/github-action@v2
         with:
+          start: bash cypress_ci.sh
           browser: chrome
           headless: true
-      - run: bash cypress_ci.sh
+      - run: cypress run

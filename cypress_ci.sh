@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm run cypress:ci
+npm start & npm run server &
