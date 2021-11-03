@@ -2,10 +2,7 @@
 
 pwd
 whoami
-ls -l dist
-echo "===================================================="
-echo "\n"
-ls -l
-echo "===================================================="
-echo "\n"
+sudo mkdir dist
+sudo chown -R runner:docker dist
+ls -lha
 npm start & npm run server &
