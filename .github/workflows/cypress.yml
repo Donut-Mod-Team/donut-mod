@@ -15,9 +15,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm install
-      - run: npm start & npm run server
       - uses: cypress-io/github-action@v2
         with:
           browser: chrome
           headless: true
+      - run: npm start & npm run server
       - run: cypress run
