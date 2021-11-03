@@ -27,11 +27,11 @@ svg {
 }
 
 .rectangle {
-    fill: #add8e6;
-    stroke: #add8e6;
-    fill-opacity: 0.3;
-    stroke-opacity: 0.7;
-    stroke-width: 2;
+    fill: #85A2CB;
+    stroke: #313336;
+    fill-opacity: 0.5;
+    stroke-opacity: 1;
+    stroke-width: 0.5;
 }
 
 .outerSectorArc {
@@ -52,12 +52,27 @@ svg {
     justify-content: center;
     align-items: center;
 }
-#center-text, #center-color{
+#center-text, #center-color, #center-expression{
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     overflow: hidden;
+    white-space: nowrap;
 }
-#center-text {
+#center-text, #center-color {
     font-weight: bold;
+}
+#settings-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    fill: #bdbfc3;
+    transition: opacity 0.25s cubic-bezier(1, 0.28, 0, 0.94);
+    cursor: pointer;
+}
+
+#settings-icon:hover {
+    fill: #858991;
 }

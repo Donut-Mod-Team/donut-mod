@@ -4,7 +4,46 @@
     "name": "Donut Chart",
     "id": "donut-chart",
     "icon": "icon.svg",
+    "properties": [
+        {
+            "name": "labelsVisible",
+            "type": "string",
+            "defaultValue": "all"
+        },
+        {
+            "name": "labelsPosition",
+            "defaultValue": "inside",
+            "type": "string"
+        },
+        {
+            "name": "labelsPercentage",
+            "defaultValue": "true",
+            "type": "boolean"
+        },
+        {
+            "name": "labelsValue",
+            "defaultValue": "false",
+            "type": "boolean"
+        },
+        {
+            "name": "labelsCategory",
+            "defaultValue": "false",
+            "type": "boolean"
+        },
+        {
+            "name": "sortedPlacement",
+            "defaultValue": "true",
+            "type": "boolean"
+        },
+        {
+            "name": "sortedPlacementOrder",
+            "defaultValue": "ascending",
+            "type": "string"
+        }
+
+    ],
     "dataViewDefinition": {
+        "tooltip": {"enabled":  true},
         "colorAxis": {
             "mode": "categorical",
             "dropTarget": {
@@ -19,7 +58,7 @@
                 "placement": "none"
             },
             {
-                "name": "Center value by",
+                "name": "Center value",
                 "mode": "continuous",
                 "placement": "none"
             }
