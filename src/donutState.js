@@ -71,7 +71,7 @@ export async function createDonutState(mod) {
     let centerAxis = await mod.visualization.axis(resources.centerAxisName);
 
     let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
-    let totalCenterSum = calculateTotalYSum(colorLeaves, resources.centerAxisName);
+    let totalCenterSum = dataViewCenterAxis != null ? calculateTotalYSum(colorLeaves, resources.centerAxisName) : null;
 
     let data;
     try {
@@ -92,6 +92,7 @@ export async function createDonutState(mod) {
                 absPercentage: absPercentage,
                 centerSum: centerSum,
                 colorValue: leaf.formattedValue(),
+                totalCenterSum: totalCenterSum,
                 centerTotal: 0,
                 getLabelText: (modProperty) =>
                     createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
@@ -116,8 +117,7 @@ export async function createDonutState(mod) {
         modControls: mod.controls,
         donutCircle: { x: 0, y: 0, radius: 0, innerRadius: 0 },
         context: context,
-        totalCenterSum: totalCenterSum,
-        centerExpression: centerAxis.parts[0].displayName,
+        centerExpression: centerAxis.parts[0] != null ? centerAxis.parts[0].displayName : "",
         clearMarking: () => dataView.clearMarking(),
         styles: {
             fontColor: context.styling.general.font.color,

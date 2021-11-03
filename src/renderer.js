@@ -72,8 +72,8 @@ export async function render(donutState, modProperty) {
         .style("fill", donutState.styles.fontColor)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-size", donutState.styles.fontSize)
-        .text("init");
+        .style("font-size", donutState.styles.fontSize);
+    //.text("init");
 
     let centerText = d3
         .selectAll("#center-text")
@@ -82,8 +82,8 @@ export async function render(donutState, modProperty) {
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
-    if (donutState.data[0].centerTotal === 0) {
-        centerText.text(roundNumber(donutState.totalCenterSum, 2));
+    if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSum != null) {
+        centerText.text(roundNumber(donutState.data[0].totalCenterSum, 2));
         centerText.style("opacity", 1);
     }
 
@@ -185,7 +185,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.text(roundNumber(donutState.totalCenterSum, 2));
+            centerText.text(d.data.totalCenterSum != null ? roundNumber(d.data.totalCenterSum, 2) : "");
             centerColorText.style("opacity", 0);
         }
     }
