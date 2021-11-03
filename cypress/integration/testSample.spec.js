@@ -8,37 +8,57 @@ describe("My First Test", () => {
                 value: 304,
                 absValue: 304,
                 id: "MW",
-                percentage: 27.5,
-                absPercentage: 27.5
+                renderID: 0,
+                percentage: "27.5",
+                absPercentage: "27.5",
+                centerSum: -26494.819981000008,
+                colorValue: "MW",
+                centerTotal: 0,
+                markedRowCount: () => 0
             },
             {
                 color: "#FA7864",
                 value: 245,
                 absValue: 245,
                 id: "NE",
-                percentage: 22.2,
-                absPercentage: 22.2
+                renderID: 1,
+                percentage: "22.2",
+                absPercentage: "22.2",
+                centerSum: -18724.86127800002,
+                colorValue: "NE",
+                centerTotal: 0,
+                markedRowCount: () => 0
             },
             {
                 color: "#FFDE5C",
                 value: 341,
                 absValue: 341,
                 id: "SE",
-                percentage: 30.9,
-                absPercentage: 30.9
+                renderID: 2,
+                percentage: "30.9",
+                absPercentage: "30.9",
+                centerSum: -30099.131803999993,
+                colorValue: "SE",
+                centerTotal: 0,
+                markedRowCount: () => 0
             },
             {
                 color: "#72ECA6",
                 value: 215,
                 absValue: 215,
                 id: "WE",
-                percentage: 19.5,
-                absPercentage: 19.5
+                renderID: 3,
+                percentage: "19.5",
+                absPercentage: "19.5",
+                centerSum: -25642.30973000003,
+                colorValue: "WE",
+                centerTotal: 0,
+                markedRowCount: () => 0
             }
         ],
         size: {
-            width: 686,
-            height: 183
+            width: 253,
+            height: 232
         },
         dataView: {},
         modControls: {
@@ -51,10 +71,10 @@ describe("My First Test", () => {
             errorOverlay: {}
         },
         donutCircle: {
-            x: 338,
-            y: 86.5,
-            radius: 76.5,
-            innerRadius: 38.25
+            x: 121.5,
+            y: 111,
+            radius: 101,
+            innerRadius: 50.5
         },
         context: {
             signalRenderComplete: () => {},
@@ -91,14 +111,53 @@ describe("My First Test", () => {
         },
         styles: {
             fontColor: "#61646B",
-            fontFamily: '"Roboto",sans-serif',
+            fontFamily: '"Roboto"',
             fontWeight: "Normal",
-            fontSize: 12
+            fontSize: 12,
+            fontStyle: "Normal",
+            backgroundColor: "#FFFFFF",
+            lineStroke: "#D1D4DE",
+            tick: "#D1D4DE"
         }
     };
-    it("Does not do much!", () => {
+
+    let modProperty = {
+        labelsPosition: {
+            name: "labelsPosition"
+        },
+        sortedPlacement: {
+            name: "sortedPlacement",
+            value: () => true
+        },
+        sortedPlacementOrder: {
+            name: "sortedPlacementOrder",
+            value: () => "ascending"
+        },
+        labelsVisible: {
+            name: "labelsVisible",
+            value: () => true
+        },
+        labelsPercentage: {
+            name: "labelsPercentage"
+        },
+        labelsValue: {
+            name: "labelsValue"
+        },
+        labelsCategory: {
+            name: "labelsCategory"
+        }
+    };
+
+    before(() => {
         cy.visit("http://127.0.0.1:8090");
-        render(donutState);
-        expect(true).to.equal(true);
+    });
+
+    it("Does not do much!", () => {
+        cy.window().then((window) => {
+            cy.get("#svg").should(() => {
+                render(donutState, modProperty);
+                expect(true).to.equal(true);
+            });
+        });
     });
 });

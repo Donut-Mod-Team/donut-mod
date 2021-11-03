@@ -1,7 +1,3 @@
-export function sum(a, b) {
-    return a + b;
-}
-
 /**
  * Function checks if a point is inside a circle given the circle's centerPoint and radius
  * @param {point} point
