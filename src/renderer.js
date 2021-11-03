@@ -69,7 +69,6 @@ export async function render(donutState, modProperty) {
     let centerColorText = d3
         .selectAll("#center-color")
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize)
@@ -79,7 +78,6 @@ export async function render(donutState, modProperty) {
         .selectAll("#center-text")
         .style("fill", donutState.styles.fontColor)
         .style("opacity", 0)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
@@ -91,7 +89,6 @@ export async function render(donutState, modProperty) {
     d3.selectAll("#center-expression")
         .style("opacity", 1)
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-weight", donutState.styles.fontWeight)
