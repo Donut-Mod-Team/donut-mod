@@ -66,8 +66,8 @@ svg {
     position: absolute;
     top: 0;
     right: 0;
-    width: 16px;
-    height: 16px;
+    width: 21px;
+    height: 21px;
     fill: #bdbfc3;
     transition: opacity 0.25s cubic-bezier(1, 0.28, 0, 0.94);
     cursor: pointer;
