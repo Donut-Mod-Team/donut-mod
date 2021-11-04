@@ -39,6 +39,11 @@
             "name": "sortedPlacementOrder",
             "defaultValue": "ascending",
             "type": "string"
+        },
+        {
+            "name": "circleType",
+            "defaultValue": "whole-circle",
+            "type": "string"
         }
 
     ],

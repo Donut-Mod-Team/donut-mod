@@ -42,6 +42,9 @@ export async function render(donutState, modProperty) {
     let sortingEnabled = modProperty.sortedPlacement.value();
     let sortingOrder = modProperty.sortedPlacementOrder.value();
 
+    let startPieAngle = modProperty.circleType.value() === "semi-circle" ? -90 * (Math.PI / 180) : 0;
+    let endPieAngle = modProperty.circleType.value() === "semi-circle" ? 90 * (Math.PI / 180) : 360 * (Math.PI / 180);
+
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
     donutState.donutCircle.y = height / 2;
@@ -54,6 +57,8 @@ export async function render(donutState, modProperty) {
 
     const pie = d3
         .pie()
+        .startAngle(startPieAngle)
+        .endAngle(endPieAngle)
         .value((d) => d.absValue)
         .sort(function (a, b) {
             if (sortingEnabled) {

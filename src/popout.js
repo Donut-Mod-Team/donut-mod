@@ -45,6 +45,7 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     name === modProperty.labelsPercentage.name && modProperty.labelsPercentage.set(value);
                     name === modProperty.labelsValue.name && modProperty.labelsValue.set(value);
                     name === modProperty.labelsCategory.name && modProperty.labelsCategory.set(value);
+                    name === modProperty.circleType.name && modProperty.circleType.set(value);
                 }
             },
             // Pass the popout sectors
@@ -146,6 +147,23 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     value: "descending",
                     enabled: modProperty.sortedPlacement.value() === true,
                     checked: modProperty.sortedPlacementOrder.value() === "descending"
+                })
+            ]
+        }),
+        section({
+            heading: "Circle type",
+            children: [
+                radioButton({
+                    name: modProperty.circleType.name,
+                    text: "Visualize whole circle",
+                    value: "whole-circle",
+                    checked: modProperty.circleType.value() === "whole-circle"
+                }),
+                radioButton({
+                    name: modProperty.circleType.name,
+                    text: "Visualize semi-circle",
+                    value: "semi-circle",
+                    checked: modProperty.circleType.value() === "semi-circle"
                 })
             ]
         })
