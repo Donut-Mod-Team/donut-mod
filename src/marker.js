@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import * as utilityCalculator from "./utility"
+import * as utilityCalculator from "./utility";
 
 /**
  * Method for selecting a dataset
@@ -69,6 +69,11 @@ export function drawRectangularSelection(donutState) {
             .select("#mod-container svg g")
             .selectAll("path")
             .filter(function (d) {
+                let id = this.id.toString();
+                // Check if the selected path is of a type of sector
+                if (!id.includes("sectorID_")) {
+                    return false;
+                }
                 /**
                  * Get the coordinates of the bounding rectangle around the path element
                  * @typedef boundingClientRect
@@ -85,10 +90,17 @@ export function drawRectangularSelection(donutState) {
                      * Get the overlapping rectangle-area coordinates ( given that both rectangles are static(not rotated) on the dom the overlap is a rectangle as well)
                      * @typedef overlappingRectangle
                      */
-                    let overlappingRectangle = utilityCalculator.getOverlappingRectangle(selectionRectangle, boundingClientRect);
+                    let overlappingRectangle = utilityCalculator.getOverlappingRectangle(
+                        selectionRectangle,
+                        boundingClientRect
+                    );
                     // Check if the overlap-area is inside the middle of the donut.
                     // Handles error case where the rectangle selection overlaps only inside the middle of the donut but don't touch the data-set
-                    match = !utilityCalculator.checkIfRectangularIsInCircle(overlappingRectangle, donutState.donutCircle, donutState.donutCircle.innerRadius);
+                    match = !utilityCalculator.checkIfRectangularIsInCircle(
+                        overlappingRectangle,
+                        donutState.donutCircle,
+                        donutState.donutCircle.innerRadius
+                    );
                     // Error case check for matches outside of the data slice
                     if (match) {
                         // Check rectangle points are in the data slice
@@ -151,15 +163,19 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
         // Get the angle of the point
         let angle = utilityCalculator.calculateAngle(centerPoint, overlappingRectanglePoints[i], startPoint);
         // Verify that the angle of the point is within the bounds of the slice
-        if (angle <= dataSlice.endAngle && angle >= dataSlice.startAngle) {
+        if (
+            (angle <= dataSlice.endAngle && angle >= dataSlice.startAngle) ||
+            checkIfRectangleIntersectsSides(dataSlice.startAngle, dataSlice.endAngle, donutCircle, overlappingRectangle)
+        ) {
             // Exclude matches in the donut hole
-            if (!utilityCalculator.checkIfPointIsInsideCircle(overlappingRectanglePoints[i], centerPoint, donutCircle.innerRadius)) {
+            if (
+                !utilityCalculator.checkIfPointIsInsideCircle(
+                    overlappingRectanglePoints[i],
+                    centerPoint,
+                    donutCircle.innerRadius
+                )
+            ) {
                 validMatch = true;
-            } else {
-                // Check if the overlapping rectangle intersects with the current sides of the sector
-                if (checkIfRectangleIntersectsSides(dataSlice.startAngle, dataSlice.endAngle, donutCircle, overlappingRectangle)) {
-                    validMatch = true;
-                }
             }
         }
     }
@@ -175,31 +191,42 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
  * @returns {boolean} true when there exists at least one intersection, false otherwise
  *  */
 function checkIfRectangleIntersectsSides(startAngle, endAngle, donutCircle, rectangle) {
-
     let startOuterPoint = utilityCalculator.getPointFromCircle(donutCircle, startAngle, donutCircle.radius);
     let startInnerPoint = utilityCalculator.getPointFromCircle(donutCircle, startAngle, donutCircle.innerRadius);
 
     let endOuterPoint = utilityCalculator.getPointFromCircle(donutCircle, endAngle, donutCircle.radius);
     let endInnerPoint = utilityCalculator.getPointFromCircle(donutCircle, endAngle, donutCircle.innerRadius);
 
-    let startLine = {innerPoint: startInnerPoint, outerPoint: startOuterPoint};
-    let endLine = {innerPoint: endInnerPoint, outerPoint: endOuterPoint};
+    let startLine = { innerPoint: startInnerPoint, outerPoint: startOuterPoint };
+    let endLine = { innerPoint: endInnerPoint, outerPoint: endOuterPoint };
 
     let rectangleSides = [
         // Top side of the rectangle
-        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y},
+        { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y },
         // Bottom side of the rectangle
-        {x1: rectangle.x, y1: rectangle.y + rectangle.height, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        {
+            x1: rectangle.x,
+            y1: rectangle.y + rectangle.height,
+            x2: rectangle.x + rectangle.width,
+            y2: rectangle.y + rectangle.height
+        },
         // Right side of the rectangle
-        {x1: rectangle.x + rectangle.width, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y + rectangle.height},
+        {
+            x1: rectangle.x + rectangle.width,
+            y1: rectangle.y,
+            x2: rectangle.x + rectangle.width,
+            y2: rectangle.y + rectangle.height
+        },
         // Left side of the rectangle
-        {x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height}
-    ]
+        { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height }
+    ];
 
     let intersections = [];
 
     // Concatenation of the intersection array's results into one
-    intersections = intersections.concat(utilityCalculator.checkIfRectangleSidesIntersectLine(startLine, rectangleSides));
+    intersections = intersections.concat(
+        utilityCalculator.checkIfRectangleSidesIntersectLine(startLine, rectangleSides)
+    );
     intersections = intersections.concat(utilityCalculator.checkIfRectangleSidesIntersectLine(endLine, rectangleSides));
 
     // If the length of the intersections array is > 0, then it means we found at least one intersection between the lines and the rectangle
