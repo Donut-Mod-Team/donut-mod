@@ -21,7 +21,7 @@ A complete guide to installation and getting started using mod can be found [her
 
 ### Continuous Integration / Continuous Deployment
 
-[Details on the current stage of the CI/CD pipelines.](/documentation/ci-cd.md)
+[Details on the current stage of the CI/CD pipelines.](/documentation/ci_cd.md)
 
 ## Team
 
