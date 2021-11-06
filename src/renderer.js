@@ -109,6 +109,9 @@ export async function render(donutState, modProperty) {
     let newSectors = sectors
         .enter()
         .append("svg:path")
+        .attr("id", function (d) {
+            return "sectorID_" + d.data.renderID;
+        })
         .on("click", function (d) {
             marker.select(d);
             d3.event.stopPropagation();
