@@ -12,14 +12,14 @@ This document gives a descriptive overview for the requirements used for the dev
 
 
 ## User Stories [last update: 2021/09/10]
-* [DMT-56](https://donut-mod-team.atlassian.net/browse/DMT-56) As a data analyst, I want the tooltip of a hovered over sector to be customizable, so that I can show data that is important to my analysis.
-* [DMT-30](https://donut-mod-team.atlassian.net/browse/DMT-30) As a data analyst, I want labels to be visualized on each sector with data specific to that sector, so that I have a quick overview of the data.
-* [DMT-53](https://donut-mod-team.atlassian.net/browse/DMT-53) As a data analyst, I want to be able to choose where the label’s text is displayed(switch between inside the donut-slice/or outside) so that I can see certain sectors better.
-* [DMT-54](https://donut-mod-team.atlassian.net/browse/DMT-54) As a data analyst, I want to be able to see the data in a semi-donut format so that I have a better overview of certain data-type.
-* [DMT-55](https://donut-mod-team.atlassian.net/browse/DMT-55) As a data analyst, I want a setting panel from which I can customize features of the chart, so that I can visualize the data in a manner that suits my preference.
 * [DMT-57](https://donut-mod-team.atlassian.net/browse/DMT-57) As a data analyst, I want to be able to customize the visualization of the labels, so that I am able to quickly reference different values of the data.
+* [DMT-56](https://donut-mod-team.atlassian.net/browse/DMT-56) As a data analyst, I want the tooltip of a hovered over sector to be customizable, so that I can show data that is important to my analysis.
+* [DMT-55](https://donut-mod-team.atlassian.net/browse/DMT-55) As a data analyst, I want a setting panel from which I can customize features of the chart, so that I can visualize the data in a manner that suits my preference.
+* [DMT-54](https://donut-mod-team.atlassian.net/browse/DMT-54) As a data analyst, I want to be able to see the data in a semi-donut format so that I have a better overview of certain data-type.
+* [DMT-53](https://donut-mod-team.atlassian.net/browse/DMT-53) As a data analyst, I want to be able to choose where the label’s text is displayed(switch between inside the donut-slice/or outside) so that I can see certain sectors better.
 * [DMT-37](https://donut-mod-team.atlassian.net/browse/DMT-37) As a data analyst, I want negative value sectors to stand out, so that I have a visual cue on which data contains negative values.
 * [DMT-36](https://donut-mod-team.atlassian.net/browse/DMT-36) As a data analyst, I want to be able to view and change the data in the middle of the donut-chart, so that I can adjust the summary to my current needs
+* [DMT-30](https://donut-mod-team.atlassian.net/browse/DMT-30) As a data analyst, I want labels to be visualized on each sector with data specific to that sector, so that I have a quick overview of the data.
 * [DMT-19](https://donut-mod-team.atlassian.net/browse/DMT-16) As a developer, I want to establish a CI/CD pipeline, so that I am confident that the changes I make do not harm the code base.
 * [DMT-15](https://donut-mod-team.atlassian.net/browse/DMT-15) As a data analyst, I want to be able to see how the mod will look like, so that I can evaluate the state of the mod.
 * [DMT-14](https://donut-mod-team.atlassian.net/browse/DMT-14) As a data analyst, I want to be able to change the fonts and font sizes on the Donut Chart, so that I can improve the readability.
