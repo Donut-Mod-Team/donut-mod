@@ -102,13 +102,13 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
             children: [
                 radioButton({
                     name: modProperty.labelsPosition.name,
-                    text: "Inside chart",
+                    text: "Inside donut",
                     value: "inside",
                     checked: modProperty.labelsPosition.value() === "inside"
                 }),
                 radioButton({
                     name: modProperty.labelsPosition.name,
-                    text: "Outside chart",
+                    text: "Outside donut",
                     value: "outside",
                     checked: modProperty.labelsPosition.value() === "outside"
                 })
