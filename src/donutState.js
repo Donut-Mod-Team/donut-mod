@@ -78,11 +78,11 @@ export async function createDonutState(mod) {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let currencySymbol = getCurrencySymbolContinuesAxis(rows, resources.centerAxisName);
-            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
-
+            let formattedCenterValue = rows[0].continuous(resources.centerAxisName).formattedValue();
+            let currencySymbol = getCurrencySymbolContinuesAxis(rows, resources.centerAxisName);
+            let lastIndex = getLastCenterIndex(rows, resources.centerAxisName);
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -91,10 +91,11 @@ export async function createDonutState(mod) {
                 renderID: leaf.leafIndex,
                 percentage: percentage.toFixed(1),
                 absPercentage: absPercentage,
-                centerSum: centerSum,
+                centerSum: formattedCenterValue,
                 currencySymbol: currencySymbol,
+                centerValueSumLastSymbol: lastIndex,
                 colorValue: leaf.formattedValue(),
-                totalCenterSum: roundNumber(totalCenterSum, 2),
+                totalCenterSum: currencySymbol + formatTotalSum(totalCenterSum) + lastIndex,
                 centerTotal: 0,
                 getLabelText: (modProperty) =>
                     createLabelText(
@@ -144,6 +145,17 @@ export async function createDonutState(mod) {
     return donutState;
 }
 
+function formatTotalSum(totalSum) {
+    return roundNumber(totalSum, 2);
+}
+
+function getLastCenterIndex(rows, axisName) {
+    let centerString = rows[0].continuous(axisName).formattedValue();
+    let firstNumberIndex = centerString.search(/\d/);
+    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex, centerString.length - 1);
+    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d,\s]+/g, "");
+    return centerValueSumLastSymbol;
+}
 /**
  * Calculate the total value for an axis from a set of rows. Null values are treated as 0.
  * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
