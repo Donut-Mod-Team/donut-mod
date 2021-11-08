@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { calculatePercentageValue } from "./utility";
+import { calculatePercentageValue, roundNumber } from "./utility";
 
 /**
  * Render the visualization
@@ -78,6 +78,7 @@ export async function createDonutState(mod) {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
+            let currencySymbol = getCurrencySymbolContinuesAxis(rows, resources.centerAxisName);
             let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
@@ -91,11 +92,17 @@ export async function createDonutState(mod) {
                 percentage: percentage.toFixed(1),
                 absPercentage: absPercentage,
                 centerSum: centerSum,
+                currencySymbol: currencySymbol,
                 colorValue: leaf.formattedValue(),
-                totalCenterSum: totalCenterSum,
+                totalCenterSum: roundNumber(totalCenterSum, 2),
                 centerTotal: 0,
                 getLabelText: (modProperty) =>
-                    createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
+                    createLabelText(
+                        modProperty,
+                        absPercentage,
+                        rows[0].continuous(resources.yAxisName).formattedValue(),
+                        leaf.formattedValue()
+                    ),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
@@ -160,12 +167,23 @@ function calculateTotalYSum(leaves, yAxisName) {
     });
     return sumOfValues;
 }
-
+/**
+ * Returns the currency symbol for continues axis given a name
+ * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
+ * @param {string} axisName
+ * @returns {string} currency symbol or empty string if not a currency
+ */
+function getCurrencySymbolContinuesAxis(rows, axisName) {
+    let formattedCenterValue = rows[0].continuous(axisName).formattedValue();
+    let firstNumberIndex = formattedCenterValue.search(/\d/);
+    let currencySymbol = formattedCenterValue.substr(0, firstNumberIndex);
+    return currencySymbol.replace(/[\s]+/, "");
+}
 /**
  * This function creates the sector's label text based on the provided modProperty
  * @param {modProperty} modProperty
  * @param {number} sectorPercentage
- * @param {number} sectorValue
+ * @param {string} sectorValue
  * @param {Spotfire.DataViewHierarchyNode.formattedValue} sectorCategory
  * @returns {string} labelText
  */

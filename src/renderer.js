@@ -82,7 +82,7 @@ export async function render(donutState, modProperty) {
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
     if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSum != null) {
-        centerText.text(roundNumber(donutState.data[0].totalCenterSum, 2));
+        centerText.text(donutState.data[0].currencySymbol + donutState.data[0].totalCenterSum, 2);
         centerText.style("opacity", 1);
     }
 
@@ -172,7 +172,7 @@ export async function render(donutState, modProperty) {
             data[i].centerTotal = centerTotal;
         }
         if (markedSectors.length > 0) {
-            centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+            centerText.text(data[0].currencySymbol + roundNumber(centerTotal, 2)).style("opacity", 1);
         }
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
@@ -187,7 +187,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.text(d.data.totalCenterSum != null ? roundNumber(d.data.totalCenterSum, 2) : "");
+            centerText.text(d.data.totalCenterSum != null ? d.data.currencySymbol + d.data.totalCenterSum : "");
             centerColorText.style("opacity", 0);
         }
     }
@@ -198,7 +198,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "1");
         if (d.data.centerTotal === 0 && d.data.centerSum != null) {
-            centerText.text(roundNumber(d.data.centerSum, 2));
+            centerText.text(d.data.currencySymbol + roundNumber(d.data.centerSum, 2));
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
             centerColorText.text(d.data.colorValue);
