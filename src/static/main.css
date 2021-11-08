@@ -53,12 +53,12 @@ svg {
     align-items: center;
 }
 #center-text, #center-color, #center-expression{
-    display: flex;
-    justify-content: flex-start;
+    white-space: nowrap;
     align-items: center;
     overflow: hidden;
-    white-space: nowrap;
+    text-overflow: ellipsis;
 }
+
 #center-text, #center-color {
     font-weight: bold;
 }

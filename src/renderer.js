@@ -73,7 +73,6 @@ export async function render(donutState, modProperty) {
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize);
-    //.text("init");
 
     let centerText = d3
         .selectAll("#center-text")
@@ -148,9 +147,9 @@ export async function render(donutState, modProperty) {
     }
 
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
-            ? calculatePercentageValue(innerRadius, width, 0)
-            : calculatePercentageValue(innerRadius, height, 0);
+        return calculatePercentageValue(radius, width, 0) < calculatePercentageValue(radius, height, 0)
+            ? calculatePercentageValue(radius, width, 0)
+            : calculatePercentageValue(radius, height, 0);
     }
 
     function calculateMarkedCenterText(data) {
@@ -198,11 +197,11 @@ export async function render(donutState, modProperty) {
             .transition()
             .duration(animationDuration)
             .style("opacity", "1");
-        if (d.data.centerTotal === 0) {
-            centerText.text(d.data.centerSum != null ? roundNumber(d.data.centerSum, 2) : "");
+        if (d.data.centerTotal === 0 && d.data.centerSum != null) {
+            centerText.text(roundNumber(d.data.centerSum, 2));
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
-            centerColorText.text(d.data.centerSum != null ? d.data.colorValue : "");
+            centerColorText.text(d.data.colorValue);
         }
     }
     // If editing mode is enabled initialize the setting-popout

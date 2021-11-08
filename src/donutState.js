@@ -156,7 +156,7 @@ function calculateTotalYSum(leaves, yAxisName) {
     leaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        sumOfValues += Math.abs(yValue);
+        sumOfValues += yValue;
     });
     return sumOfValues;
 }
