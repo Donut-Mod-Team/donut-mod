@@ -165,10 +165,7 @@ export async function render(donutState, modProperty) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
                 // Extract the number from the formatted value string and convert it to a number
-                let variable = data[i].centerSumFormatted.match(/[^\d ]/g);
-                console.log(variable);
-                console.log(data[i].centerSumFormatted);
-                let centerSumNumber = Number(data[i].centerSumFormatted.replace(/[^0-9]/g, ""));
+                let centerSumNumber = Number(data[i].centerSumFormatted.replace(/[^0-9,]/g, "").replace(",", "."));
                 centerTotal += centerSumNumber;
                 markedSectors.push(i);
             }
@@ -178,7 +175,14 @@ export async function render(donutState, modProperty) {
         }
         if (markedSectors.length > 0) {
             centerText
-                .text(data[0].currencySymbol + roundNumber(centerTotal, 2) + data[0].centerValueSumLastSymbol)
+                .text(
+                    data[0].currencySymbol +
+                        roundNumber(centerTotal, 2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                            .replace(".", ",") +
+                        data[0].centerValueSumLastSymbol
+                )
                 .style("opacity", 1);
         }
         if (markedSectors.length === 1) {
