@@ -4,6 +4,7 @@ import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
 import { addLabels } from "./labels";
+import { resources } from "./resources";
 
 /**
  * @param {object} donutState
@@ -42,8 +43,14 @@ export async function render(donutState, modProperty) {
     let sortingEnabled = modProperty.sortedPlacement.value();
     let sortingOrder = modProperty.sortedPlacementOrder.value();
 
-    let startPieAngle = modProperty.circleType.value() === "semi-circle" ? -90 * (Math.PI / 180) : 0;
-    let endPieAngle = modProperty.circleType.value() === "semi-circle" ? 90 * (Math.PI / 180) : 360 * (Math.PI / 180);
+    // Specify the starting and ending angle for the Donut Chart to use, in order to be drawn.
+    // Default starts from 0 to 360 degrees. For semi-donut chart the values are -90 to 90 degrees.
+    let startPieAngle =
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? -90 * (Math.PI / 180) : 0;
+    let endPieAngle =
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
+            ? 90 * (Math.PI / 180)
+            : 360 * (Math.PI / 180);
 
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
@@ -62,7 +69,7 @@ export async function render(donutState, modProperty) {
         .value((d) => d.absValue)
         .sort(function (a, b) {
             if (sortingEnabled) {
-                if (sortingOrder === "ascending") {
+                if (sortingOrder === resources.popoutSortedPlacementOrderAscendingValue) {
                     return b.value - a.value;
                 }
                 return a.value - b.value;

@@ -16,5 +16,42 @@ export const resources = {
     // Axis-related
     yAxisName: "Sector size by",
     colorAxisName: "Color",
-    centerAxisName: "Center value"
+    centerAxisName: "Center value",
+
+    // Popout settings menu: components' values
+    popoutLabelsVisibleAllValue: "all",
+    popoutLabelsVisibleMarkedValue: "marked",
+    popoutLabelsVisibleNoneValue: "none",
+    popoutLabelsPositionInsideValue: "inside",
+    popoutLabelsPositionOutsideValue: "outside",
+    popoutSortedPlacementOrderAscendingValue: "ascending",
+    popoutSortedPlacementOrderDescendingValue: "descending",
+    popoutCircleTypeWholeValue: "whole-circle",
+    popoutCircleTypeSemiValue: "semi-circle",
+
+    // Popout settings menu: components' text titles
+    popoutLabelsHeading: "Show labels for",
+    popoutLabelsVisibleAllText: "All",
+    popoutLabelsVisibleMarkedText: "Marked rows",
+    popoutLabelsVisibleNoneText: "None",
+    popoutDisplayedLabelsDataHeading: "Show in labels",
+    popoutDisplayedLabelsDataPercentageText: "Sector percentage",
+    popoutDisplayedLabelsDataValueText: "Sector value",
+    popoutDisplayedLabelsDataCategoryText: "Sector category",
+    popoutLabelsPositionHeading: "Labels position",
+    popoutLabelsPositionInsideText: "Inside chart",
+    popoutLabelsPositionOutsideText: "Outside chart",
+    popoutSortedPlacementHeading: "Sorting",
+    popoutSortedPlacementCheckboxText: "Sort sectors by size",
+    popoutSortedPlacementOrderAscendingText: "Sort sectors ascending",
+    popoutSortedPlacementOrderDescendingText: "Sort sectors descending",
+    popoutCircleTypeHeading: "Circle type",
+    popoutCircleTypeWholeText: "Visualize whole circle",
+    popoutCircleTypeSemiText: "Visualize semi-circle",
+
+    // Popout settings menu: components' tooltip text
+    popoutDisplayedLabelsDataPercentageTooltip: "Shows sector percentage",
+    popoutDisplayedLabelsDataValueTooltip: "Shows sector value",
+    popoutDisplayedLabelsDataCategoryTooltip: "Shows sector category",
+    popoutSortedPlacementCheckboxTooltip: "Enable/disable sectors sorting"
 };
