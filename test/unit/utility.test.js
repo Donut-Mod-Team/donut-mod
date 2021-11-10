@@ -90,3 +90,12 @@ test("Check if rectangle and circle are colliding", () => {
     donutCircle.innerRadius = 25;
     expect(rectangularCircleColliding(rectangle.getBoundingClientRect(), donutCircle)).toBeFalsy();
 });
+
+test("Check if a points is inside a circle", () => {
+    let donutCircle = { x: 515, y: 160, radius: 150, innerRadius: 75 };
+    let centerPoint = { x: donutCircle.x, y: donutCircle.y };
+    let pointInside = { x: 550, y: 200 };
+    let pointOutside = { x: 100, y: 200 };
+    expect(checkIfPointIsInsideCircle(pointInside, centerPoint, donutCircle.radius)).toBeTruthy();
+    expect(checkIfPointIsInsideCircle(pointOutside, centerPoint, donutCircle.radius)).toBeFalsy();
+});
