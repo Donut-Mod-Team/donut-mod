@@ -156,3 +156,15 @@ test("Check if correct overlapping rectangle is generated", () => {
         getOverlappingRectangle(firstRectangle.getBoundingClientRect(), secondRectangle.getBoundingClientRect())
     ).toEqual(overlappingRectangleExpected.getBoundingClientRect());
 });
+
+test("Check if angle between 3 points is calculated correctly", () => {
+    let firstPoint = { x: 10, y: 10 };
+    let middlePoint = { x: 20, y: 10 };
+    let secondPoint = { x: 30, y: 10 };
+
+    expect(calculateAngle(middlePoint, secondPoint, firstPoint)).toEqual(Math.PI);
+    firstPoint.x = 20;
+    firstPoint.y = 5;
+    expect(calculateAngle(middlePoint, secondPoint, firstPoint)).toEqual(Math.PI / 2);
+    expect(calculateAngle(middlePoint, secondPoint, firstPoint)).not.toEqual(Math.PI);
+});
