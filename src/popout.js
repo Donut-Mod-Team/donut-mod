@@ -16,7 +16,7 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
     const modContainer = d3.select("#mod-container");
 
     // Select the settings icon svg and set the default opacity
-    const settingsIcon = modContainer.select("#settings-icon").style("opacity", "0");
+    const settingsIcon = modContainer.select("#settings-icon");
 
     // Set the onclick behaviour for the icon
     settingsIcon.node().onclick = (e) => {
@@ -149,9 +149,9 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
     // Control the visibility of the popout based on the user's mouse
     modContainer
         .on("mouseover", function () {
-            settingsIcon.style("opacity", "1");
+            settingsIcon.style("opacity", "1").style("visibility", "visible");
         })
         .on("mouseleave", function () {
-            settingsIcon.style("opacity", "0");
+            settingsIcon.style("opacity", "0").style("visibility", "hidden");
         });
 }
