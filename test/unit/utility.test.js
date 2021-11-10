@@ -127,3 +127,32 @@ test("Check if rectangle is inside a circle", () => {
         checkIfRectangularIsInCircle(rectangleInsideCircle.getBoundingClientRect(), donutCircle, donutCircle.radius)
     ).toBeTruthy();
 });
+
+test("Check if correct overlapping rectangle is generated", () => {
+    const firstRectangle = document.createElement("div");
+    firstRectangle.getBoundingClientRect = jest.fn(() => ({
+        height: 10,
+        width: 10,
+        x: 10,
+        y: 10,
+        toJSON: () => ""
+    }));
+    const secondRectangle = document.createElement("div");
+    secondRectangle.getBoundingClientRect = jest.fn(() => ({
+        height: 10,
+        width: 10,
+        x: 15,
+        y: 10,
+        toJSON: () => ""
+    }));
+    const overlappingRectangleExpected = document.createElement("div");
+    overlappingRectangleExpected.getBoundingClientRect = jest.fn(() => ({
+        height: 10,
+        width: 5,
+        x: 15,
+        y: 10
+    }));
+    expect(
+        getOverlappingRectangle(firstRectangle.getBoundingClientRect(), secondRectangle.getBoundingClientRect())
+    ).toEqual(overlappingRectangleExpected.getBoundingClientRect());
+});
