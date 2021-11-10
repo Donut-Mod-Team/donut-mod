@@ -158,7 +158,10 @@ export async function createDonutState(mod) {
  */
 function formatTotalSum(totalSum) {
     if (totalSum != null) {
-        return roundNumber(totalSum, 2);
+        return roundNumber(totalSum, 2)
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+            .replace(".", ",");
     }
     return "";
 }
@@ -216,7 +219,8 @@ function calculateTotalCenterSum(leaves, centerAxisName) {
             rows[0]
                 .continuous(centerAxisName)
                 .formattedValue()
-                .replace(/[^0-9]/g, "")
+                .replace(/[^0-9,]/g, "")
+                .replace(",", ".")
         );
         sumOfValues += centerValue;
     });
