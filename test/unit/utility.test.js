@@ -99,3 +99,31 @@ test("Check if a points is inside a circle", () => {
     expect(checkIfPointIsInsideCircle(pointInside, centerPoint, donutCircle.radius)).toBeTruthy();
     expect(checkIfPointIsInsideCircle(pointOutside, centerPoint, donutCircle.radius)).toBeFalsy();
 });
+
+test("Check if rectangle is inside a circle", () => {
+    let donutCircle = { x: 210, y: 160, radius: 150, innerRadius: 75 };
+    const rectangleNotInsideCircle = document.createElement("div");
+    rectangleNotInsideCircle.getBoundingClientRect = jest.fn(() => ({
+        height: 20,
+        width: 50,
+        x: 320,
+        y: 25,
+        toJSON: () => ""
+    }));
+    const rectangleInsideCircle = document.createElement("div");
+    rectangleInsideCircle.getBoundingClientRect = jest.fn(() => ({
+        height: 20,
+        width: 40,
+        x: 210,
+        y: 162,
+        toJSON: () => ""
+    }));
+
+    expect(
+        checkIfRectangularIsInCircle(rectangleNotInsideCircle.getBoundingClientRect(), donutCircle, donutCircle.radius)
+    ).toBeFalsy();
+
+    expect(
+        checkIfRectangularIsInCircle(rectangleInsideCircle.getBoundingClientRect(), donutCircle, donutCircle.radius)
+    ).toBeTruthy();
+});
