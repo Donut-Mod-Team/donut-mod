@@ -168,3 +168,11 @@ test("Check if angle between 3 points is calculated correctly", () => {
     expect(calculateAngle(middlePoint, secondPoint, firstPoint)).toEqual(Math.PI / 2);
     expect(calculateAngle(middlePoint, secondPoint, firstPoint)).not.toEqual(Math.PI);
 });
+
+test("Check correctness of percentage calculations", () => {
+    let value = 25;
+    let total = 100;
+    expect(calculatePercentageValue(value, total, 2)).toEqual(25.0);
+    value = 23.2558;
+    expect(calculatePercentageValue(value, total, 2)).toEqual(23.26);
+});
