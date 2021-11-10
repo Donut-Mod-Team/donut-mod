@@ -167,6 +167,9 @@ test("Check if angle between 3 points is calculated correctly", () => {
     firstPoint.y = 5;
     expect(calculateAngle(middlePoint, secondPoint, firstPoint)).toEqual(Math.PI / 2);
     expect(calculateAngle(middlePoint, secondPoint, firstPoint)).not.toEqual(Math.PI);
+    secondPoint.x = 15;
+    secondPoint.y = 10;
+    expect(calculateAngle(middlePoint, secondPoint, firstPoint)).toEqual(Math.PI + Math.PI / 2);
 });
 
 test("Check correctness of percentage calculations", () => {
@@ -175,4 +178,82 @@ test("Check correctness of percentage calculations", () => {
     expect(calculatePercentageValue(value, total, 2)).toEqual(25.0);
     value = 23.2558;
     expect(calculatePercentageValue(value, total, 2)).toEqual(23.26);
+});
+
+test("Check if rectangle sides intersect line", () => {
+    let line = { innerPoint: { x: 280, y: 300 }, outerPoint: { x: 230, y: 400 } };
+
+    const rectangleDiv = document.createElement("div");
+    rectangleDiv.getBoundingClientRect = jest.fn(() => ({
+        height: 50,
+        width: 40,
+        x: 225,
+        y: 320,
+        toJSON: () => ""
+    }));
+    let rectangle = rectangleDiv.getBoundingClientRect();
+    let rectangleSides = [
+        // Top side of the rectangle
+        { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y },
+        // Bottom side of the rectangle
+        {
+            x1: rectangle.x,
+            y1: rectangle.y + rectangle.height,
+            x2: rectangle.x + rectangle.width,
+            y2: rectangle.y + rectangle.height
+        },
+        // Right side of the rectangle
+        {
+            x1: rectangle.x + rectangle.width,
+            y1: rectangle.y,
+            x2: rectangle.x + rectangle.width,
+            y2: rectangle.y + rectangle.height
+        },
+        // Left side of the rectangle
+        { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height }
+    ];
+    expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 2).toBeTruthy();
+    let line2 = { innerPoint: { x: 435, y: 255 }, outerPoint: { x: 530, y: 300 } };
+
+    const rectangleDiv2 = document.createElement("div");
+    rectangleDiv.getBoundingClientRect = jest.fn(() => ({
+        height: 20,
+        width: 10,
+        x: 230,
+        y: 300,
+        toJSON: () => ""
+    }));
+    let rectangle2 = rectangleDiv2.getBoundingClientRect();
+    let rectangleSides2 = [
+        // Top side of the rectangle
+        { x1: rectangle2.x, y1: rectangle2.y, x2: rectangle2.x + rectangle2.width, y2: rectangle2.y },
+        // Bottom side of the rectangle
+        {
+            x1: rectangle2.x,
+            y1: rectangle2.y + rectangle2.height,
+            x2: rectangle2.x + rectangle2.width,
+            y2: rectangle2.y + rectangle2.height
+        },
+        // Right side of the rectangle
+        {
+            x1: rectangle2.x + rectangle2.width,
+            y1: rectangle2.y,
+            x2: rectangle2.x + rectangle2.width,
+            y2: rectangle.y + rectangle2.height
+        },
+        // Left side of the rectangle
+        { x1: rectangle2.x, y1: rectangle2.y, x2: rectangle2.x, y2: rectangle2.y + rectangle2.height }
+    ];
+
+    expect(checkIfRectangleSidesIntersectLine(line2, rectangleSides2).length === 0).toBeTruthy();
+});
+
+test("Check if a point of a circle is correct", () => {
+    let donutCircle = { x: 210, y: 160, radius: 150, innerRadius: 75 };
+    let angle = Math.PI;
+
+    expect(getPointFromCircle({ x: donutCircle.x, y: donutCircle.y }, angle, donutCircle.radius)).toEqual({
+        x: 210,
+        y: 310
+    });
 });
