@@ -69,3 +69,24 @@ test("Check if a number is rounded by two decimals", () => {
     expect(roundNumber(testNumber, decimals)).not.toEqual(expectedWrongNumber);
     expect(roundNumber(testNumber, decimals)).toEqual(expectedCorrectNumber);
 });
+
+test("Check if rectangle and circle are colliding", () => {
+    const rectangle = document.createElement("div");
+    rectangle.getBoundingClientRect = jest.fn(() => ({
+        left: 300,
+        right: 460,
+        top: 45,
+        bottom: 100,
+        height: 60,
+        width: 160,
+        x: 300,
+        y: 45,
+        toJSON: () => ""
+    }));
+
+    let donutCircle = { x: 515, y: 160, radius: 150, innerRadius: 75 };
+    expect(rectangularCircleColliding(rectangle.getBoundingClientRect(), donutCircle)).toBeTruthy();
+    donutCircle.radius = 50;
+    donutCircle.innerRadius = 25;
+    expect(rectangularCircleColliding(rectangle.getBoundingClientRect(), donutCircle)).toBeFalsy();
+});
