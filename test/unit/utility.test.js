@@ -1,4 +1,15 @@
-import { checkIfRectanglesOverlap } from "../../src/utility";
+import {
+    checkIfRectanglesOverlap,
+    calculateAngle,
+    checkIfRectangleSidesIntersectLine,
+    calculatePercentageValue,
+    checkIfPointIsInsideCircle,
+    checkIfRectangularIsInCircle,
+    getOverlappingRectangle,
+    getPointFromCircle,
+    rectangularCircleColliding,
+    roundNumber
+} from "../../src/utility";
 
 test("Check if two rectangles are overlapping", () => {
     const firstRectangle = document.createElement("div");
@@ -47,4 +58,14 @@ test("Check if two rectangles are overlapping", () => {
     expect(
         checkIfRectanglesOverlap(firstRectangle.getBoundingClientRect(), thirdRectangle.getBoundingClientRect())
     ).toBeFalsy();
+});
+
+test("Check if a number is rounded by two decimals", () => {
+    let testNumber = 3.456;
+    let expectedCorrectNumber = 3.46;
+    let expectedWrongNumber = 3;
+    let decimals = 2;
+
+    expect(roundNumber(testNumber, decimals)).not.toEqual(expectedWrongNumber);
+    expect(roundNumber(testNumber, decimals)).toEqual(expectedCorrectNumber);
 });
