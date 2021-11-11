@@ -142,7 +142,7 @@ export function getPointFromCircle(centerPoint, angle, radius) {
 /**
  * Function that checks if the provided rectangle sides intersect with a given line
  * @param {line} line
- * @param {rectangleSides} rectangleSides
+ * @param {lines[]} rectangleSides
  * @returns {array} intersections
  *  */
 export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
@@ -165,7 +165,7 @@ export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
 /**
  * Function that calculates the denominator used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @returns {number}
  *  */
 function calculateDenominator(line, rectangleLine) {
@@ -178,7 +178,7 @@ function calculateDenominator(line, rectangleLine) {
 /**
  * Function that calculates the lambda used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @param {number} denominator
  * @returns {number}
  *  */
@@ -193,7 +193,7 @@ function calculateLambda(line, rectangleLine, denominator) {
 /**
  * Function that calculates the gamma used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @param {number} denominator
  * @returns {number}
  *  */

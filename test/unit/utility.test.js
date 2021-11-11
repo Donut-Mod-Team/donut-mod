@@ -24,8 +24,7 @@ test("Check if two rectangles are overlapping", () => {
         height: 0,
         width: 0,
         x: 0,
-        y: 0,
-        toJSON: () => ""
+        y: 0
     }));
 
     secondRectangle.getBoundingClientRect = jest.fn(() => ({
@@ -36,8 +35,7 @@ test("Check if two rectangles are overlapping", () => {
         height: 0,
         width: 0,
         x: 0,
-        y: 0,
-        toJSON: () => ""
+        y: 0
     }));
 
     thirdRectangle.getBoundingClientRect = jest.fn(() => ({
@@ -48,8 +46,7 @@ test("Check if two rectangles are overlapping", () => {
         height: 0,
         width: 0,
         x: 0,
-        y: 0,
-        toJSON: () => ""
+        y: 0
     }));
 
     expect(
@@ -73,26 +70,21 @@ test("Check if a number is rounded by two decimals", () => {
 test("Check if rectangle and circle are colliding", () => {
     const rectangle = document.createElement("div");
     rectangle.getBoundingClientRect = jest.fn(() => ({
-        left: 300,
-        right: 460,
-        top: 45,
-        bottom: 100,
+        x: 50,
+        y: 50,
         height: 60,
-        width: 160,
-        x: 300,
-        y: 45,
-        toJSON: () => ""
+        width: 70
     }));
 
-    let donutCircle = { x: 515, y: 160, radius: 150, innerRadius: 75 };
+    let donutCircle = { x: 100, y: 100, radius: 100, innerRadius: 75 };
     expect(rectangularCircleColliding(rectangle.getBoundingClientRect(), donutCircle)).toBeTruthy();
-    donutCircle.radius = 50;
-    donutCircle.innerRadius = 25;
+    donutCircle.x = 300;
+    donutCircle.y = 200;
     expect(rectangularCircleColliding(rectangle.getBoundingClientRect(), donutCircle)).toBeFalsy();
 });
 
 test("Check if a points is inside a circle", () => {
-    let donutCircle = { x: 515, y: 160, radius: 150, innerRadius: 75 };
+    let donutCircle = { x: 500, y: 150, radius: 150, innerRadius: 75 };
     let centerPoint = { x: donutCircle.x, y: donutCircle.y };
     let pointInside = { x: 550, y: 200 };
     let pointOutside = { x: 100, y: 200 };
@@ -101,22 +93,20 @@ test("Check if a points is inside a circle", () => {
 });
 
 test("Check if rectangle is inside a circle", () => {
-    let donutCircle = { x: 210, y: 160, radius: 150, innerRadius: 75 };
+    let donutCircle = { x: 200, y: 150, radius: 150, innerRadius: 75 };
     const rectangleNotInsideCircle = document.createElement("div");
     rectangleNotInsideCircle.getBoundingClientRect = jest.fn(() => ({
-        height: 20,
-        width: 50,
-        x: 320,
-        y: 25,
-        toJSON: () => ""
+        x: 300,
+        y: 100,
+        height: 50,
+        width: 100
     }));
     const rectangleInsideCircle = document.createElement("div");
     rectangleInsideCircle.getBoundingClientRect = jest.fn(() => ({
-        height: 20,
-        width: 40,
-        x: 210,
-        y: 162,
-        toJSON: () => ""
+        x: 200,
+        y: 150,
+        height: 50,
+        width: 100
     }));
 
     expect(
@@ -131,26 +121,24 @@ test("Check if rectangle is inside a circle", () => {
 test("Check if correct overlapping rectangle is generated", () => {
     const firstRectangle = document.createElement("div");
     firstRectangle.getBoundingClientRect = jest.fn(() => ({
-        height: 10,
-        width: 10,
         x: 10,
         y: 10,
-        toJSON: () => ""
+        height: 10,
+        width: 10
     }));
     const secondRectangle = document.createElement("div");
     secondRectangle.getBoundingClientRect = jest.fn(() => ({
-        height: 10,
-        width: 10,
         x: 15,
         y: 10,
-        toJSON: () => ""
+        height: 10,
+        width: 10
     }));
     const overlappingRectangleExpected = document.createElement("div");
     overlappingRectangleExpected.getBoundingClientRect = jest.fn(() => ({
-        height: 10,
-        width: 5,
         x: 15,
-        y: 10
+        y: 10,
+        height: 10,
+        width: 5
     }));
     expect(
         getOverlappingRectangle(firstRectangle.getBoundingClientRect(), secondRectangle.getBoundingClientRect())
@@ -213,6 +201,9 @@ test("Check if rectangle sides intersect line", () => {
         { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height }
     ];
     expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 2).toBeTruthy();
+    line = { innerPoint: { x: 225, y: 320 }, outerPoint: { x: 265, y: 320 } };
+    expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 0).toBeTruthy();
+
     let line2 = { innerPoint: { x: 435, y: 255 }, outerPoint: { x: 530, y: 300 } };
 
     const rectangleDiv2 = document.createElement("div");
@@ -249,11 +240,11 @@ test("Check if rectangle sides intersect line", () => {
 });
 
 test("Check if a point of a circle is correct", () => {
-    let donutCircle = { x: 210, y: 160, radius: 150, innerRadius: 75 };
+    let donutCircle = { x: 200, y: 150, radius: 150, innerRadius: 75 };
     let angle = Math.PI;
 
     expect(getPointFromCircle({ x: donutCircle.x, y: donutCircle.y }, angle, donutCircle.radius)).toEqual({
-        x: 210,
-        y: 310
+        x: 200,
+        y: 300
     });
 });
