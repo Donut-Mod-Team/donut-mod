@@ -169,17 +169,16 @@ test("Check correctness of percentage calculations", () => {
 });
 
 test("Check if rectangle sides intersect line", () => {
-    let line = { innerPoint: { x: 280, y: 300 }, outerPoint: { x: 230, y: 400 } };
+    let line = { innerPoint: { x: 300, y: 400 }, outerPoint: { x: 200, y: 300 } };
 
-    const rectangleDiv = document.createElement("div");
-    rectangleDiv.getBoundingClientRect = jest.fn(() => ({
-        height: 50,
-        width: 40,
-        x: 225,
-        y: 320,
-        toJSON: () => ""
+    const rectangleDivIntersedcting = document.createElement("div");
+    rectangleDivIntersedcting.getBoundingClientRect = jest.fn(() => ({
+        x: 200,
+        y: 350,
+        height: 100,
+        width: 75
     }));
-    let rectangle = rectangleDiv.getBoundingClientRect();
+    let rectangle = rectangleDivIntersedcting.getBoundingClientRect();
     let rectangleSides = [
         // Top side of the rectangle
         { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x + rectangle.width, y2: rectangle.y },
@@ -201,42 +200,10 @@ test("Check if rectangle sides intersect line", () => {
         { x1: rectangle.x, y1: rectangle.y, x2: rectangle.x, y2: rectangle.y + rectangle.height }
     ];
     expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 2).toBeTruthy();
-    line = { innerPoint: { x: 225, y: 320 }, outerPoint: { x: 265, y: 320 } };
+    line.outerPoint.x = 400;
     expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 0).toBeTruthy();
-
-    let line2 = { innerPoint: { x: 435, y: 255 }, outerPoint: { x: 530, y: 300 } };
-
-    const rectangleDiv2 = document.createElement("div");
-    rectangleDiv.getBoundingClientRect = jest.fn(() => ({
-        height: 20,
-        width: 10,
-        x: 230,
-        y: 300,
-        toJSON: () => ""
-    }));
-    let rectangle2 = rectangleDiv2.getBoundingClientRect();
-    let rectangleSides2 = [
-        // Top side of the rectangle
-        { x1: rectangle2.x, y1: rectangle2.y, x2: rectangle2.x + rectangle2.width, y2: rectangle2.y },
-        // Bottom side of the rectangle
-        {
-            x1: rectangle2.x,
-            y1: rectangle2.y + rectangle2.height,
-            x2: rectangle2.x + rectangle2.width,
-            y2: rectangle2.y + rectangle2.height
-        },
-        // Right side of the rectangle
-        {
-            x1: rectangle2.x + rectangle2.width,
-            y1: rectangle2.y,
-            x2: rectangle2.x + rectangle2.width,
-            y2: rectangle.y + rectangle2.height
-        },
-        // Left side of the rectangle
-        { x1: rectangle2.x, y1: rectangle2.y, x2: rectangle2.x, y2: rectangle2.y + rectangle2.height }
-    ];
-
-    expect(checkIfRectangleSidesIntersectLine(line2, rectangleSides2).length === 0).toBeTruthy();
+    line = { innerPoint: { x: 275, y: 350 }, outerPoint: { x: 200, y: 350 } };
+    expect(checkIfRectangleSidesIntersectLine(line, rectangleSides).length === 0).toBeTruthy();
 });
 
 test("Check if a point of a circle is correct", () => {
