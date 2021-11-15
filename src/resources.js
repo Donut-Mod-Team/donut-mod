@@ -39,8 +39,8 @@ export const resources = {
     popoutDisplayedLabelsDataValueText: "Sector value",
     popoutDisplayedLabelsDataCategoryText: "Sector category",
     popoutLabelsPositionHeading: "Labels position",
-    popoutLabelsPositionInsideText: "Inside chart",
-    popoutLabelsPositionOutsideText: "Outside chart",
+    popoutLabelsPositionInsideText: "Inside donut",
+    popoutLabelsPositionOutsideText: "Outside donut",
     popoutSortedPlacementHeading: "Sorting",
     popoutSortedPlacementCheckboxText: "Sort sectors by size",
     popoutSortedPlacementOrderAscendingText: "Sort sectors ascending",
@@ -53,5 +53,10 @@ export const resources = {
     popoutDisplayedLabelsDataPercentageTooltip: "Shows sector percentage",
     popoutDisplayedLabelsDataValueTooltip: "Shows sector value",
     popoutDisplayedLabelsDataCategoryTooltip: "Shows sector category",
-    popoutSortedPlacementCheckboxTooltip: "Enable/disable sectors sorting"
+    popoutSortedPlacementCheckboxTooltip: "Enable/disable sectors sorting",
+
+    // D3 animation duration used for svg shapes
+    animationDuration: 250,
+    // Added a resource to remove the magic numbers within the width, height and radius calculations.
+    sizeModifier: 10
 };
