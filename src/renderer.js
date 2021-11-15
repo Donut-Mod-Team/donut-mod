@@ -85,7 +85,6 @@ export async function render(donutState, modProperty) {
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", donutState.styles.fontSize);
-    //.text("init");
 
     let centerText = d3
         .selectAll("#center-text")
@@ -94,8 +93,8 @@ export async function render(donutState, modProperty) {
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
         .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
-    if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSum != null) {
-        centerText.text(roundNumber(donutState.data[0].totalCenterSum, 2));
+    if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSumFormatted != null) {
+        centerText.text(donutState.data[0].totalCenterSumFormatted, 2);
         centerText.style("opacity", 1);
     }
 
@@ -121,6 +120,9 @@ export async function render(donutState, modProperty) {
     let newSectors = sectors
         .enter()
         .append("svg:path")
+        .attr("id", function (d) {
+            return "sectorID_" + d.data.renderID;
+        })
         .on("click", function (d) {
             marker.select(d);
             d3.event.stopPropagation();
@@ -157,16 +159,16 @@ export async function render(donutState, modProperty) {
     }
 
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
-            ? calculatePercentageValue(innerRadius, width, 0)
-            : calculatePercentageValue(innerRadius, height, 0);
+        return calculatePercentageValue(radius, width, 0) < calculatePercentageValue(radius, height, 0)
+            ? calculatePercentageValue(radius, width, 0)
+            : calculatePercentageValue(radius, height, 0);
     }
 
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
         let markedSectors = [];
 
-        if (data.length > 0 && data[0].centerSum === null) {
+        if (data.length > 0 && data[0].centerSumFormatted === null) {
             return;
         } else if (data.length === 0) {
             return;
@@ -174,7 +176,9 @@ export async function render(donutState, modProperty) {
 
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
-                centerTotal += data[i].centerSum;
+                // Extract the number from the formatted value string and convert it to a number
+                let centerSumNumber = Number(data[i].centerSumFormatted.replace(/[^0-9,]/g, "").replace(",", "."));
+                centerTotal += centerSumNumber;
                 markedSectors.push(i);
             }
         }
@@ -182,7 +186,16 @@ export async function render(donutState, modProperty) {
             data[i].centerTotal = centerTotal;
         }
         if (markedSectors.length > 0) {
-            centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+            centerText
+                .text(
+                    data[0].currencySymbol +
+                        roundNumber(centerTotal, 2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                            .replace(".", ",") +
+                        data[0].centerValueSumLastSymbol
+                )
+                .style("opacity", 1);
         }
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
@@ -197,7 +210,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.text(d.data.totalCenterSum != null ? roundNumber(d.data.totalCenterSum, 2) : "");
+            centerText.text(d.data.totalCenterSumFormatted != null ? d.data.totalCenterSumFormatted : "");
             centerColorText.style("opacity", 0);
         }
     }
@@ -207,11 +220,11 @@ export async function render(donutState, modProperty) {
             .transition()
             .duration(animationDuration)
             .style("opacity", "1");
-        if (d.data.centerTotal === 0) {
-            centerText.text(d.data.centerSum != null ? roundNumber(d.data.centerSum, 2) : "");
+        if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
+            centerText.text(d.data.centerSumFormatted);
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
-            centerColorText.text(d.data.centerSum != null ? d.data.colorValue : "");
+            centerColorText.text(d.data.colorValue);
         }
     }
     // If editing mode is enabled initialize the setting-popout

@@ -27,7 +27,9 @@ Once you have the repository downloaded and extracted, you navigate inside the f
 You first need to clone or download the repository from the project's GitHub repository homepage, by pressing the `Code` button and selecting one of the cloning or download options.
 Once you have the repository downloaded and extracted, you navigate inside the folder using the command line. Alternatively, you can clone it via:
 
->git clone https://github.com/Donut-Mod-Team/donut-mod.git
+```shell
+git clone https://github.com/Donut-Mod-Team/donut-mod.git
+```
 
 ## Run the mod locally
 
@@ -63,7 +65,7 @@ and press the button that says "Connect to project".
 
 Click "Development Server" and connect to the following:
 
->http://127.0.0.1:8090/
+> http://127.0.0.1:8090/
 
 Congratulations! You should now be able to see the Donut Chart!
 
@@ -72,15 +74,15 @@ Congratulations! You should now be able to see the Donut Chart!
 ### Functionality and Features
 
 #### Marking:
-- Select/Mark a data-set/slice by clicking(mouse left) on a sub-set of the donut.
+- Select/Mark a data-set/slice by clicking (mouse left-click) on a subset of the donut.
 
-- Select and add to a selection set by left-clicking(mouse) while holding CTRL.
+- Select and add to a selection set by `left-clicking` (mouse) while holding the `CTRL` key.
 
-- Select single/multiple sub-sets by clicking and holding the left mouse button and dragging(rectangle selection) - selects everything the rectangle overlaps.
+- Select single or multiple sectors by drawing a rectangle using your mouse, by holding the mouse `left-click` button, and increasing/decreasing the selection's bounds accordingly.
 
-- Adding to selection with holding CTRL while working with rectangle selection.
+- Adding to selection by holding the `CTRL` key, while working with rectangle selection.
 
-- Unselect/Unmark by clicking on the background(within the mod canvas.
+- Unselect/Unmark by clicking on the background within the mod's canvas area.
 
 #### Tooltip
 
@@ -95,7 +97,68 @@ Congratulations! You should now be able to see the Donut Chart!
 
 - Visualize chart data-slices containing negative values in the data set by adding a red outline to the corresponding data slice
 
+#### Center text
+
+- Dynamically visualize the sum of values as center text, depending on the data-set loaded in Spotfire.
+- When selecting/marking sector(s) then this value is calculated based on the corresponding sectors' values.
+- When no sector is selected, then by default the center text corresponds to the total sum of the sectors' values. In addition, by hovering upon different sectors then the center text changes by depicting their value, until the user hovers outside their area.
+- Functionality has been implemented to alter the type of the center value, based on the options for the loaded data-set in Spotfire, by selecting a different one from corresponding axis found on the axes' sidebar.
+
+#### Donut-mod's settings popout menu
+
+The user can find in the top-right corner of the mod's canvas area a settings icon specific to this mode. From there, the following customization options can be applied to the visualization of the mod:
+
+- Change labels' visualization options by:
+  - showing text for all the sectors
+  - showing text for only the selected/marked sectors
+  - not showing any label-related text
+- Select the type of information to be included as part of the labels' text among the following options:
+  - sector percentage
+  - sector value
+  - sector category
+- Change the labels' position between `inside donut` and `outside donut`
+- Select a sorting option for the sectors' position in the Donut Chart:
+  - enable ascending sorting
+  - enable descending sorting
+  - disable the sorting of the sectors
+
 #### Labels
 
 - Labels displayed on each data slice showing the ratio/percentage of that slice
 - The colours of the labels changes depending on if it's a light or dark mode
+
+## Testing
+
+Currently, Donut-Mod's testing strategy consists of User Interface related automated tests, as well as unit tests of some classes' components.
+Apart from the above, manual testing is being performed by the development team throughout every development stage, in order to ensure the quality of the delivered product.
+
+### Automated UI tests
+
+For this type of testing the `Cypress` testing framework is being used. In order to run these automated tests, first you need to make sure you have installed all the needed packages via:
+
+```shell
+npm install
+```
+
+Then, you have the option of running Cypress either in `headless` or in `headed` mode. Specifically, for headless try running in your console:
+
+```shell
+npm run cypress:run
+```
+
+> **_NOTE:_** The above command tries to run Cypress by using Chrome as the headless browser. Please edit the `package.json` file if you need to change it, or run the Cypress manually. For instance, you can use for firefox
+`cypress run --browser firefox` instead.
+
+In order to force the browser to be shown in order to have more specific control upon the process of the automated tests, by opening the Cypress Test Runner, please run in your console:
+
+```shell
+npm run cypress:open
+```
+
+### Unit testing
+
+To run the Jest testing framework for the corresponding unit tests currently available, please execute the following command in your console (assuming you have already run `npm install`, if this is right after cloning the repository):
+
+```shell
+npm run test
+```
