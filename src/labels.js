@@ -7,9 +7,8 @@ import { resources } from "./resources";
  * @param {d3.pie} pie
  * @param {donutState} donutState
  * @param {modProperty} modProperty
- * @param {number} animationDuration
  */
-export function addLabels(arc, pie, donutState, modProperty, animationDuration) {
+export function addLabels(arc, pie, donutState, modProperty) {
     const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1, 2), 16),
         parseInt(donutState.styles.fontColor.substr(3, 2), 16),
@@ -62,7 +61,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
 
     labels
         .transition("update labels")
-        .duration(animationDuration)
+        .duration(resources.animationDuration)
         .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attrTween("transform", function (d) {
             return function () {
@@ -82,7 +81,12 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
 
-    labels.exit().transition("remove labels").duration(animationDuration).attr("fill", "transparent").remove();
+    labels
+        .exit()
+        .transition("remove labels")
+        .duration(resources.animationDuration)
+        .attr("fill", "transparent")
+        .remove();
 
     /**
      * This function returns the corresponding alignment for the label's text

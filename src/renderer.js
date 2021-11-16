@@ -163,17 +163,12 @@ export async function render(donutState, modProperty) {
 
     // If editing mode is enabled initialize the setting-popout
     donutState.context.isEditing &&
-        initializeSettingsPopout(
-            donutState.modControls.popout,
-            donutState.modControls.tooltip,
-            resources.animationDuration,
-            modProperty
-        );
+        initializeSettingsPopout(donutState.modControls.popout, donutState.modControls.tooltip, modProperty);
 
     marker.drawRectangularSelection(donutState);
-    applyHoverEffect(pie, donutState, resources.animationDuration);
-    addLabels(arc, pie, donutState, modProperty, resources.animationDuration);
-    drawOuterLinesForNegativeValues(pie, donutState, resources.animationDuration, padding, svg);
+    applyHoverEffect(pie, donutState);
+    addLabels(arc, pie, donutState, modProperty);
+    drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
 
     sectors.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 
@@ -184,11 +179,10 @@ export async function render(donutState, modProperty) {
  * Function is creating and drawing the outlines for sectors with negative values
  * @param {d3.pie} pie
  * @param {donutState} donutState
- * @param {number} animationDuration
  * @param {number} padding
  * @param {d3.svg} svg
  * */
-function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg) {
+function drawOuterLinesForNegativeValues(pie, donutState, padding, svg) {
     // Used for the outer side showing negative values
     let outerArcNegativeValues = d3
         .arc()
@@ -217,7 +211,7 @@ function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, pad
     // Define behavior on transition
     outerSectorsNegativeValues
         .transition()
-        .duration(animationDuration)
+        .duration(resources.animationDuration)
         .attrTween("d", function (d) {
             return function () {
                 return outerArcNegativeValues(d);
@@ -226,7 +220,12 @@ function drawOuterLinesForNegativeValues(pie, donutState, animationDuration, pad
         .attr("class", "outerSectorArc")
         .style("opacity", getOpacityForOuterSide);
 
-    outerSectorsNegativeValues.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+    outerSectorsNegativeValues
+        .exit()
+        .transition()
+        .duration(resources.animationDuration)
+        .attr("fill", "transparent")
+        .remove();
 }
 
 /** Function check if a data-set contains negative values and returns the opacity

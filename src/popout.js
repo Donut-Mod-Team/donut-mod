@@ -5,10 +5,9 @@ import { resources } from "./resources";
  *
  * @param {Popout} popout
  * @param {Tooltip} tooltip
- * @param {number} animationDuration
  * @param {modProperty} modProperty
  */
-export function initializeSettingsPopout(popout, tooltip, animationDuration, modProperty) {
+export function initializeSettingsPopout(popout, tooltip, modProperty) {
     // Import mod-popout building blocks
     const { radioButton, checkbox } = popout.components;
     const { section } = popout;
@@ -163,9 +162,9 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
             ]
         })
     ];
-    settingsIcon.transition("add labels").duration(animationDuration).style("opacity", "1");
+    settingsIcon.transition("add labels").duration(resources.animationDuration).style("opacity", "1");
 
-    settingsIcon.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+    settingsIcon.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 
     // Control the visibility of the popout based on the user's mouse
     modContainer
