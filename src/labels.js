@@ -9,6 +9,8 @@ import { resources } from "./resources";
  * @param {modProperty} modProperty
  */
 export function addLabels(arc, pie, donutState, modProperty) {
+    const middleRadiansThreshold = modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 0 : Math.PI;
+
     const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1, 2), 16),
         parseInt(donutState.styles.fontColor.substr(3, 2), 16),
@@ -45,13 +47,11 @@ export function addLabels(arc, pie, donutState, modProperty) {
         .style("text-anchor", (d) => {
             if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
                 return "middle";
-            } else if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
-                return "middle";
-            } else if (midAngle(d) < Math.PI) {
-                return "start";
-            } else {
-                return "end";
             }
+            if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+                return midAngle(d) < middleRadiansThreshold ? "end" : "start";
+            }
+            return midAngle(d) < middleRadiansThreshold ? "start" : "end";
         })
         .attr("fill", (d) => calculateTextColor(d.data.color))
         .attr("opacity", function (d) {
@@ -106,9 +106,9 @@ export function addLabels(arc, pie, donutState, modProperty) {
             let d2 = interpolate(t);
 
             if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
-                return "middle";
+                return midAngle(d2) < middleRadiansThreshold ? "end" : "start";
             }
-            return midAngle(d2) < Math.PI ? "start" : "end";
+            return midAngle(d2) < middleRadiansThreshold ? "start" : "end";
         };
     }
 
@@ -225,14 +225,8 @@ export function addLabels(arc, pie, donutState, modProperty) {
      * @returns {string} label position
      */
     function calculateLabelPosition(data) {
-        let positionOffset;
-        if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
-            positionOffset =
-                modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.07;
-        } else {
-            positionOffset =
-                modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
-        }
+        let positionOffset =
+            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
 
         let centeringFactor = donutState.donutCircle.radius * positionOffset;
         let centroid = arc.centroid(data);
