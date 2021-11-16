@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { calculatePercentageValue, roundNumber } from "./utility";
+import { calculatePercentageValue, parseToNumber, roundNumber } from "./utility";
 import { resources } from "./resources";
 
 export function renderCenterText(donutState, radius, modProperty) {
@@ -72,8 +72,8 @@ export function renderCenterText(donutState, radius, modProperty) {
 
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
-                // Extract the number from the formatted value string and convert it to a number
-                let centerSumNumber = Number(data[i].centerSumFormatted.replace(/[^0-9,]/g, "").replace(",", "."));
+                // Extract the formated number from the formatted value string and convert it to a number
+                let centerSumNumber = parseToNumber(data[i].centerSumFormatted.replace(/[^\d.,\s]+/g, ""));
                 centerTotal += centerSumNumber;
                 markedSectors.push(i);
             }
@@ -81,20 +81,22 @@ export function renderCenterText(donutState, radius, modProperty) {
         for (let i = 0; i < data.length; i++) {
             data[i].centerTotal = centerTotal;
         }
-        if (markedSectors.length > 0) {
+        if (markedSectors.length > 1) {
             centerText
                 .text(
                     data[0].currencySymbol +
                         roundNumber(centerTotal, 2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-                            .replace(".", ",") +
+                            .toLocaleString() +
                         data[0].centerValueSumLastSymbol
                 )
                 .style("opacity", 1);
         }
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
+            centerText
+                .text(
+            data[markedSectors[0]].centerSumFormatted )
+                .style("opacity", 1);
         } else {
             centerColorText.style("opacity", 0);
         }

@@ -11,6 +11,21 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
     return distanceX * distanceX + distanceY * distanceY < radius * radius;
 }
 
+/***
+ * Function parses a given formatted string to a number
+ * @param {string} value
+ * @returns {number}
+ */
+export function parseToNumber(value) {
+    let localeLanguages = navigator.languages;
+    const exampleLocalFormat = Intl.NumberFormat(localeLanguages).format('1.1');
+    // Define local pattern format
+    const expressionPattern = new RegExp(`[^-+0-9${ exampleLocalFormat.charAt( 1 ) }]`, 'g');
+    // Clean the value given the local pattern and parse it to float
+    const cleanedValue = value.replace(expressionPattern, "");
+    const normalized = cleanedValue.replace(exampleLocalFormat.charAt(1), ".");
+    return parseFloat(normalized);
+}
 /**
  * Function calculates the angle of between 3 points CRS -> point C is the centerPoint, point R is the rectanglePoint and point S is the startPoint
  * resources: https://stackoverflow.com/questions/3486172/angle-between-3-points
