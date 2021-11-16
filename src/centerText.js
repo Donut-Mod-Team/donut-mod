@@ -2,12 +2,14 @@ import * as d3 from "d3";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { resources } from "./resources";
 
-export function renderCenterText(donutState, radius) {
+export function renderCenterText(donutState, radius, modProperty) {
     // Constant to be used for making the center value font size larger
     const centerValueFontModifier = 1.2;
 
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
+
+    const centerTextSemiCircleTransformationHeight = height / 10;
 
     let centerColorText = d3
         .selectAll("#center-color")
@@ -37,6 +39,18 @@ export function renderCenterText(donutState, radius) {
         .style("font-size", donutState.styles.fontSize)
         .text(donutState.centerExpression);
 
+    d3.select("#center")
+        .transition()
+        .duration(resources.animationDuration)
+        .style(
+            "transform",
+            `translate(${0}px, ${
+                modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
+                    ? centerTextSemiCircleTransformationHeight
+                    : 0
+            }px)`
+        );
+
     calculateMarkedCenterText(donutState.data);
 
     function calculateCenterTextSpace() {
@@ -51,7 +65,8 @@ export function renderCenterText(donutState, radius) {
 
         if (data.length > 0 && data[0].centerSumFormatted === null) {
             return;
-        } else if (data.length === 0) {
+        }
+        if (data.length === 0) {
             return;
         }
 

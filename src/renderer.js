@@ -14,6 +14,12 @@ export async function render(donutState, modProperty) {
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
 
+    const circleTypeTransformationHeight =
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? height / 1.5 : height / 2;
+    const circleTypeTransformationWidth = width / 2;
+
+    // const transformationCenterTextHeight
+
     if (height <= 0 || width <= 0) {
         return;
     }
@@ -51,7 +57,9 @@ export async function render(donutState, modProperty) {
 
     d3.select("#mod-container svg").attr("width", width).attr("height", height);
 
-    const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const svg = d3
+        .select("#mod-container svg g")
+        .attr("transform", `translate(${circleTypeTransformationWidth}, ${circleTypeTransformationHeight})`);
 
     const pie = d3
         .pie()
@@ -59,18 +67,12 @@ export async function render(donutState, modProperty) {
         .endAngle(endPieAngle)
         .value((d) => d.absValue)
         .sort(function (a, b) {
-            if (sortingEnabled) {
-                if (sortingOrder === resources.popoutSortedPlacementOrderAscendingValue) {
-                    return b.value - a.value;
-                }
-                return a.value - b.value;
-            }
-            return null;
+            calculateSortingOrder(a, b);
         });
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
-    renderCenterText(donutState, radius);
+    renderCenterText(donutState, radius, modProperty);
 
     // Join new data
     const sectors = svg
@@ -141,6 +143,17 @@ export async function render(donutState, modProperty) {
             refreshCenterTextOnMouseover(d);
         }
     }
+
+    function calculateSortingOrder(a, b) {
+        if (sortingEnabled) {
+            if (sortingOrder === resources.popoutSortedPlacementOrderAscendingValue) {
+                return b.value - a.value;
+            }
+            return a.value - b.value;
+        }
+        return null;
+    }
+
     // If editing mode is enabled initialize the setting-popout
     donutState.context.isEditing &&
         initializeSettingsPopout(
