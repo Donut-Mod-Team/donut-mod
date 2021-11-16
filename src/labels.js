@@ -43,13 +43,17 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-size", donutState.styles.fontSize)
         .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attr("transform", calculateLabelPosition)
-        .style("text-anchor", (d) =>
-            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue
-                ? "middle"
-                : midAngle(d) < Math.PI
-                ? "start"
-                : "end"
-        )
+        .style("text-anchor", (d) => {
+            if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
+                return "middle";
+            } else if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+                return "middle";
+            } else if (midAngle(d) < Math.PI) {
+                return "start";
+            } else {
+                return "end";
+            }
+        })
         .attr("fill", (d) => calculateTextColor(d.data.color))
         .attr("opacity", function (d) {
             let that = this;
@@ -96,6 +100,10 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         this._current = interpolate(0);
         return function (t) {
             let d2 = interpolate(t);
+
+            if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+                return "middle";
+            }
             return midAngle(d2) < Math.PI ? "start" : "end";
         };
     }
@@ -213,8 +221,15 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
      * @returns {string} label position
      */
     function calculateLabelPosition(data) {
-        let positionOffset =
-            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
+        let positionOffset;
+        if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+            positionOffset =
+                modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.07;
+        } else {
+            positionOffset =
+                modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
+        }
+
         let centeringFactor = donutState.donutCircle.radius * positionOffset;
         let centroid = arc.centroid(data);
         let x = centroid[0];

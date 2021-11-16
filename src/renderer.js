@@ -67,7 +67,7 @@ export async function render(donutState, modProperty) {
         .endAngle(endPieAngle)
         .value((d) => d.absValue)
         .sort(function (a, b) {
-            calculateSortingOrder(a, b);
+            return calculateSortingOrder(a, b);
         });
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
