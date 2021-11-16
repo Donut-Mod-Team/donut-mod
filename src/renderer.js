@@ -3,6 +3,7 @@ import * as marker from "./marker";
 import { calculatePercentageValue, roundNumber } from "./utility";
 import { applyHoverEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
+import { addLabels } from "./labels";
 
 /**
  * @param {object} donutState
@@ -12,6 +13,9 @@ export async function render(donutState, modProperty) {
     // Added a constant to remove the magic numbers within the width, height and radius calculations.
     const sizeModifier = 10;
     // D3 animation duration used for svg shapes
+
+    // Constant to be used for making the center value font size larger
+    const centerValueFontModifier = 1.2;
 
     const animationDuration = 250;
 
@@ -35,6 +39,9 @@ export async function render(donutState, modProperty) {
         padding = 0.05 / donutState.data.length;
     }
 
+    let sortingEnabled = modProperty.sortedPlacement.value();
+    let sortingOrder = modProperty.sortedPlacementOrder.value();
+
     // Initialize the circle state
     donutState.donutCircle.x = width / 2;
     donutState.donutCircle.y = height / 2;
@@ -45,27 +52,48 @@ export async function render(donutState, modProperty) {
 
     const svg = d3.select("#mod-container svg g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    const pie = d3.pie().value((d) => d.absValue);
+    const pie = d3
+        .pie()
+        .value((d) => d.absValue)
+        .sort(function (a, b) {
+            if (sortingEnabled) {
+                if (sortingOrder === "ascending") {
+                    return b.value - a.value;
+                }
+                return a.value - b.value;
+            }
+            return null;
+        });
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
     let centerColorText = d3
         .selectAll("#center-color")
         .style("fill", donutState.styles.fontColor)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-weight", donutState.styles.fontWeight)
         .style("font-size", donutState.styles.fontSize);
 
     let centerText = d3
         .selectAll("#center-text")
         .style("fill", donutState.styles.fontColor)
         .style("opacity", 0)
-        .style("width", `${calculateCenterTextSpace()}%`)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-size", donutState.styles.fontSize);
+        .style("font-size", `${donutState.styles.fontSize * centerValueFontModifier}px`);
+    if (donutState.data[0].centerTotal === 0 && donutState.data[0].totalCenterSumFormatted != null) {
+        centerText.text(donutState.data[0].totalCenterSumFormatted, 2);
+        centerText.style("opacity", 1);
+    }
+
+    d3.selectAll("#center-expression")
+        .style("opacity", 1)
+        .style("fill", donutState.styles.fontColor)
+        .style("max-width", `${calculateCenterTextSpace()}%`)
+        .style("font-family", donutState.styles.fontFamily)
+        .style("font-weight", donutState.styles.fontWeight)
+        .style("font-size", donutState.styles.fontSize)
+        .text(donutState.centerExpression);
 
     calculateMarkedCenterText(donutState.data);
 
@@ -80,6 +108,9 @@ export async function render(donutState, modProperty) {
     let newSectors = sectors
         .enter()
         .append("svg:path")
+        .attr("id", function (d) {
+            return "sectorID_" + d.data.renderID;
+        })
         .on("click", function (d) {
             marker.select(d);
             d3.event.stopPropagation();
@@ -103,63 +134,6 @@ export async function render(donutState, modProperty) {
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
 
-    svg.select("g#labels")
-        .attr("pointer-events", "none")
-        .selectAll("text")
-        .data(pie(donutState.data), (d) => `label-${d.data.id}`)
-        .join(
-            (enter) => {
-                return enter
-                    .append("text")
-                    .style("opacity", 0)
-                    .attr("dy", "0.35em")
-                    .attr("fill", donutState.styles.fontColor)
-                    .attr("font-family", donutState.styles.fontFamily)
-                    .attr("font-style", donutState.styles.fontStyle)
-                    .attr("font-weight", donutState.styles.fontWeight)
-                    .attr("font-size", donutState.styles.fontSize)
-                    .text((d) => d.data.absPercentage + "%")
-                    .attr("text-anchor", "middle")
-                    .call((enter) =>
-                        enter
-                            .transition("add labels")
-                            .duration(animationDuration)
-                            .style("opacity", calculateTextOpacity)
-                            .attr("transform", calculateLabelPosition)
-                            .attr("fill", donutState.styles.fontColor)
-                            .attr("font-family", donutState.styles.fontFamily)
-                            .attr("font-style", donutState.styles.fontStyle)
-                            .attr("font-weight", donutState.styles.fontWeight)
-                            .attr("font-size", donutState.styles.fontSize)
-                    );
-            },
-            (update) =>
-                update.call((update) =>
-                    update
-                        .transition("update labels")
-                        .duration(animationDuration)
-                        .style("opacity", calculateTextOpacity)
-                        .text((d) => d.data.absPercentage + "%")
-                        .attr("transform", calculateLabelPosition)
-                        .attr("fill", donutState.styles.fontColor)
-                        .attr("font-family", donutState.styles.fontFamily)
-                        .attr("font-style", donutState.styles.fontStyle)
-                        .attr("font-weight", donutState.styles.fontWeight)
-                        .attr("font-size", donutState.styles.fontSize)
-                ),
-            (exit) => exit.transition("remove labels").duration(animationDuration).style("opacity", 0).remove()
-        );
-
-    function calculateTextOpacity(data) {
-        let box = this.getBoundingClientRect();
-        let labelWidth = box.right - box.left;
-        let labelHeight = box.bottom - box.top;
-        let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
-        return labelWidth < labelVisibilityBound && labelHeight < labelVisibilityBound && data.data.absPercentage >= 5
-            ? "1"
-            : "0";
-    }
-
     function tweenArc(elem) {
         let prevValue = this.__prev || {};
         let newValue = elem;
@@ -172,27 +146,27 @@ export async function render(donutState, modProperty) {
         };
     }
 
-    function calculateLabelPosition(data) {
-        let centeringFactor = radius * 0.75;
-        let centroid = arc.centroid(data);
-        let x = centroid[0];
-        let y = centroid[1];
-        let h = Math.sqrt(x * x + y * y);
-        return "translate(" + (x / h) * centeringFactor + "," + (y / h) * centeringFactor + ")";
-    }
-
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(innerRadius, width, 0) > calculatePercentageValue(radius, height, 0)
-            ? calculatePercentageValue(innerRadius, width, 0)
-            : calculatePercentageValue(innerRadius, height, 0);
+        return calculatePercentageValue(radius, width, 0) < calculatePercentageValue(radius, height, 0)
+            ? calculatePercentageValue(radius, width, 0)
+            : calculatePercentageValue(radius, height, 0);
     }
 
     function calculateMarkedCenterText(data) {
         let centerTotal = 0;
         let markedSectors = [];
+
+        if (data.length > 0 && data[0].centerSumFormatted === null) {
+            return;
+        } else if (data.length === 0) {
+            return;
+        }
+
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
-                centerTotal += data[i].centerSum;
+                // Extract the number from the formatted value string and convert it to a number
+                let centerSumNumber = Number(data[i].centerSumFormatted.replace(/[^0-9,]/g, "").replace(",", "."));
+                centerTotal += centerSumNumber;
                 markedSectors.push(i);
             }
         }
@@ -200,7 +174,16 @@ export async function render(donutState, modProperty) {
             data[i].centerTotal = centerTotal;
         }
         if (markedSectors.length > 0) {
-            centerText.text(roundNumber(centerTotal, 2)).style("opacity", 1);
+            centerText
+                .text(
+                    data[0].currencySymbol +
+                        roundNumber(centerTotal, 2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+                            .replace(".", ",") +
+                        data[0].centerValueSumLastSymbol
+                )
+                .style("opacity", 1);
         }
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
@@ -215,7 +198,7 @@ export async function render(donutState, modProperty) {
             .duration(animationDuration)
             .style("opacity", "0");
         if (centerText.style("opacity") === "1" && d.data.centerTotal === 0) {
-            centerText.style("opacity", 0);
+            centerText.text(d.data.totalCenterSumFormatted != null ? d.data.totalCenterSumFormatted : "");
             centerColorText.style("opacity", 0);
         }
     }
@@ -225,8 +208,8 @@ export async function render(donutState, modProperty) {
             .transition()
             .duration(animationDuration)
             .style("opacity", "1");
-        if (d.data.markedRowCount() === 0 && centerText.style("opacity") === "0") {
-            centerText.text(roundNumber(d.data.centerSum, 2));
+        if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
+            centerText.text(d.data.centerSumFormatted);
             centerText.style("opacity", 1);
             centerColorText.style("opacity", 1);
             centerColorText.text(d.data.colorValue);
@@ -243,7 +226,7 @@ export async function render(donutState, modProperty) {
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState, animationDuration);
-
+    addLabels(arc, pie, donutState, modProperty, animationDuration);
     drawOuterLinesForNegativeValues(pie, donutState, animationDuration, padding, svg);
 
     sectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();

@@ -1,4 +1,8 @@
 # Donut Mod
+
+[![Cypress CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/cypress.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/cypress.yml)
+[![Node.js CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml)
+
 The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using this donut chart representation.
 
 ## Requirements Specification
@@ -21,7 +25,7 @@ A complete guide to installation and getting started using mod can be found [her
 
 ### Continuous Integration / Continuous Deployment
 
-[Details on the current stage of the CI/CD pipelines.](/documentation/ci-cd.md)
+[Details on the current stage of the CI/CD pipelines.](/documentation/ci_cd.md)
 
 ## Team
 
