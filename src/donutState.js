@@ -205,7 +205,7 @@ function getCurrencySymbolContinuesAxis(rows, axisName) {
     let formattedCenterValue = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = formattedCenterValue.search(/\d/);
     let currencySymbol = formattedCenterValue.substr(0, firstNumberIndex);
-    return currencySymbol.replace(/[\s]+/, "");
+    return currencySymbol.replace(/[\s-]+/g, "");
 }
 /**
  * This function creates the sector's label text based on the provided modProperty
