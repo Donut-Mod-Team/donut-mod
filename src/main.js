@@ -14,7 +14,8 @@ import { resources } from "./resources";
                 labelsVisible: labelsVisible,
                 labelsPercentage: labelsPercentage,
                 labelsValue: labelsValue,
-                labelsCategory: labelsCategory
+                labelsCategory: labelsCategory,
+                circleType: circleType
             }} modProperty
  * */
 /**
@@ -37,6 +38,7 @@ Spotfire.initialize(async (mod) => {
         mod.property("labelsPercentage"),
         mod.property("labelsValue"),
         mod.property("labelsCategory"),
+        mod.property("circleType"),
         mod.visualization.axis(resources.centerAxisName)
     );
 
@@ -58,7 +60,8 @@ Spotfire.initialize(async (mod) => {
             labelsVisible,
             labelsPercentage,
             labelsValue,
-            labelsCategory
+            labelsCategory,
+            circleType
         ) => {
             let donutState = await createDonutState(mod);
 
@@ -81,7 +84,8 @@ Spotfire.initialize(async (mod) => {
                 labelsVisible: labelsVisible,
                 labelsPercentage: labelsPercentage,
                 labelsValue: labelsValue,
-                labelsCategory: labelsCategory
+                labelsCategory: labelsCategory,
+                circleType: circleType
             };
             try {
                 await render(donutState, modProperty);
