@@ -173,7 +173,7 @@ function formatTotalSum(totalSum) {
 function getLastCenterSymbols(rows, axisName) {
     let centerString = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = centerString.search(/\d/);
-    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex, centerString.length - 1);
+    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex);
     centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,\s]+/g, "");
     return centerValueSumLastSymbol;
 }
