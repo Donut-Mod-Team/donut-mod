@@ -50,8 +50,8 @@ export async function render(donutState, modProperty) {
             : 360 * (Math.PI / 180);
 
     // Initialize the circle state
-    donutState.donutCircle.x = width / 2;
-    donutState.donutCircle.y = height / 2;
+    donutState.donutCircle.x = circleTypeTransformationWidth;
+    donutState.donutCircle.y = circleTypeTransformationHeight;
     donutState.donutCircle.radius = radius;
     donutState.donutCircle.innerRadius = innerRadius;
 
