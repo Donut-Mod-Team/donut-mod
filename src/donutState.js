@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { calculatePercentageValue, roundNumber } from "./utility";
+import { calculatePercentageValue, parseToNumber, roundNumber } from "./utility";
 
 /**
  * Render the visualization
@@ -159,9 +159,7 @@ export async function createDonutState(mod) {
 function formatTotalSum(totalSum) {
     if (totalSum != null) {
         return roundNumber(totalSum, 2)
-            .toString()
-            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-            .replace(".", ",");
+            .toLocaleString();
     }
     return "";
 }
@@ -175,8 +173,8 @@ function formatTotalSum(totalSum) {
 function getLastCenterSymbols(rows, axisName) {
     let centerString = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = centerString.search(/\d/);
-    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex, centerString.length - 1);
-    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d,\s]+/g, "");
+    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex);
+    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,\s]+/g, "");
     return centerValueSumLastSymbol;
 }
 
@@ -214,14 +212,10 @@ function calculateTotalCenterSum(leaves, centerAxisName) {
     let sumOfValues = 0;
     leaves.map((leaf) => {
         let rows = leaf.rows();
+        let centerSum = rows[0].continuous(centerAxisName).formattedValue()
+        centerSum = centerSum.replace(/[^\d.,\s]+/g, "");
         // Extract the number from the formatted value string and convert it to a number
-        let centerValue = Number(
-            rows[0]
-                .continuous(centerAxisName)
-                .formattedValue()
-                .replace(/[^0-9,]/g, "")
-                .replace(",", ".")
-        );
+        let centerValue = parseToNumber(centerSum);
         sumOfValues += centerValue;
     });
     return sumOfValues;
