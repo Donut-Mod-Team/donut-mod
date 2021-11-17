@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { resources } from "./resources";
 
 /**
  * This function is respondible to generate the labels and handle their behavior
@@ -6,9 +7,10 @@ import * as d3 from "d3";
  * @param {d3.pie} pie
  * @param {donutState} donutState
  * @param {modProperty} modProperty
- * @param {number} animationDuration
  */
-export function addLabels(arc, pie, donutState, modProperty, animationDuration) {
+export function addLabels(arc, pie, donutState, modProperty) {
+    const middleRadiansThreshold = modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 0 : Math.PI;
+
     const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1, 2), 16),
         parseInt(donutState.styles.fontColor.substr(3, 2), 16),
@@ -40,11 +42,17 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-style", donutState.styles.fontStyle)
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize)
-        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
+        .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attr("transform", calculateLabelPosition)
-        .style("text-anchor", (d) =>
-            modProperty.labelsPosition.value() === "inside" ? "middle" : midAngle(d) < Math.PI ? "start" : "end"
-        )
+        .style("text-anchor", (d) => {
+            if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
+                return "middle";
+            }
+            if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+                return midAngle(d) < middleRadiansThreshold ? "end" : "start";
+            }
+            return midAngle(d) < middleRadiansThreshold ? "start" : "end";
+        })
         .attr("fill", (d) => calculateTextColor(d.data.color))
         .attr("opacity", function (d) {
             let that = this;
@@ -53,8 +61,8 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
 
     labels
         .transition("update labels")
-        .duration(animationDuration)
-        .text(modProperty.labelsVisible.value === "none" ? "" : getLabelText())
+        .duration(resources.animationDuration)
+        .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attrTween("transform", function (d) {
             return function () {
                 return calculateLabelPosition(d);
@@ -73,7 +81,12 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize);
 
-    labels.exit().transition("remove labels").duration(animationDuration).attr("fill", "transparent").remove();
+    labels
+        .exit()
+        .transition("remove labels")
+        .duration(resources.animationDuration)
+        .attr("fill", "transparent")
+        .remove();
 
     /**
      * This function returns the corresponding alignment for the label's text
@@ -81,7 +94,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
      * @returns {(function(): string)|(function(*=): string)} label's alignment
      */
     function getLabelAlignment(d) {
-        if (modProperty.labelsPosition.value() === "inside") {
+        if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
             return function () {
                 return "middle";
             };
@@ -91,7 +104,11 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         this._current = interpolate(0);
         return function (t) {
             let d2 = interpolate(t);
-            return midAngle(d2) < Math.PI ? "start" : "end";
+
+            if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
+                return midAngle(d2) < middleRadiansThreshold ? "end" : "start";
+            }
+            return midAngle(d2) < middleRadiansThreshold ? "start" : "end";
         };
     }
 
@@ -105,7 +122,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         if (sectorColor === "transparent") {
             return donutState.styles.fontColor;
         }
-        if (modProperty.labelsPosition.value() === "outside") {
+        if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionOutsideValue) {
             return donutState.styles.fontColor;
         }
         // Check if background luminance is closer to dark background color
@@ -166,7 +183,7 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
         let labelBox = that.getBoundingClientRect();
         let labelWidth = labelBox.right - labelBox.left;
         let labelHeight = labelBox.bottom - labelBox.top;
-        if (modProperty.labelsPosition.value() === "inside") {
+        if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
             let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
             return labelWidth < labelVisibilityBound &&
                 labelHeight < labelVisibilityBound &&
@@ -187,9 +204,9 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
 
     // Returns the function and/or empty string depending for the labels depending on the settings selected in popout(defined in the modProperty
     function getLabelText() {
-        if (modProperty.labelsVisible.value() === "all") {
+        if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue) {
             return (d) => d.data.getLabelText(modProperty);
-        } else if (modProperty.labelsVisible.value() === "marked") {
+        } else if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue) {
             return (d) => {
                 if (d.data.markedRowCount() > 0) {
                     return d.data.getLabelText(modProperty);
@@ -208,7 +225,9 @@ export function addLabels(arc, pie, donutState, modProperty, animationDuration) 
      * @returns {string} label position
      */
     function calculateLabelPosition(data) {
-        let positionOffset = modProperty.labelsPosition.value() === "inside" ? 0.75 : 1.03;
+        let positionOffset =
+            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
+
         let centeringFactor = donutState.donutCircle.radius * positionOffset;
         let centroid = arc.centroid(data);
         let x = centroid[0];

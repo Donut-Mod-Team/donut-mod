@@ -1,13 +1,13 @@
 import * as d3 from "d3";
+import { resources } from "./resources";
 
 /**
  *
  * @param {Popout} popout
  * @param {Tooltip} tooltip
- * @param {number} animationDuration
  * @param {modProperty} modProperty
  */
-export function initializeSettingsPopout(popout, tooltip, animationDuration, modProperty) {
+export function initializeSettingsPopout(popout, tooltip, modProperty) {
     // Import mod-popout building blocks
     const { radioButton, checkbox } = popout.components;
     const { section } = popout;
@@ -37,6 +37,7 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
                     name === modProperty.labelsPercentage.name && modProperty.labelsPercentage.set(value);
                     name === modProperty.labelsValue.name && modProperty.labelsValue.set(value);
                     name === modProperty.labelsCategory.name && modProperty.labelsCategory.set(value);
+                    name === modProperty.circleType.name && modProperty.circleType.set(value);
                 }
             },
             // Pass the popout sectors
@@ -47,104 +48,123 @@ export function initializeSettingsPopout(popout, tooltip, animationDuration, mod
     const settingsPopout = () => [
         // Define sector controlling when to show labels
         section({
-            heading: "Show labels for",
+            heading: resources.popoutLabelsHeading,
             children: [
                 radioButton({
                     name: modProperty.labelsVisible.name,
-                    text: "All",
-                    value: "all",
-                    checked: modProperty.labelsVisible.value() === "all"
+                    text: resources.popoutLabelsVisibleAllText,
+                    value: resources.popoutLabelsVisibleAllValue,
+                    checked: modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue
                 }),
                 radioButton({
                     name: modProperty.labelsVisible.name,
-                    text: "Marked rows",
-                    value: "marked",
-                    checked: modProperty.labelsVisible.value() === "marked"
+                    text: resources.popoutLabelsVisibleMarkedText,
+                    value: resources.popoutLabelsVisibleMarkedValue,
+                    checked: modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue
                 }),
                 radioButton({
                     name: modProperty.labelsVisible.name,
-                    text: "None",
-                    value: "none",
-                    checked: modProperty.labelsVisible.value() === "none"
+                    text: resources.popoutLabelsVisibleNoneText,
+                    value: resources.popoutLabelsVisibleNoneValue,
+                    checked: modProperty.labelsVisible.value() === resources.popoutLabelsVisibleNoneValue
                 })
             ]
         }),
         // Define popout sector for the type of data to be displayed for the labels
         section({
-            heading: "Show in labels",
+            heading: resources.popoutDisplayedLabelsDataHeading,
             children: [
                 checkbox({
                     name: modProperty.labelsPercentage.name,
-                    text: "Sector percentage",
+                    text: resources.popoutDisplayedLabelsDataPercentageText,
                     enabled: true,
-                    tooltip: "Shows sector percentage",
+                    tooltip: resources.popoutDisplayedLabelsDataPercentageTooltip,
                     checked: modProperty.labelsPercentage.value() === true
                 }),
                 checkbox({
                     name: modProperty.labelsValue.name,
-                    text: "Sector value",
+                    text: resources.popoutDisplayedLabelsDataValueText,
                     enabled: true,
-                    tooltip: "Shows sector value",
+                    tooltip: resources.popoutDisplayedLabelsDataValueTooltip,
                     checked: modProperty.labelsValue.value() === true
                 }),
                 checkbox({
                     name: modProperty.labelsCategory.name,
-                    text: "Sector category",
+                    text: resources.popoutDisplayedLabelsDataCategoryText,
                     enabled: true,
-                    tooltip: "Shows sector category",
+                    tooltip: resources.popoutDisplayedLabelsDataCategoryTooltip,
                     checked: modProperty.labelsCategory.value() === true
                 })
             ]
         }),
         // Define options for labels position
         section({
-            heading: "Labels position",
+            heading: resources.popoutLabelsPositionHeading,
             children: [
                 radioButton({
                     name: modProperty.labelsPosition.name,
-                    text: "Inside donut",
-                    value: "inside",
-                    checked: modProperty.labelsPosition.value() === "inside"
+                    text: resources.popoutLabelsPositionInsideText,
+                    value: resources.popoutLabelsPositionInsideValue,
+                    checked: modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue
                 }),
                 radioButton({
                     name: modProperty.labelsPosition.name,
-                    text: "Outside donut",
-                    value: "outside",
-                    checked: modProperty.labelsPosition.value() === "outside"
+                    text: resources.popoutLabelsPositionOutsideText,
+                    value: resources.popoutLabelsPositionOutsideValue,
+                    checked: modProperty.labelsPosition.value() === resources.popoutLabelsPositionOutsideValue
                 })
             ]
         }),
         // Define sorting options for the sectors' visualization
         section({
-            heading: "Sorting",
+            heading: resources.popoutSortedPlacementHeading,
             children: [
                 checkbox({
                     name: modProperty.sortedPlacement.name,
-                    text: "Sort sectors by size",
+                    text: resources.popoutSortedPlacementCheckboxText,
                     enabled: true,
-                    tooltip: "Biggest sizes placed at the top-right",
+                    tooltip: resources.popoutSortedPlacementCheckboxTooltip,
                     checked: modProperty.sortedPlacement.value() === true
                 }),
                 radioButton({
                     name: modProperty.sortedPlacementOrder.name,
-                    text: "Sort sectors ascending",
-                    value: "ascending",
+                    text: resources.popoutSortedPlacementOrderAscendingText,
+                    value: resources.popoutSortedPlacementOrderAscendingValue,
                     enabled: modProperty.sortedPlacement.value() === true,
-                    checked: modProperty.sortedPlacementOrder.value() === "ascending"
+                    checked:
+                        modProperty.sortedPlacementOrder.value() === resources.popoutSortedPlacementOrderAscendingValue
                 }),
                 radioButton({
                     name: modProperty.sortedPlacementOrder.name,
-                    text: "Sort sectors descending",
-                    value: "descending",
+                    text: resources.popoutSortedPlacementOrderDescendingText,
+                    value: resources.popoutSortedPlacementOrderDescendingValue,
                     enabled: modProperty.sortedPlacement.value() === true,
-                    checked: modProperty.sortedPlacementOrder.value() === "descending"
+                    checked:
+                        modProperty.sortedPlacementOrder.value() === resources.popoutSortedPlacementOrderDescendingValue
+                })
+            ]
+        }),
+        section({
+            heading: resources.popoutCircleTypeHeading,
+            children: [
+                radioButton({
+                    name: modProperty.circleType.name,
+                    text: resources.popoutCircleTypeWholeText,
+                    value: resources.popoutCircleTypeWholeValue,
+                    checked: modProperty.circleType.value() === resources.popoutCircleTypeWholeValue
+                }),
+                radioButton({
+                    name: modProperty.circleType.name,
+                    text: resources.popoutCircleTypeSemiText,
+                    value: resources.popoutCircleTypeSemiValue,
+                    checked: modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
                 })
             ]
         })
     ];
-    settingsIcon.transition("add labels").duration(animationDuration).style("opacity", "1");
+    settingsIcon.transition("add labels").duration(resources.animationDuration).style("opacity", "1");
 
-    settingsIcon.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+    settingsIcon.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 
     // Control the visibility of the popout based on the user's mouse
     modContainer
