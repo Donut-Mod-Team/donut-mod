@@ -19,9 +19,9 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
  */
 export function formatTotalSum(totalSum, lastSymbol) {
     if (totalSum != null) {
-        if (lastSymbol != null) {
+        if (lastSymbol != null && lastSymbol.length !== 0) {
             lastSymbol = lastSymbol.toLowerCase();
-            let total = roundNumber(totalSum, 2);
+            let total = roundNumber(totalSum, 0);
             if (lastSymbol.includes("b")) {
                 total = roundNumber(totalSum / 1000000000, 0);
             }
@@ -34,7 +34,7 @@ export function formatTotalSum(totalSum, lastSymbol) {
             if (lastSymbol.includes("t")) {
                 total = roundNumber(totalSum / 1000000000000, 0);
             }
-            return total.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            return total.toLocaleString();
         }
         return roundNumber(totalSum, 2).toLocaleString(undefined, { minimumFractionDigits: 2 });
     }
