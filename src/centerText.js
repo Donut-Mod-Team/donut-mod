@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { calculatePercentageValue, parseToNumber, roundNumber } from "./utility";
+import { calculatePercentageValue, formatTotalSum } from "./utility";
 import { resources } from "./resources";
 
 export function renderCenterText(donutState, radius, modProperty) {
@@ -73,8 +73,7 @@ export function renderCenterText(donutState, radius, modProperty) {
         for (let i = 0; i < data.length; i++) {
             if (data[i].markedRowCount() > 0) {
                 // Extract the formated number from the formatted value string and convert it to a number
-                let centerSumNumber = parseToNumber(data[i].centerSumFormatted.replace(/[^\d.,\s]+/g, ""));
-                centerTotal += centerSumNumber;
+                centerTotal += data[i].centerSum;
                 markedSectors.push(i);
             }
         }
@@ -85,18 +84,14 @@ export function renderCenterText(donutState, radius, modProperty) {
             centerText
                 .text(
                     data[0].currencySymbol +
-                        roundNumber(centerTotal, 2)
-                            .toLocaleString() +
+                        formatTotalSum(centerTotal, data[0].centerValueSumLastSymbol) +
                         data[0].centerValueSumLastSymbol
                 )
                 .style("opacity", 1);
         }
         if (markedSectors.length === 1) {
             centerColorText.text(data[markedSectors[0]].colorValue).style("opacity", 1);
-            centerText
-                .text(
-            data[markedSectors[0]].centerSumFormatted )
-                .style("opacity", 1);
+            centerText.text(data[markedSectors[0]].centerSumFormatted).style("opacity", 1);
         } else {
             centerColorText.style("opacity", 0);
         }
