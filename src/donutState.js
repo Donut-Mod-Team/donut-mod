@@ -83,9 +83,11 @@ export async function createDonutState(mod) {
             // Extract the currency symbol from the formatted value if any
             let currencySymbol =
                 dataViewCenterAxis != null ? getCurrencySymbolContinuesAxis(rows, resources.centerAxisName) : "";
+            let labelCurrencySymbol = getCurrencySymbolContinuesAxis(rows, resources.yAxisName);
             let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             // Extract last symbols from the formatting
             let lastSymbols = dataViewCenterAxis != null ? getLastCenterSymbols(rows, resources.centerAxisName) : "";
+            let labelLastSymbols = getLastCenterSymbols(rows, resources.yAxisName);
             let formattedCenterValue =
                 dataViewCenterAxis != null
                     ? currencySymbol +
@@ -111,9 +113,9 @@ export async function createDonutState(mod) {
                     createLabelText(
                         modProperty,
                         absPercentage,
-                        currencySymbol +
-                            formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), lastSymbols) +
-                            lastSymbols,
+                        labelCurrencySymbol +
+                            formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols) +
+                            labelLastSymbols,
                         leaf.formattedValue()
                     ),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),

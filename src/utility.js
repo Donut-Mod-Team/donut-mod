@@ -34,6 +34,9 @@ export function formatTotalSum(totalSum, lastSymbol) {
             if (lastSymbol.includes("t")) {
                 total = roundNumber(totalSum / 1000000000000, 0);
             }
+            if (lastSymbol.includes("%")) {
+                total = roundNumber(totalSum * 100, 2);
+            }
             return total.toLocaleString();
         }
         return roundNumber(totalSum, 2).toLocaleString(undefined, { minimumFractionDigits: 2 });
