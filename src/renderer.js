@@ -72,8 +72,6 @@ export async function render(donutState, modProperty) {
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
-    renderCenterText(donutState, radius, modProperty);
-
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -169,6 +167,7 @@ export async function render(donutState, modProperty) {
     applyHoverEffect(pie, donutState);
     addLabels(arc, pie, donutState, modProperty);
     drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
+    renderCenterText(donutState, radius, modProperty);
 
     sectors.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 
