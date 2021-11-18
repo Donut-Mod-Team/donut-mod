@@ -9,8 +9,6 @@ export function renderCenterText(donutState, radius, modProperty) {
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
 
-    const centerTextSemiCircleTransformationHeight = height / 10;
-
     let centerColorText = d3
         .selectAll("#center-color")
         .style("fill", donutState.styles.fontColor)
@@ -39,24 +37,24 @@ export function renderCenterText(donutState, radius, modProperty) {
         .style("font-size", donutState.styles.fontSize)
         .text(donutState.centerExpression);
 
+    let centerTextBox = d3.selectAll("#center-text").node().getBoundingClientRect();
+    let yPointDifference = centerTextBox.bottom - height / 2;
+    let centerTextSemiCircleTransformationHeight = donutState.donutCircle.y - centerTextBox.bottom - centerTextBox.height + yPointDifference;
+
     d3.select("#center")
         .transition()
         .duration(resources.animationDuration)
         .style(
             "transform",
-            `translate(${0}px, ${
-                modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
-                    ? centerTextSemiCircleTransformationHeight
-                    : 0
-            }px)`
+            `translate(${0}px, ${modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? centerTextSemiCircleTransformationHeight : 0}px)`
         );
 
     calculateMarkedCenterText(donutState.data);
 
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(radius, width, 0) < calculatePercentageValue(radius, height, 0)
-            ? calculatePercentageValue(radius, width, 0)
-            : calculatePercentageValue(radius, height, 0);
+        return calculatePercentageValue(radius * 0.9, width, 0) < calculatePercentageValue(radius * 0.9, height, 0)
+            ? calculatePercentageValue(radius * 0.9, width, 0)
+            : calculatePercentageValue(radius * 0.9, height, 0);
     }
 
     function calculateMarkedCenterText(data) {
