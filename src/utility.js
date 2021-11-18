@@ -39,7 +39,9 @@ export function formatTotalSum(totalSum, lastSymbol) {
             }
             return total.toLocaleString();
         }
-        return roundNumber(totalSum, 2).toLocaleString(undefined, { minimumFractionDigits: 2 });
+        return roundNumber(totalSum, 2).toLocaleString(undefined, {
+            minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+        });
     }
     return "";
 }
