@@ -14,7 +14,9 @@ export function renderCenterText(donutState, radius, modProperty) {
         .style("fill", donutState.styles.fontColor)
         .style("max-width", `${calculateCenterTextSpace()}%`)
         .style("font-family", donutState.styles.fontFamily)
-        .style("font-size", donutState.styles.fontSize);
+        .style("font-size", donutState.styles.fontSize)
+        .style("opacity", 0)
+        .text(".");
 
     let centerText = d3
         .selectAll("#center-text")
