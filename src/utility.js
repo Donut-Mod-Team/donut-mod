@@ -12,20 +12,40 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
 }
 
 /***
- * Function parses a given formatted string to a number
- * @param {string} value
- * @returns {number}
+ * Function returns the formatted value of a given number by a given symbol(last symbol can be B, M, K, T)
+ * @param {number} totalSum
+ * @param {string} lastSymbol
+ * @returns {string|Number} returns a formatted number or empty string if provided value is null
  */
-export function parseToNumber(value) {
-    let localeLanguages = navigator.languages;
-    const exampleLocalFormat = Intl.NumberFormat(localeLanguages).format('1.1');
-    // Define local pattern format
-    const expressionPattern = new RegExp(`[^-+0-9${ exampleLocalFormat.charAt( 1 ) }]`, 'g');
-    // Clean the value given the local pattern and parse it to float
-    const cleanedValue = value.replace(expressionPattern, "");
-    const normalized = cleanedValue.replace(exampleLocalFormat.charAt(1), ".");
-    return parseFloat(normalized);
+export function formatTotalSum(totalSum, lastSymbol) {
+    if (totalSum != null) {
+        if (lastSymbol != null && lastSymbol.length !== 0) {
+            lastSymbol = lastSymbol.toLowerCase();
+            let total = roundNumber(totalSum, 0);
+            if (lastSymbol.includes("b")) {
+                total = roundNumber(totalSum / 1000000000, 0);
+            }
+            if (lastSymbol.includes("k")) {
+                total = roundNumber(totalSum / 1000, 0);
+            }
+            if (lastSymbol.includes("m")) {
+                total = roundNumber(totalSum / 1000000, 0);
+            }
+            if (lastSymbol.includes("t")) {
+                total = roundNumber(totalSum / 1000000000000, 0);
+            }
+            if (lastSymbol.includes("%")) {
+                total = roundNumber(totalSum * 100, 2);
+            }
+            return total.toLocaleString();
+        }
+        return roundNumber(totalSum, 2).toLocaleString(undefined, {
+            minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+        });
+    }
+    return "";
 }
+
 /**
  * Function calculates the angle of between 3 points CRS -> point C is the centerPoint, point R is the rectanglePoint and point S is the startPoint
  * resources: https://stackoverflow.com/questions/3486172/angle-between-3-points
