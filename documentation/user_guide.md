@@ -87,7 +87,8 @@ Congratulations! You should now be able to see the Donut Chart!
 #### Tooltip
 
 - Tooltip showing while hovering over a data-set slice of the donut chart. 
-- Tooltip shows the Ratio, Name of the data showing on the Y axis with total rows count, Name of the color axis and the leaf formatted value
+- The data displayed in the tooltip is fully customizable from the Spotfire settings in the Desktop client
+- The default data displayed in the web-client is the values of the selected axes 
 
 #### Hover
 
@@ -103,6 +104,7 @@ Congratulations! You should now be able to see the Donut Chart!
 - When selecting/marking sector(s) then this value is calculated based on the corresponding sectors' values.
 - When no sector is selected, then by default the center text corresponds to the total sum of the sectors' values. In addition, by hovering upon different sectors then the center text changes by depicting their value, until the user hovers outside their area.
 - Functionality has been implemented to alter the type of the center value, based on the options for the loaded data-set in Spotfire, by selecting a different one from corresponding axis found on the axes' sidebar.
+- Formatting of center value text to match local machine(or browser for web-client) settings
 
 #### Donut-mod's settings popout menu
 
@@ -121,11 +123,13 @@ The user can find in the top-right corner of the mod's canvas area a settings ic
   - enable ascending sorting
   - enable descending sorting
   - disable the sorting of the sectors
+- Select the Donut Chart to be shown as full-circle or semi-circle/half-circle
 
 #### Labels
 
-- Labels displayed on each data slice showing the ratio/percentage of that slice
+- Labels displayed on each data slice showing the ratio/percentage of that slice(default, the data can be changed from the pop-out setting menu)
 - The colours of the labels changes depending on if it's a light or dark mode
+- Formatting of labels value text to match local machine(or browser for web-client) settings
 
 ## Testing
 
