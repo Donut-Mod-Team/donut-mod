@@ -11,6 +11,41 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
     return distanceX * distanceX + distanceY * distanceY < radius * radius;
 }
 
+/***
+ * Function returns the formatted value of a given number by a given symbol(last symbol can be B, M, K, T)
+ * @param {number} totalSum
+ * @param {string} lastSymbol
+ * @returns {string|Number} returns a formatted number or empty string if provided value is null
+ */
+export function formatTotalSum(totalSum, lastSymbol) {
+    if (totalSum != null) {
+        if (lastSymbol != null && lastSymbol.length !== 0) {
+            lastSymbol = lastSymbol.toLowerCase();
+            let total = roundNumber(totalSum, 0);
+            if (lastSymbol.includes("b")) {
+                total = roundNumber(totalSum / 1000000000, 0);
+            }
+            if (lastSymbol.includes("k")) {
+                total = roundNumber(totalSum / 1000, 0);
+            }
+            if (lastSymbol.includes("m")) {
+                total = roundNumber(totalSum / 1000000, 0);
+            }
+            if (lastSymbol.includes("t")) {
+                total = roundNumber(totalSum / 1000000000000, 0);
+            }
+            if (lastSymbol.includes("%")) {
+                total = roundNumber(totalSum * 100, 2);
+            }
+            return total.toLocaleString();
+        }
+        return roundNumber(totalSum, 2).toLocaleString(undefined, {
+            minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+        });
+    }
+    return "";
+}
+
 /**
  * Function calculates the angle of between 3 points CRS -> point C is the centerPoint, point R is the rectanglePoint and point S is the startPoint
  * resources: https://stackoverflow.com/questions/3486172/angle-between-3-points
@@ -142,7 +177,7 @@ export function getPointFromCircle(centerPoint, angle, radius) {
 /**
  * Function that checks if the provided rectangle sides intersect with a given line
  * @param {line} line
- * @param {rectangleSides} rectangleSides
+ * @param {lines[]} rectangleSides
  * @returns {array} intersections
  *  */
 export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
@@ -165,7 +200,7 @@ export function checkIfRectangleSidesIntersectLine(line, rectangleSides) {
 /**
  * Function that calculates the denominator used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @returns {number}
  *  */
 function calculateDenominator(line, rectangleLine) {
@@ -178,7 +213,7 @@ function calculateDenominator(line, rectangleLine) {
 /**
  * Function that calculates the lambda used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @param {number} denominator
  * @returns {number}
  *  */
@@ -193,7 +228,7 @@ function calculateLambda(line, rectangleLine, denominator) {
 /**
  * Function that calculates the gamma used for the intersection calculations between two lines
  * @param {line} line
- * @param {rectangleLine} rectangleLine
+ * @param {line} rectangleLine
  * @param {number} denominator
  * @returns {number}
  *  */

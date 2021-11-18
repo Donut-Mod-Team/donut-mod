@@ -1,12 +1,12 @@
 import * as d3 from "d3";
+import { resources } from "./resources";
 
 /**
  * Function is responsible for creating and applying hover effect on the donut-chart
  * @param {d3.pie} pie
  * @param {donutState} donutState
- * @param {number} animationDuration
  * */
-export function applyHoverEffect(pie, donutState, animationDuration) {
+export function applyHoverEffect(pie, donutState) {
     const angleOffset = 0.01;
     // Define the highlight arc for hovering
     const highlightArc = d3
@@ -41,7 +41,7 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
     // define behaviour for transition
     highlightedSectors
         .transition()
-        .duration(animationDuration)
+        .duration(resources.animationDuration)
         .attrTween("d", function (d) {
             return function () {
                 highlightArc.startAngle(d.startAngle - angleOffset).endAngle(d.endAngle + angleOffset);
@@ -52,5 +52,5 @@ export function applyHoverEffect(pie, donutState, animationDuration) {
         .attr("stroke", donutState.styles.fontColor)
         .style("stroke-width", "1px");
 
-    highlightedSectors.exit().transition().duration(animationDuration).attr("fill", "transparent").remove();
+    highlightedSectors.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 }

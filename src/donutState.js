@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { calculatePercentageValue } from "./utility";
+import { calculatePercentageValue, formatTotalSum } from "./utility";
 
 /**
  * Render the visualization
@@ -70,18 +70,30 @@ export async function createDonutState(mod) {
 
     let centerAxis = await mod.visualization.axis(resources.centerAxisName);
 
-    let totalYSum = calculateTotalYSum(colorLeaves, resources.yAxisName);
-    let totalCenterSum = dataViewCenterAxis != null ? calculateTotalYSum(colorLeaves, resources.centerAxisName) : null;
+    let totalYSum = calculateTotalSum(colorLeaves, resources.yAxisName);
+    let totalCenterSum = dataViewCenterAxis != null ? calculateTotalSum(colorLeaves, resources.centerAxisName) : null;
 
     let data;
     try {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             let yValue = sumValue(rows, resources.yAxisName);
-            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
-
+            // Extract the currency symbol from the formatted value if any
+            let currencySymbol =
+                dataViewCenterAxis != null ? getCurrencySymbolContinuesAxis(rows, resources.centerAxisName) : "";
+            let labelCurrencySymbol = getCurrencySymbolContinuesAxis(rows, resources.yAxisName);
+            let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
+            // Extract last symbols from the formatting
+            let lastSymbols = dataViewCenterAxis != null ? getLastCenterSymbols(rows, resources.centerAxisName) : "";
+            let labelLastSymbols = getLastCenterSymbols(rows, resources.yAxisName);
+            let formattedCenterValue =
+                dataViewCenterAxis != null
+                    ? currencySymbol +
+                      formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), lastSymbols) +
+                      lastSymbols
+                    : null;
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -90,12 +102,22 @@ export async function createDonutState(mod) {
                 renderID: leaf.leafIndex,
                 percentage: percentage.toFixed(1),
                 absPercentage: absPercentage,
+                centerSumFormatted: formattedCenterValue,
                 centerSum: centerSum,
+                currencySymbol: currencySymbol,
+                centerValueSumLastSymbol: lastSymbols,
                 colorValue: leaf.formattedValue(),
-                totalCenterSum: totalCenterSum,
+                totalCenterSumFormatted: currencySymbol + formatTotalSum(totalCenterSum, lastSymbols) + lastSymbols,
                 centerTotal: 0,
                 getLabelText: (modProperty) =>
-                    createLabelText(modProperty, absPercentage, yValue, leaf.formattedValue()),
+                    createLabelText(
+                        modProperty,
+                        absPercentage,
+                        labelCurrencySymbol +
+                            formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols) +
+                            labelLastSymbols,
+                        leaf.formattedValue()
+                    ),
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
@@ -137,6 +159,20 @@ export async function createDonutState(mod) {
     return donutState;
 }
 
+/***
+ * Function returns the last symbols(after the numbers) if any from the formatted value of a continues axis
+ * @param {Spotfire.DataViewRow[]} rows
+ * @param {string} axisName
+ * @returns {string} last symbol of formatted value/if any otherwise empty string
+ */
+function getLastCenterSymbols(rows, axisName) {
+    let centerString = rows[0].continuous(axisName).formattedValue();
+    let firstNumberIndex = centerString.search(/\d/);
+    let centerValueSumLastSymbol = centerString.substr(firstNumberIndex);
+    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,\s]+/g, "");
+    return centerValueSumLastSymbol;
+}
+
 /**
  * Calculate the total value for an axis from a set of rows. Null values are treated as 0.
  * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
@@ -147,25 +183,37 @@ function sumValue(rows, axis) {
 }
 
 /** Function sums the values of each leaf in the data
- * @param {leaves} leaves
+ * @param {Spotfire.DataViewHierarchyNode[]} leaves
  * @param {string} yAxisName
  * @return {Number} sumOfValues
  * */
-function calculateTotalYSum(leaves, yAxisName) {
+function calculateTotalSum(leaves, yAxisName) {
     let sumOfValues = 0;
     leaves.map((leaf) => {
         let rows = leaf.rows();
         let yValue = sumValue(rows, yAxisName);
-        sumOfValues += Math.abs(yValue);
+        sumOfValues += yValue;
     });
     return sumOfValues;
 }
 
 /**
+ * Returns the currency symbol for continues axis given a name
+ * @param {Spotfire.DataViewRow[]} rows Rows to calculate the total value from
+ * @param {string} axisName
+ * @returns {string} currency symbol or empty string if not a currency
+ */
+function getCurrencySymbolContinuesAxis(rows, axisName) {
+    let formattedCenterValue = rows[0].continuous(axisName).formattedValue();
+    let firstNumberIndex = formattedCenterValue.search(/\d/);
+    let currencySymbol = formattedCenterValue.substr(0, firstNumberIndex);
+    return currencySymbol.replace(/[\s-]+/g, "");
+}
+/**
  * This function creates the sector's label text based on the provided modProperty
  * @param {modProperty} modProperty
  * @param {number} sectorPercentage
- * @param {number} sectorValue
+ * @param {string} sectorValue
  * @param {Spotfire.DataViewHierarchyNode.formattedValue} sectorCategory
  * @returns {string} labelText
  */
