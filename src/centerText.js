@@ -39,22 +39,29 @@ export function renderCenterText(donutState, radius, modProperty) {
 
     let centerTextBox = d3.selectAll("#center-text").node().getBoundingClientRect();
     let yPointDifference = centerTextBox.bottom - height / 2;
-    let centerTextSemiCircleTransformationHeight = donutState.donutCircle.y - centerTextBox.bottom - centerTextBox.height + yPointDifference;
+    let centerTextSemiCircleTransformationHeight =
+        donutState.donutCircle.y - centerTextBox.bottom - centerTextBox.height + yPointDifference;
 
     d3.select("#center")
         .transition()
         .duration(resources.animationDuration)
         .style(
             "transform",
-            `translate(${0}px, ${modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? centerTextSemiCircleTransformationHeight : 0}px)`
+            `translate(${0}px, ${
+                modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
+                    ? centerTextSemiCircleTransformationHeight
+                    : 0
+            }px)`
         );
 
     calculateMarkedCenterText(donutState.data);
 
     function calculateCenterTextSpace() {
-        return calculatePercentageValue(radius * 0.9, width, 0) < calculatePercentageValue(radius * 0.9, height, 0)
-            ? calculatePercentageValue(radius * 0.9, width, 0)
-            : calculatePercentageValue(radius * 0.9, height, 0);
+        const spaceModifier = 0.9;
+        return calculatePercentageValue(radius * spaceModifier, width, 0) <
+            calculatePercentageValue(radius * spaceModifier, height, 0)
+            ? calculatePercentageValue(radius * spaceModifier, width, 0)
+            : calculatePercentageValue(radius * spaceModifier, height, 0);
     }
 
     function calculateMarkedCenterText(data) {
