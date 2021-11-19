@@ -8,7 +8,8 @@ import {
     getOverlappingRectangle,
     getPointFromCircle,
     rectangularCircleColliding,
-    roundNumber
+    roundNumber,
+    formatTotalSum
 } from "../../src/utility";
 
 test("Check if two rectangles are overlapping", () => {
@@ -214,4 +215,15 @@ test("Check if a point of a circle is correct", () => {
         x: 200,
         y: 300
     });
+});
+
+test("Check if a number is formatted correctly", () => {
+    expect(formatTotalSum("0.1", "%") === (10).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("11000000.1", "M") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("11000000000.1", "B") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("11000000000000.1", "T") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("21000.1", "K") === (21).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("21000.111", "") === (21000.11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("21000", "") === (21000).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum(null) === "").toBeTruthy();
 });
