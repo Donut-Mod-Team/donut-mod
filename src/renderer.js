@@ -24,7 +24,10 @@ export async function render(donutState, modProperty) {
         return;
     }
 
-    const radius = Math.min(width, height) / 2 - resources.sizeModifier;
+    const radius =
+        modProperty.labelsPosition.value() === resources.popoutLabelsPositionOutsideValue
+            ? Math.min(width, height) / 2 - resources.sizeModifier - 40
+            : Math.min(width, height) / 2 - resources.sizeModifier;
     const innerRadius = radius * 0.5;
 
     let padding = 0;

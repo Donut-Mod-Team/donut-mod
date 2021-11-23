@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { resources } from "./resources";
+import { checkIfRectanglesGoOutside } from "./utility";
 
 /**
  * This function is respondible to generate the labels and handle their behavior
@@ -42,7 +43,6 @@ export function addLabels(arc, pie, donutState, modProperty) {
         .attr("font-style", donutState.styles.fontStyle)
         .attr("font-weight", donutState.styles.fontWeight)
         .attr("font-size", donutState.styles.fontSize)
-        .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attr("transform", calculateLabelPosition)
         .style("text-anchor", (d) => {
             if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
@@ -54,39 +54,84 @@ export function addLabels(arc, pie, donutState, modProperty) {
             return midAngle(d) < middleRadiansThreshold ? "start" : "end";
         })
         .attr("fill", (d) => calculateTextColor(d.data.color))
-        .attr("opacity", function (d) {
-            let that = this;
-            return calculateTextOpacity(d, that);
-        });
+        .text(
+            modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue
+                ? ""
+                : function (d) {
+                      let text = d.data.getLabelText(modProperty);
+                      setTimeout(() => {
+                          return calcSpace(d, text);
+                      }, 1);
+                  }
+        );
+    // .attr("opacity", function (d) {
+    //     let that = this;
+    //     return calculateTextOpacity(d, that);
+    // });
 
     labels
         .transition("update labels")
         .duration(resources.animationDuration)
-        .text(modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : getLabelText())
         .attrTween("transform", function (d) {
             return function () {
                 return calculateLabelPosition(d);
             };
         })
         .styleTween("text-anchor", getLabelAlignment)
-        .styleTween("opacity", function (d) {
-            let that = this;
-            return function () {
-                return calculateTextOpacity(d, that);
-            };
-        })
+        // .styleTween("opacity", function (d) {
+        //     let that = this;
+        //     return function () {
+        //         return calculateTextOpacity(d, that);
+        //     };
+        // })
         .attr("fill", (d) => calculateTextColor(d.data.color))
         .attr("font-family", donutState.styles.fontFamily)
         .attr("font-style", donutState.styles.fontStyle)
         .attr("font-weight", donutState.styles.fontWeight)
-        .attr("font-size", donutState.styles.fontSize);
+        .attr("font-size", donutState.styles.fontSize)
+        .text(
+            modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue
+                ? ""
+                : function (d) {
+                      let text = d.data.getLabelText(modProperty);
+                      setTimeout(() => {
+                          return calcSpace(d, text);
+                      }, 1);
+                  }
+        );
 
-    labels
-        .exit()
-        .transition("remove labels")
-        .duration(resources.animationDuration)
-        .attr("fill", "transparent")
-        .remove();
+    function calcSpace(d, text) {
+        let labels = d3.selectAll("g#labels").selectAll("text");
+        let node = labels.filter(function () {
+            return this.id === "labelID_" + d.index;
+        });
+        let container = d3.select("#mod-container");
+        text = text.toString();
+        node.text(text);
+        while (
+            checkIfRectanglesGoOutside(node.node().getBoundingClientRect(), container.node().getBoundingClientRect())
+        ) {
+            if (text.length < 2) {
+                text = "";
+                return text;
+            }
+            text = text.slice(0, text.length - 1);
+            node.text(text);
+
+            if (
+                !checkIfRectanglesGoOutside(
+                    node.node().getBoundingClientRect(),
+                    container.node().getBoundingClientRect()
+                )
+            ) {
+                text = text.slice(0, text.length - 2);
+                text = text + "...";
+                node.text(text);
+                return text;
+            }
+        }
+        return text;
+    }
 
     /**
      * This function returns the corresponding alignment for the label's text
@@ -173,48 +218,48 @@ export function addLabels(arc, pie, donutState, modProperty) {
         return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
 
-    /**
-     * This function is responsible for managing the visualization of the labels (either shown or stay hidden)
-     * @param {donutState.data} data
-     * @param {this} that
-     * @returns {string} opacity value
-     */
-    function calculateTextOpacity(data, that) {
-        let labelBox = that.getBoundingClientRect();
-        let labelWidth = labelBox.right - labelBox.left;
-        let labelHeight = labelBox.bottom - labelBox.top;
-        if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
-            let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
-            return labelWidth < labelVisibilityBound &&
-                labelHeight < labelVisibilityBound &&
-                data.data.absPercentage >= 5
-                ? "1"
-                : "0";
-        } else {
-            let containerBox = d3.select("#mod-container").node().getBoundingClientRect();
-            return labelBox.top >= containerBox.top &&
-                labelBox.bottom <= containerBox.bottom &&
-                labelBox.left >= containerBox.left &&
-                labelBox.right <= containerBox.right &&
-                data.data.absPercentage >= 5
-                ? "1"
-                : "0";
-        }
-    }
+    // /**
+    //  * This function is responsible for managing the visualization of the labels (either shown or stay hidden)
+    //  * @param {donutState.data} data
+    //  * @param {this} that
+    //  * @returns {string} opacity value
+    //  */
+    // function calculateTextOpacity(data, that) {
+    //     let labelBox = that.getBoundingClientRect();
+    //     let labelWidth = labelBox.right - labelBox.left;
+    //     let labelHeight = labelBox.bottom - labelBox.top;
+    //     if (modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue) {
+    //         let labelVisibilityBound = donutState.donutCircle.radius - donutState.donutCircle.innerRadius;
+    //         return labelWidth < labelVisibilityBound &&
+    //             labelHeight < labelVisibilityBound &&
+    //             data.data.absPercentage >= 5
+    //             ? "1"
+    //             : "0";
+    //     } else {
+    //         let containerBox = d3.select("#mod-container").node().getBoundingClientRect();
+    //         return labelBox.top >= containerBox.top &&
+    //             labelBox.bottom <= containerBox.bottom &&
+    //             labelBox.left >= containerBox.left &&
+    //             labelBox.right <= containerBox.right &&
+    //             data.data.absPercentage >= 5
+    //             ? "1"
+    //             : "0";
+    //     }
+    // }
 
-    // Returns the function and/or empty string depending for the labels depending on the settings selected in popout(defined in the modProperty
-    function getLabelText() {
-        if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue) {
-            return (d) => d.data.getLabelText(modProperty);
-        } else if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue) {
-            return (d) => {
-                if (d.data.markedRowCount() > 0) {
-                    return d.data.getLabelText(modProperty);
-                } else return "";
-            };
-        }
-        return "";
-    }
+    // // Returns the function and/or empty string depending for the labels depending on the settings selected in popout(defined in the modProperty
+    // function getLabelText(d) {
+    //     if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue) {
+    //         return (d) => d.data.getLabelText(modProperty);
+    //     } else if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue) {
+    //         return (d) => {
+    //             if (d.data.markedRowCount() > 0) {
+    //                 return d.data.getLabelText(modProperty);
+    //             } else return "";
+    //         };
+    //     }
+    //     return "";
+    // }
     function midAngle(d) {
         return d.startAngle + (d.endAngle - d.startAngle) / 2;
     }
