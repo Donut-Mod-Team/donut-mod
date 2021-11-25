@@ -9,16 +9,16 @@ import { refreshCenterTextOnMouseLeave, refreshCenterTextOnMouseover, renderCent
 /**
  * @param {object} donutState
  * @param {modProperty} modProperty
+ * @param {boolean} circleTypeChanged
+ * @param {boolean} labelsPositionChanged
  */
-export async function render(donutState, modProperty) {
+export async function render(donutState, modProperty, circleTypeChanged, labelsPositionChanged) {
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
 
     const circleTypeTransformationHeight =
         modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? height / 1.5 : height / 2;
     const circleTypeTransformationWidth = width / 2;
-
-    // const transformationCenterTextHeight
 
     if (height <= 0 || width <= 0) {
         return;
@@ -168,7 +168,7 @@ export async function render(donutState, modProperty) {
 
     marker.drawRectangularSelection(donutState);
     applyHoverEffect(pie, donutState);
-    addLabels(arc, pie, donutState, modProperty);
+    addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged);
     drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
     renderCenterText(donutState, radius, modProperty);
 
