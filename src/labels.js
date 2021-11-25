@@ -83,6 +83,9 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
      * @param {donutState.data} d
      */
     function returnLabelText(d) {
+        if (d.data.absPercentage < 5) {
+            return "";
+        }
         let text = d.data.getLabelText(modProperty);
         d3.timeout(
             () => {
@@ -100,7 +103,7 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
     function adjustLabelTextToFit(d, text) {
         let labelNodes = d3.selectAll("g#labels").selectAll("text");
         let label = labelNodes.filter(function () {
-            return this.id === "labelID_" + d.index;
+            return this.id === "labelID_" + d.data.renderID;
         });
         let container = d3.select("#mod-container");
         text = text.toString();
