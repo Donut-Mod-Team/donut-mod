@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import * as marker from "./marker";
-import { applyHoverEffect } from "./hoverer";
+import { applyHoverEffect, hideHighlightEffect, showHighlightEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
 import { addLabels } from "./labels";
 import { resources } from "./resources";
@@ -123,20 +123,14 @@ export async function render(donutState, modProperty) {
 
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
-        d3.select("path#hoverID_" + d.data.renderID)
-            .transition()
-            .duration(resources.animationDuration)
-            .style("opacity", "0");
+        hideHighlightEffect(d);
         if (d3.select("#center-text").style("opacity") === "1" && d.data.centerTotal === 0) {
             refreshCenterTextOnMouseLeave(d);
         }
     }
 
     function onMouseOver(d) {
-        d3.select("path#hoverID_" + d.data.renderID)
-            .transition()
-            .duration(resources.animationDuration)
-            .style("opacity", "1");
+        showHighlightEffect(d);
         if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
             refreshCenterTextOnMouseover(d);
         }
