@@ -9,7 +9,8 @@ import {
     getPointFromCircle,
     rectangularCircleColliding,
     roundNumber,
-    formatTotalSum
+    formatTotalSum,
+    checkIfRectanglesGoOutside
 } from "../../src/utility";
 
 test("Check if two rectangles are overlapping", () => {
@@ -226,4 +227,78 @@ test("Check if a number is formatted correctly", () => {
     expect(formatTotalSum("21000.111", "") === (21000.11).toLocaleString()).toBeTruthy();
     expect(formatTotalSum("21000", "") === (21000).toLocaleString()).toBeTruthy();
     expect(formatTotalSum(null) === "").toBeTruthy();
+});
+
+test("Check if a selected rectangle's bounds exceed the bounds of a second one", () => {
+    const containerBoundingRectangle = document.createElement("div");
+    const selectedRectangleInsideRightLimit = document.createElement("div");
+    const selectedRectangleInsideLeftLimit = document.createElement("div");
+    const selectedRectangleOutside = document.createElement("div");
+
+    // Bounding rectangle used as the container
+    containerBoundingRectangle.getBoundingClientRect = jest.fn(() => ({
+        left: 0,
+        right: 480,
+        top: 0,
+        bottom: 240,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle inside the expected limits (right corner-case)
+    selectedRectangleInsideRightLimit.getBoundingClientRect = jest.fn(() => ({
+        left: 30,
+        right: 473,
+        top: 20,
+        bottom: 40,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle inside the expected limits (left corner-case)
+    selectedRectangleInsideLeftLimit.getBoundingClientRect = jest.fn(() => ({
+        left: 7,
+        right: 20,
+        top: 20,
+        bottom: 40,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle outside of the expected limits of the container
+    selectedRectangleOutside.getBoundingClientRect = jest.fn(() => ({
+        left: 450,
+        right: 474,
+        top: 50,
+        bottom: 100,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleInsideRightLimit.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeFalsy();
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleInsideLeftLimit.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeFalsy();
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleOutside.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeTruthy();
 });
