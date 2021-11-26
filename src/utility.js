@@ -91,6 +91,13 @@ export function checkIfRectanglesOverlap(selectionRectangle, boundingClientRect)
         selectionRectangle.bottom <= boundingClientRect.top
     );
 }
+export function checkIfRectanglesGoOutside(selectionRectangle, boundingClientRect) {
+    const centeringFactor = 7;
+    return (
+        selectionRectangle.left < boundingClientRect.left + centeringFactor ||
+        selectionRectangle.right > boundingClientRect.right - centeringFactor
+    );
+}
 
 /**
  * Function is checking if a rectangle is inside a circle

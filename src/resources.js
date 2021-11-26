@@ -57,6 +57,21 @@ export const resources = {
 
     // D3 animation duration used for svg shapes
     animationDuration: 250,
-    // Added a resource to remove the magic numbers within the width, height and radius calculations.
-    sizeModifier: 10
+    // Value used as a modifier within the width, height and radius calculations
+    sizeModifier: 10,
+    // Value used as a modifier that specifies the the reduction factor for the donut,
+    // when labels are visualized outside of the sectors
+    labelsTextOutsideSizeModifier: 40,
+    // Delay used for the DOM to properly load (in ms)
+    timeoutDelay: 10,
+    // Offsets related to the labels' positions
+    labelsPositionOffsetInsideDonut: 0.75,
+    labelsPositionOffsetOutsideDonut: 1.03,
+    // Starting and ending angles, in degrees, for semi and whole circle visualizations
+    semiCircleStartAngle: -90 * (Math.PI / 180),
+    wholeCircleStartAngle: 0,
+    semiCircleEndAngle: 90 * (Math.PI / 180),
+    wholeCircleEndAngle: 360 * (Math.PI / 180),
+    // Threshold used for not showing sectors' labels based on their percentage value
+    sectorHidingPercentageThreshold: 5
 };
