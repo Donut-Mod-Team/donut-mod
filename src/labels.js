@@ -78,6 +78,13 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
             modProperty.labelsVisible.value === resources.popoutLabelsVisibleNoneValue ? "" : (d) => returnLabelText(d)
         );
 
+    labels
+        .exit()
+        .transition("remove labels")
+        .duration(resources.animationDuration)
+        .attr("fill", "transparent")
+        .remove();
+
     /** Function that returns the label's text with a timeout to allow the DOM to refresh, in order to
      *  get the correct bounding boxes.
      * @param {donutState.data} d
