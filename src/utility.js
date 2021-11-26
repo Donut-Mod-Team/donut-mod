@@ -91,11 +91,19 @@ export function checkIfRectanglesOverlap(selectionRectangle, boundingClientRect)
         selectionRectangle.bottom <= boundingClientRect.top
     );
 }
-export function checkIfRectanglesGoOutside(selectionRectangle, boundingClientRect) {
+
+/**
+ * Function is checking if a given rectangle's X-axis dimensions go outside of a specified (container-like) rectangle
+ * @param {selectionRectangle} selectionRectangle
+ * @param {boundingClientRectangle} boundingClientRectangle
+ * @returns {boolean}
+ */
+export function checkIfRectanglesGoOutside(selectionRectangle, boundingClientRectangle) {
+    // Offset used to narrow the space which is considered to be marked as "outside" of the epxected one
     const centeringFactor = 7;
     return (
-        selectionRectangle.left < boundingClientRect.left + centeringFactor ||
-        selectionRectangle.right > boundingClientRect.right - centeringFactor
+        selectionRectangle.left < boundingClientRectangle.left + centeringFactor ||
+        selectionRectangle.right > boundingClientRectangle.right - centeringFactor
     );
 }
 
