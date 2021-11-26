@@ -26,7 +26,7 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
 
     const radius =
         modProperty.labelsPosition.value() === resources.popoutLabelsPositionOutsideValue
-            ? Math.min(width, height) / 2 - resources.sizeModifier - 40
+            ? Math.min(width, height) / 2 - resources.sizeModifier - resources.labelsTextOutsideSizeModifier
             : Math.min(width, height) / 2 - resources.sizeModifier;
     const innerRadius = radius * 0.5;
 
@@ -46,11 +46,11 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
     // Specify the starting and ending angle for the Donut Chart to use, in order to be drawn.
     // Default starts from 0 to 360 degrees. For semi-donut chart the values are -90 to 90 degrees.
     let startPieAngle =
-        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? -90 * (Math.PI / 180) : 0;
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? resources.semiCircleStartAngle : resources.wholeCircleStartAngle;
     let endPieAngle =
         modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
-            ? 90 * (Math.PI / 180)
-            : 360 * (Math.PI / 180);
+            ? resources.semiCircleEndAngle
+            : resources.wholeCircleEndAngle;
 
     // Initialize the circle state
     donutState.donutCircle.x = circleTypeTransformationWidth;

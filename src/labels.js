@@ -90,7 +90,7 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
      * @param {donutState.data} d
      */
     function returnLabelText(d) {
-        if (d.data.absPercentage < 5) {
+        if (d.data.absPercentage < resources.sectorHidingPercentageThreshold) {
             return "";
         }
         let text = d.data.getLabelText(modProperty);
@@ -98,7 +98,7 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
             () => {
                 return adjustLabelTextToFit(d, text);
             },
-            circleTypeChanged || labelsPositionChanged ? resources.animationDuration : 10
+            circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
         );
     }
 
@@ -236,7 +236,9 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
      */
     function calculateLabelPosition(data) {
         let positionOffset =
-            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue ? 0.75 : 1.03;
+            modProperty.labelsPosition.value() === resources.popoutLabelsPositionInsideValue
+                ? resources.labelsPositionOffsetInsideDonut
+                : resources.labelsPositionOffsetOutsideDonut;
 
         let centeringFactor = donutState.donutCircle.radius * positionOffset;
         let centroid = arc.centroid(data);
