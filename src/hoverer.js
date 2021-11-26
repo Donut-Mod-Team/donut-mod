@@ -8,25 +8,24 @@ import { getPointFromCircle } from "./utility";
  * @param {donutState} donutState
  * */
 export function applyHoverEffect(pie, donutState) {
-    const angleOffset = 0;
     // Define the sectors to be shown when hovering over
 
     // Define the highlight arc for hovering
     let arc = d3
         .arc()
         .innerRadius(donutState.donutCircle.radius + 4.5)
-        .outerRadius(donutState.donutCircle.radius + 4);
-    drawArc(pie, arc, donutState, angleOffset, "outer");
+        .outerRadius(donutState.donutCircle.radius + 4.5);
+    drawArc(pie, arc, donutState, "outer");
     // Define the highlight arc for hovering
     arc = d3
         .arc()
-        .innerRadius(donutState.donutCircle.innerRadius - 2.5)
-        .outerRadius(donutState.donutCircle.innerRadius - 1.5);
-    drawArc(pie, arc, donutState, angleOffset, "inner");
+        .innerRadius(donutState.donutCircle.innerRadius - 3)
+        .outerRadius(donutState.donutCircle.innerRadius - 3);
+    drawArc(pie, arc, donutState, "inner");
     drawLines(pie, donutState);
 }
 
-function drawArc(pie, highlightArc, donutState, angleOffset, idKey) {
+function drawArc(pie, highlightArc, donutState, idKey) {
     let highlightedSectors = d3
         .select("g#highlight-sector-" + idKey)
         .attr("pointer-events", "none")
@@ -42,7 +41,7 @@ function drawArc(pie, highlightArc, donutState, angleOffset, idKey) {
             return "hoverID_" + idKey + "_" + d.data.renderID;
         })
         .attr("d", function (d) {
-            highlightArc.startAngle(d.startAngle - angleOffset).endAngle(d.endAngle + angleOffset);
+            highlightArc.startAngle(d.startAngle).endAngle(d.endAngle);
             return highlightArc(d);
         })
         .attr("class", "line-hover")
@@ -56,7 +55,7 @@ function drawArc(pie, highlightArc, donutState, angleOffset, idKey) {
         .duration(resources.animationDuration)
         .attrTween("d", function (d) {
             return function () {
-                highlightArc.startAngle(d.startAngle - angleOffset).endAngle(d.endAngle + angleOffset);
+                highlightArc.startAngle(d.startAngle).endAngle(d.endAngle);
                 return highlightArc(d);
             };
         })
@@ -66,7 +65,7 @@ function drawArc(pie, highlightArc, donutState, angleOffset, idKey) {
 
     highlightedSectors.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 }
-export function hideHighlightEffect(d) {
+export async function hideHighlightEffect(d) {
     d3.select("path#hoverID_inner_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
@@ -75,17 +74,17 @@ export function hideHighlightEffect(d) {
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
-    d3.select("line#hoverID_line_end_" + d.data.renderID)
+    d3.select("path#hoverID_line_end_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
-    d3.select("line#hoverID_line_start_" + d.data.renderID)
+    d3.select("path#hoverID_line_start_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
 }
 
-export function showHighlightEffect(d) {
+export async function showHighlightEffect(d) {
     d3.select("path#hoverID_inner_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
@@ -94,27 +93,35 @@ export function showHighlightEffect(d) {
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
-    d3.select("line#hoverID_line_end_" + d.data.renderID)
+    d3.select("path#hoverID_line_end_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
-    d3.select("line#hoverID_line_start_" + d.data.renderID)
+    d3.select("path#hoverID_line_start_" + d.data.renderID)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
 }
 
 function drawLines(pie, donutState) {
-    // Define the sectors to be shown when hovering over
+    let oldSideLinesPresent = false;
+
+    if (d3.selectAll("#highlight-side-lines").nodes().length > 0) {
+        d3.select("#highlight-side-lines").remove();
+        oldSideLinesPresent = true;
+    }
+
     let svg = d3
         .select("#mod-container svg")
-        .selectAll("line")
+        .append("g")
+        .attr("id", "highlight-side-lines")
+        .selectAll("path")
         .data(pie(donutState.data), (d, i) => {
             return d.data.id + i;
         });
 
     svg.enter()
-        .append("line")
+        .append("path")
         .attr("pointer-events", "none")
         .attr("id", function (d) {
             return "hoverID_line_start_" + d.data.renderID;
@@ -122,14 +129,19 @@ function drawLines(pie, donutState) {
         .style("stroke", donutState.styles.fontColor)
         .style("stroke-width", "1px")
         .attr("class", "line-hover")
-        .attr("x1", (d) => getPoints(d, donutState)[0][0])
-        .attr("x2", (d) => getPoints(d, donutState)[1][0])
-        .attr("y1", (d) => getPoints(d, donutState)[0][1])
-        .attr("y2", (d) => getPoints(d, donutState)[1][1])
-        .style("opacity", "0");
+        .style("opacity", (d) => (oldSideLinesPresent && d.data.markedRowCount() > 0 ? "1" : "0"))
+        .attr("d", (d) => {
+            let points = getPoints(d, donutState);
+            return d3.line()([
+                [points[4][0], points[4][1]],
+                [points[0][0], points[0][1]],
+                [points[1][0], points[1][1]],
+                [points[5][0], points[5][1]]
+            ]);
+        });
 
     svg.enter()
-        .append("line")
+        .append("path")
         .attr("pointer-events", "none")
         .attr("id", function (d) {
             return "hoverID_line_end_" + d.data.renderID;
@@ -137,30 +149,26 @@ function drawLines(pie, donutState) {
         .style("stroke", donutState.styles.fontColor)
         .style("stroke-width", "1px")
         .attr("class", "line-hover")
-        .attr("x1", (d) => getPoints(d, donutState)[2][0])
-        .attr("x2", (d) => getPoints(d, donutState)[3][0])
-        .attr("y1", (d) => getPoints(d, donutState)[2][1])
-        .attr("y2", (d) => getPoints(d, donutState)[3][1])
-        .style("opacity", "0")
-        .transition()
-        .duration(resources.animationDuration)
-        .attr("x1", (d) => getPoints(d, donutState)[2][0])
-        .attr("x2", (d) => getPoints(d, donutState)[3][0])
-        .attr("y1", (d) => getPoints(d, donutState)[2][1])
-        .attr("y2", (d) => getPoints(d, donutState)[3][1])
-        .attr("class", "line-hover")
-        .attr("stroke", donutState.styles.fontColor)
-        .style("stroke-width", "1px");
+        .attr("d", (d) => {
+            let points = getPoints(d, donutState);
+            return d3.line()([
+                [points[6][0], points[6][1]],
+                [points[2][0], points[2][1]],
+                [points[3][0], points[3][1]],
+                [points[7][0], points[7][1]]
+            ]);
+        })
+        .style("opacity", (d) => (oldSideLinesPresent && d.data.markedRowCount() > 0 ? "1" : "0"));
+
+    svg.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 }
 
 function getPoints(d, donutState) {
-    const angleOffset = 0;
-
-    let innerRadius = donutState.donutCircle.innerRadius - 2.5;
+    let innerRadius = donutState.donutCircle.innerRadius - 3;
     let radius = donutState.donutCircle.radius + 4;
     let distance = 3;
-    let startPointInnerOriginal = getPointFromCircle(donutState.donutCircle, d.startAngle - angleOffset, innerRadius);
-    let startPointOuterOriginal = getPointFromCircle(donutState.donutCircle, d.startAngle - angleOffset, radius);
+    let startPointInnerOriginal = getPointFromCircle(donutState.donutCircle, d.startAngle, innerRadius);
+    let startPointOuterOriginal = getPointFromCircle(donutState.donutCircle, d.startAngle, radius);
     let startPointOuterOffset = {
         x:
             startPointOuterOriginal.x -
@@ -203,8 +211,8 @@ function getPoints(d, donutState) {
                 )
     };
     //https://stackoverflow.com/questions/58727038/draw-parallel-measurement-notation-lines-using-d3js
-    let endPointInnerOriginal = getPointFromCircle(donutState.donutCircle, d.endAngle + angleOffset, innerRadius);
-    let endPointOuterOriginal = getPointFromCircle(donutState.donutCircle, d.endAngle + angleOffset, radius);
+    let endPointInnerOriginal = getPointFromCircle(donutState.donutCircle, d.endAngle, innerRadius);
+    let endPointOuterOriginal = getPointFromCircle(donutState.donutCircle, d.endAngle, radius);
     let endPointOuterOffset = {
         x:
             endPointOuterOriginal.x -
@@ -253,6 +261,10 @@ function getPoints(d, donutState) {
         [startPointInnerOffset.x, startPointInnerOffset.y],
         [startPointOuterOffset.x, startPointOuterOffset.y],
         [endPointInnerOffset.x, endPointInnerOffset.y],
-        [endPointOuterOffset.x, endPointOuterOffset.y]
+        [endPointOuterOffset.x, endPointOuterOffset.y],
+        [startPointInnerOriginal.x, startPointInnerOriginal.y],
+        [startPointOuterOriginal.x, startPointOuterOriginal.y],
+        [endPointInnerOriginal.x, endPointInnerOriginal.y],
+        [endPointOuterOriginal.x, endPointOuterOriginal.y]
     ];
 }
