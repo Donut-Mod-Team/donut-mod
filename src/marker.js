@@ -34,6 +34,15 @@ export function drawRectangularSelection(donutState) {
     }
 
     let canvas = d3.select("#mod-container svg");
+
+    // Remove previously appended rectangles before creating a new one
+    d3.select("svg")
+        .selectAll("path")
+        .filter(function () {
+            return d3.select(this).attr("class") === "rectangle";
+        })
+        .remove();
+
     const rectangle = canvas.append("path").attr("class", "rectangle").attr("visibility", "hidden");
 
     // Start drawing the selection-rectangle
