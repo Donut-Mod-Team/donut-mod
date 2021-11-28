@@ -121,8 +121,6 @@ export async function showHighlightEffect(sectorData) {
  * @param donutState
  */
 function drawLines(pie, donutState) {
-    let oldSideLinesPresent = false;
-
     let startLines = d3
         .select("g#highlight-side-lines-start")
         .selectAll("path")
@@ -140,7 +138,7 @@ function drawLines(pie, donutState) {
         .style("stroke", donutState.styles.fontColor)
         .style("stroke-width", "1px")
         .attr("class", "line-hover")
-        .style("opacity", (d) => (oldSideLinesPresent && d.data.markedRowCount() > 0 ? "1" : "0"))
+        .style("opacity", "0")
         .attr("d", (d) => {
             let points = getPoints(d, donutState);
             return d3.line()([
@@ -154,7 +152,7 @@ function drawLines(pie, donutState) {
     startLines
         .merge(linesStart)
         .transition()
-        .duration(resources.animationDuration)
+        .duration(1)
         .attr("d", (d) => {
             let points = getPoints(d, donutState);
             return d3.line()([
@@ -190,11 +188,11 @@ function drawLines(pie, donutState) {
                 [points[7][0], points[7][1]]
             ]);
         })
-        .style("opacity", (d) => (oldSideLinesPresent && d.data.markedRowCount() > 0 ? "1" : "0"));
+        .style("opacity", "0");
     endLines
         .merge(linesEnd)
         .transition()
-        .duration(resources.animationDuration)
+        .duration(1)
         .attr("d", (d) => {
             let points = getPoints(d, donutState);
             return d3.line()([
@@ -205,8 +203,8 @@ function drawLines(pie, donutState) {
             ]);
         });
 
-    startLines.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
-    endLines.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
+    startLines.exit().transition().duration(1).attr("fill", "transparent").remove();
+    endLines.exit().transition().duration(1).attr("fill", "transparent").remove();
 }
 
 /**
