@@ -90,16 +90,33 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
      * @param {donutState.data} d
      */
     function returnLabelText(d) {
+        let text = "";
         if (d.data.absPercentage < resources.sectorHidingPercentageThreshold) {
-            return "";
+            return text;
         }
-        let text = d.data.getLabelText(modProperty);
-        d3.timeout(
-            () => {
-                return adjustLabelTextToFit(d, text);
-            },
-            circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
-        );
+
+        if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue) {
+            text = d.data.getLabelText(modProperty);
+            d3.timeout(
+                () => {
+                    return adjustLabelTextToFit(d, text);
+                },
+                circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
+            );
+        }
+
+        if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue) {
+            if (d.data.markedRowCount() > 0) {
+                text = d.data.getLabelText(modProperty);
+                d3.timeout(
+                    () => {
+                        return adjustLabelTextToFit(d, text);
+                    },
+                    circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
+                );
+            }
+        }
+        return text;
     }
 
     /** Function that adjusts given label's text based on whenever they overlap with the mod-container.
