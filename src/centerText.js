@@ -89,11 +89,19 @@ export function renderCenterText(donutState, radius, modProperty) {
         }
         if (markedSectors.length > 1) {
             centerText
-                .text(
-                    data[0].currencySymbol +
+                .text(() => {
+                    if (data[0].centerValueSumLastSymbol === "E+") {
+                        return (
+                            data[0].centerValueFirstSymbols +
+                            formatTotalSum(centerTotal, data[0].centerValueSumLastSymbol)
+                        );
+                    }
+                    return (
+                        data[0].centerValueFirstSymbols +
                         formatTotalSum(centerTotal, data[0].centerValueSumLastSymbol) +
                         data[0].centerValueSumLastSymbol
-                )
+                    );
+                })
                 .style("opacity", 1);
         }
         if (markedSectors.length === 1) {

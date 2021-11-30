@@ -23,6 +23,9 @@ export function formatTotalSum(totalSum, lastSymbol) {
             lastSymbol = lastSymbol.toLowerCase().trim();
             let total = totalSum;
             let isRounded = false;
+            if (lastSymbol === "e+") {
+                return total.toExponential(6);
+            }
             if (lastSymbol === "b") {
                 total = roundNumber(totalSum / 1000000000, 0);
                 isRounded = true;
@@ -41,18 +44,29 @@ export function formatTotalSum(totalSum, lastSymbol) {
             }
             if (lastSymbol === "%") {
                 isRounded = true;
-
                 total = roundNumber(totalSum * 100, 2);
+                return total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             }
+
             if (!isRounded) {
                 roundNumber(total, 2);
+                return total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } else {
+                return total.toLocaleString(undefined, {
+                    maximumFractionDigits: total % 1 !== 0 ? 2 : 0,
+                    minimumFractionDigits: total % 1 !== 0 ? 2 : 0
+                });
             }
-            return total.toLocaleString(undefined, {
-                minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
-            });
         }
         return roundNumber(totalSum, 2).toLocaleString(undefined, {
-            minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
     }
     return "";

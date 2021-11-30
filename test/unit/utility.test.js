@@ -219,13 +219,23 @@ test("Check if a point of a circle is correct", () => {
 });
 
 test("Check if a number is formatted correctly", () => {
-    expect(formatTotalSum("0.1", "%") === (10).toLocaleString()).toBeTruthy();
-    expect(formatTotalSum("11000000.1", "M") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("0.1", "%") === (10).toLocaleString(undefined, { minimumFractionDigits: 2 })).toBeTruthy();
+    expect(
+        formatTotalSum("11000000.1", "M") ===
+            (11).toLocaleString(undefined, { maximumFractionDigits: 0, minimumFractionDigits: 0 })
+    ).toBeTruthy();
     expect(formatTotalSum("11000000000.1", "B") === (11).toLocaleString()).toBeTruthy();
     expect(formatTotalSum("11000000000000.1", "T") === (11).toLocaleString()).toBeTruthy();
     expect(formatTotalSum("21000.1", "K") === (21).toLocaleString()).toBeTruthy();
     expect(formatTotalSum("21000.111", "") === (21000.11).toLocaleString()).toBeTruthy();
-    expect(formatTotalSum("21000", "") === (21000).toLocaleString()).toBeTruthy();
+    console.log(formatTotalSum("21000", ""));
+    expect(
+        formatTotalSum("21000", "") ===
+            (21000).toLocaleString(undefined, {
+                minimumFractionDigits: 2
+            })
+    ).toBeTruthy();
+    expect(formatTotalSum(11000000000.1, "E+") === (11000000000.1).toExponential(6)).toBeTruthy();
     expect(formatTotalSum(null) === "").toBeTruthy();
 });
 
