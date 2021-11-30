@@ -68,9 +68,9 @@ export const resources = {
     labelsPositionOffsetInsideDonut: 0.75,
     labelsPositionOffsetOutsideDonut: 1.03,
     // Starting and ending angles, in degrees, for semi and whole circle visualizations
-    semiCircleStartAngle: -90 * (Math.PI / 180),
+    semiCircleStartAngle: 270 * (Math.PI / 180),
     wholeCircleStartAngle: 0,
-    semiCircleEndAngle: 90 * (Math.PI / 180),
+    semiCircleEndAngle: 450 * (Math.PI / 180),
     wholeCircleEndAngle: 360 * (Math.PI / 180),
     // Threshold used for not showing sectors' labels based on their percentage value
     sectorHidingPercentageThreshold: 5,
