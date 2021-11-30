@@ -169,7 +169,7 @@ function getLastCenterSymbols(rows, axisName) {
     let centerString = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = centerString.search(/\d/);
     let centerValueSumLastSymbol = centerString.substr(firstNumberIndex);
-    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,\s]+/g, "");
+    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,]+/g, "");
     return centerValueSumLastSymbol;
 }
 
@@ -207,7 +207,7 @@ function getCurrencySymbolContinuesAxis(rows, axisName) {
     let formattedCenterValue = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = formattedCenterValue.search(/\d/);
     let currencySymbol = formattedCenterValue.substr(0, firstNumberIndex);
-    return currencySymbol.replace(/[\s-]+/g, "");
+    return currencySymbol.replace(/[-]+/g, "");
 }
 /**
  * This function creates the sector's label text based on the provided modProperty

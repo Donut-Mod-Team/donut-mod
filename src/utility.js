@@ -20,24 +20,36 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
 export function formatTotalSum(totalSum, lastSymbol) {
     if (totalSum != null) {
         if (lastSymbol != null && lastSymbol.length !== 0) {
-            lastSymbol = lastSymbol.toLowerCase();
-            let total = roundNumber(totalSum, 0);
-            if (lastSymbol.includes("b")) {
+            lastSymbol = lastSymbol.toLowerCase().trim();
+            let total = totalSum;
+            let isRounded = false;
+            if (lastSymbol === "b") {
                 total = roundNumber(totalSum / 1000000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("k")) {
+            if (lastSymbol === "k") {
                 total = roundNumber(totalSum / 1000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("m")) {
+            if (lastSymbol === "m") {
                 total = roundNumber(totalSum / 1000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("t")) {
+            if (lastSymbol === "t") {
                 total = roundNumber(totalSum / 1000000000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("%")) {
+            if (lastSymbol === "%") {
+                isRounded = true;
+
                 total = roundNumber(totalSum * 100, 2);
             }
-            return total.toLocaleString();
+            if (!isRounded) {
+                roundNumber(total, 2);
+            }
+            return total.toLocaleString(undefined, {
+                minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+            });
         }
         return roundNumber(totalSum, 2).toLocaleString(undefined, {
             minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
