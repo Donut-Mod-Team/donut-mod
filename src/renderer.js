@@ -162,7 +162,7 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
     donutState.context.isEditing &&
         initializeSettingsPopout(donutState.modControls.popout, donutState.modControls.tooltip, modProperty);
 
-    drawRectangularSelection(donutState);
+    drawRectangularSelection(donutState, modProperty);
     applyHoverEffect(pie, donutState);
     addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged);
     drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
