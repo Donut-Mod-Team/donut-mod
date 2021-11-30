@@ -128,14 +128,14 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
 
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
-        hideHighlightEffect(d);
+        hideHighlightEffect(d.data.renderID);
         if (d3.select("#center-text").style("opacity") === "1" && d.data.centerTotal === 0) {
             refreshCenterTextOnMouseLeave(d);
         }
     }
 
     function onMouseOver(d) {
-        showHighlightEffect(d);
+        showHighlightEffect(d.data.renderID);
         if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
             refreshCenterTextOnMouseover(d);
         }
