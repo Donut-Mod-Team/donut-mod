@@ -73,5 +73,11 @@ export const resources = {
     semiCircleEndAngle: 90 * (Math.PI / 180),
     wholeCircleEndAngle: 360 * (Math.PI / 180),
     // Threshold used for not showing sectors' labels based on their percentage value
-    sectorHidingPercentageThreshold: 5
+    sectorHidingPercentageThreshold: 5,
+    // Hover highlight offsets
+    arcsRadiusInnerOffset: 3,
+    arcsRadiusOuterOffset: 4.5,
+    // Hover highlight sector-sides id prefix/sides identifier
+    leftSectorSideIdentifier: "left",
+    rightSectorSideIdentifier: "right"
 };
