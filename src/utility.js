@@ -24,7 +24,7 @@ export function formatTotalSum(totalSum, lastSymbol) {
             let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol
             let total = totalSum;
             let isRounded = false;
-            if (unit === "e+") {
+            if (unit === "e") {
                 return total.toExponential(6);
             }
             if (unit === ("b")) {
