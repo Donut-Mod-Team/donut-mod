@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import * as marker from "./marker";
-import { applyHoverEffect } from "./hoverer";
+import { drawRectangularSelection, select } from "./marker";
+import { applyHoverEffect, hideHighlightEffect, showHighlightEffect } from "./hoverer";
 import { initializeSettingsPopout } from "./popout";
 import { addLabels } from "./labels";
 import { resources } from "./resources";
@@ -9,8 +9,10 @@ import { refreshCenterTextOnMouseLeave, refreshCenterTextOnMouseover, renderCent
 /**
  * @param {object} donutState
  * @param {modProperty} modProperty
+ * @param {boolean} circleTypeChanged
+ * @param {boolean} labelsPositionChanged
  */
-export async function render(donutState, modProperty) {
+export async function render(donutState, modProperty, circleTypeChanged, labelsPositionChanged) {
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
 
@@ -18,13 +20,14 @@ export async function render(donutState, modProperty) {
         modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? height / 1.5 : height / 2;
     const circleTypeTransformationWidth = width / 2;
 
-    // const transformationCenterTextHeight
-
     if (height <= 0 || width <= 0) {
         return;
     }
 
-    const radius = Math.min(width, height) / 2 - resources.sizeModifier;
+    const radius =
+        modProperty.labelsPosition.value() === resources.popoutLabelsPositionOutsideValue
+            ? Math.min(width, height) / 2 - resources.sizeModifier - resources.labelsTextOutsideSizeModifier
+            : Math.min(width, height) / 2 - resources.sizeModifier;
     const innerRadius = radius * 0.5;
 
     let padding = 0;
@@ -43,11 +46,13 @@ export async function render(donutState, modProperty) {
     // Specify the starting and ending angle for the Donut Chart to use, in order to be drawn.
     // Default starts from 0 to 360 degrees. For semi-donut chart the values are -90 to 90 degrees.
     let startPieAngle =
-        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? -90 * (Math.PI / 180) : 0;
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
+            ? resources.semiCircleStartAngle
+            : resources.wholeCircleStartAngle;
     let endPieAngle =
         modProperty.circleType.value() === resources.popoutCircleTypeSemiValue
-            ? 90 * (Math.PI / 180)
-            : 360 * (Math.PI / 180);
+            ? resources.semiCircleEndAngle
+            : resources.wholeCircleEndAngle;
 
     // Initialize the circle state
     donutState.donutCircle.x = circleTypeTransformationWidth;
@@ -72,8 +77,6 @@ export async function render(donutState, modProperty) {
 
     const arc = d3.arc().padAngle(padding).innerRadius(innerRadius).outerRadius(radius);
 
-    renderCenterText(donutState, radius, modProperty);
-
     // Join new data
     const sectors = svg
         .select("g#sectors")
@@ -89,7 +92,7 @@ export async function render(donutState, modProperty) {
             return "sectorID_" + d.data.renderID;
         })
         .on("click", function (d) {
-            marker.select(d);
+            select(d);
             d3.event.stopPropagation();
         })
         .on("mouseenter", function (d) {
@@ -125,20 +128,14 @@ export async function render(donutState, modProperty) {
 
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
-        d3.select("path#hoverID_" + d.data.renderID)
-            .transition()
-            .duration(resources.animationDuration)
-            .style("opacity", "0");
+        hideHighlightEffect(d.data.renderID);
         if (d3.select("#center-text").style("opacity") === "1" && d.data.centerTotal === 0) {
             refreshCenterTextOnMouseLeave(d);
         }
     }
 
     function onMouseOver(d) {
-        d3.select("path#hoverID_" + d.data.renderID)
-            .transition()
-            .duration(resources.animationDuration)
-            .style("opacity", "1");
+        showHighlightEffect(d.data.renderID);
         if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
             refreshCenterTextOnMouseover(d);
         }
@@ -165,10 +162,11 @@ export async function render(donutState, modProperty) {
     donutState.context.isEditing &&
         initializeSettingsPopout(donutState.modControls.popout, donutState.modControls.tooltip, modProperty);
 
-    marker.drawRectangularSelection(donutState);
+    drawRectangularSelection(donutState, modProperty);
     applyHoverEffect(pie, donutState);
-    addLabels(arc, pie, donutState, modProperty);
+    addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged);
     drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
+    renderCenterText(donutState, radius, modProperty);
 
     sectors.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
 

@@ -8,7 +8,9 @@ import {
     getOverlappingRectangle,
     getPointFromCircle,
     rectangularCircleColliding,
-    roundNumber
+    roundNumber,
+    formatTotalSum,
+    checkIfRectanglesGoOutside
 } from "../../src/utility";
 
 test("Check if two rectangles are overlapping", () => {
@@ -214,4 +216,99 @@ test("Check if a point of a circle is correct", () => {
         x: 200,
         y: 300
     });
+});
+
+test("Check if a number is formatted correctly", () => {
+    expect(formatTotalSum("0.1", "%") === (10).toLocaleString(undefined, { minimumFractionDigits: 2 })).toBeTruthy();
+    expect(
+        formatTotalSum("11000000.1", "M") ===
+            (11).toLocaleString(undefined, { maximumFractionDigits: 0, minimumFractionDigits: 0 })
+    ).toBeTruthy();
+    expect(formatTotalSum("11000000000.1", "B") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("11000000000000.1", "T") === (11).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("21000.1", "K") === (21).toLocaleString()).toBeTruthy();
+    expect(formatTotalSum("21000.111", "") === (21000.11).toLocaleString()).toBeTruthy();
+    console.log(formatTotalSum("21000", ""));
+    expect(
+        formatTotalSum("21000", "") ===
+            (21000).toLocaleString(undefined, {
+                minimumFractionDigits: 2
+            })
+    ).toBeTruthy();
+    expect(formatTotalSum(11000000000.1, "E+") === (11000000000.1).toExponential(6)).toBeTruthy();
+    expect(formatTotalSum(null) === "").toBeTruthy();
+});
+
+test("Check if a selected rectangle's bounds exceed the bounds of a second one", () => {
+    const containerBoundingRectangle = document.createElement("div");
+    const selectedRectangleInsideRightLimit = document.createElement("div");
+    const selectedRectangleInsideLeftLimit = document.createElement("div");
+    const selectedRectangleOutside = document.createElement("div");
+
+    // Bounding rectangle used as the container
+    containerBoundingRectangle.getBoundingClientRect = jest.fn(() => ({
+        left: 0,
+        right: 480,
+        top: 0,
+        bottom: 240,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle inside the expected limits (right corner-case)
+    selectedRectangleInsideRightLimit.getBoundingClientRect = jest.fn(() => ({
+        left: 30,
+        right: 473,
+        top: 20,
+        bottom: 40,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle inside the expected limits (left corner-case)
+    selectedRectangleInsideLeftLimit.getBoundingClientRect = jest.fn(() => ({
+        left: 7,
+        right: 20,
+        top: 20,
+        bottom: 40,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    // Bounding rectangle outside of the expected limits of the container
+    selectedRectangleOutside.getBoundingClientRect = jest.fn(() => ({
+        left: 450,
+        right: 474,
+        top: 50,
+        bottom: 100,
+        height: 0,
+        width: 0,
+        x: 0,
+        y: 0
+    }));
+
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleInsideRightLimit.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeFalsy();
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleInsideLeftLimit.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeFalsy();
+    expect(
+        checkIfRectanglesGoOutside(
+            selectedRectangleOutside.getBoundingClientRect(),
+            containerBoundingRectangle.getBoundingClientRect()
+        )
+    ).toBeTruthy();
 });

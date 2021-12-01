@@ -164,8 +164,6 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
     ];
     settingsIcon.transition("add labels").duration(resources.animationDuration).style("opacity", "1");
 
-    settingsIcon.exit().transition().duration(resources.animationDuration).attr("fill", "transparent").remove();
-
     // Control the visibility of the popout based on the user's mouse
     modContainer
         .on("mouseover", function () {

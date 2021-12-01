@@ -21,26 +21,53 @@ export function formatTotalSum(totalSum, lastSymbol) {
     if (totalSum != null) {
         if (lastSymbol != null && lastSymbol.length !== 0) {
             lastSymbol = lastSymbol.toLowerCase();
-            let total = roundNumber(totalSum, 0);
-            if (lastSymbol.includes("b")) {
+            let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol;
+            let total = totalSum;
+            let isRounded = false;
+            if (unit === "e") {
+                return total.toExponential(6);
+            }
+            if (unit === "b") {
                 total = roundNumber(totalSum / 1000000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("k")) {
+            if (unit === "k") {
                 total = roundNumber(totalSum / 1000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("m")) {
+            if (unit === "m") {
                 total = roundNumber(totalSum / 1000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("t")) {
+            if (unit === "t") {
                 total = roundNumber(totalSum / 1000000000000, 0);
+                isRounded = true;
             }
-            if (lastSymbol.includes("%")) {
+            if (unit === "%") {
+                isRounded = true;
                 total = roundNumber(totalSum * 100, 2);
+                return total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             }
-            return total.toLocaleString();
+
+            if (!isRounded) {
+                roundNumber(total, 2);
+                return total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } else {
+                return total.toLocaleString(undefined, {
+                    maximumFractionDigits: total % 1 !== 0 ? 2 : 0,
+                    minimumFractionDigits: total % 1 !== 0 ? 2 : 0
+                });
+            }
         }
         return roundNumber(totalSum, 2).toLocaleString(undefined, {
-            minimumFractionDigits: totalSum % 1 !== 0 ? 2 : 0
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
     }
     return "";
@@ -89,6 +116,21 @@ export function checkIfRectanglesOverlap(selectionRectangle, boundingClientRect)
         selectionRectangle.top >= boundingClientRect.bottom ||
         selectionRectangle.right <= boundingClientRect.left ||
         selectionRectangle.bottom <= boundingClientRect.top
+    );
+}
+
+/**
+ * Function is checking if a given rectangle's X-axis dimensions go outside of a specified (container-like) rectangle
+ * @param {selectionRectangle} selectionRectangle
+ * @param {boundingClientRectangle} boundingClientRectangle
+ * @returns {boolean}
+ */
+export function checkIfRectanglesGoOutside(selectionRectangle, boundingClientRectangle) {
+    // Offset used to narrow the space which is considered to be marked as "outside" of the epxected one
+    const centeringFactor = 7;
+    return (
+        selectionRectangle.left < boundingClientRectangle.left + centeringFactor ||
+        selectionRectangle.right > boundingClientRectangle.right - centeringFactor
     );
 }
 

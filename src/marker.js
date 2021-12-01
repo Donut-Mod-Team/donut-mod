@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import * as utilityCalculator from "./utility";
+import {resources} from "./resources";
 
 /**
  * Method for selecting a dataset
@@ -23,8 +24,9 @@ export function unSelect(donutState) {
  * Skeleton structure from https://github.com/TIBCOSoftware/spotfire-mods/blob/be96519cf67e301611468c9bd4c638f3fa0371a2/examples/ts-spiderchart-d3/src/render.ts#L655
  * Updated logic for selection from the spider chart
  * @param {donutState} donutState
+ * @param {modProperty} modProperty
  */
-export function drawRectangularSelection(donutState) {
+export function drawRectangularSelection(donutState, modProperty) {
     /**
      * Function to draw rectangle given a set of parameters
      * @returns {rectangle}
@@ -34,6 +36,15 @@ export function drawRectangularSelection(donutState) {
     }
 
     let canvas = d3.select("#mod-container svg");
+
+    // Remove previously appended rectangles before creating a new one
+    d3.select("svg")
+        .selectAll("path")
+        .filter(function () {
+            return d3.select(this).attr("class") === "rectangle";
+        })
+        .remove();
+
     const rectangle = canvas.append("path").attr("class", "rectangle").attr("visibility", "hidden");
 
     // Start drawing the selection-rectangle
@@ -104,7 +115,7 @@ export function drawRectangularSelection(donutState) {
                     // Error case check for matches outside of the data slice
                     if (match) {
                         // Check rectangle points are in the data slice
-                        match = checkRectanglesPoints(overlappingRectangle, donutState.donutCircle, d);
+                        match = checkRectanglesPoints(overlappingRectangle, donutState.donutCircle, d, modProperty);
                     }
                 }
                 return match;
@@ -140,9 +151,13 @@ export function drawRectangularSelection(donutState) {
  * @param {overlappingRectangle} overlappingRectangle
  * @param {donutState.donutCircle} donutCircle
  * @param {d} dataSlice
+ * @param {modProperty} modProperty
  * @returns boolean true if points are withing the slice angles and not in the middle
  */
-function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
+function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice, modProperty) {
+    // The starting angle depends on the type of the donut; when semi-circle is selected it corresponds to 3π/2 radians, otherwise 0.
+    const startAngle = modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 3*Math.PI/2 : 0;
+
     // Define all the points that need to checked
     let overlappingRectanglePoints = [
         { x: overlappingRectangle.x, y: overlappingRectangle.y },
@@ -153,7 +168,7 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
             y: overlappingRectangle.y + overlappingRectangle.height
         }
     ];
-    let startPoint = utilityCalculator.getPointFromCircle(donutCircle, 0, donutCircle.radius);
+    let startPoint = utilityCalculator.getPointFromCircle(donutCircle, startAngle, donutCircle.radius);
     // Default center point
     let centerPoint = { x: donutCircle.x, y: donutCircle.y };
 
@@ -162,9 +177,10 @@ function checkRectanglesPoints(overlappingRectangle, donutCircle, dataSlice) {
     for (let i = 0; i < overlappingRectanglePoints.length; i++) {
         // Get the angle of the point
         let angle = utilityCalculator.calculateAngle(centerPoint, overlappingRectanglePoints[i], startPoint);
+
         // Verify that the angle of the point is within the bounds of the slice
         if (
-            (angle <= dataSlice.endAngle && angle >= dataSlice.startAngle) ||
+            (angle <= dataSlice.endAngle - startAngle  && angle >= dataSlice.startAngle - startAngle) ||
             checkIfRectangleIntersectsSides(dataSlice.startAngle, dataSlice.endAngle, donutCircle, overlappingRectangle)
         ) {
             // Exclude matches in the donut hole

@@ -19,4 +19,4 @@ The diagram below showcases the main use cases that are to be implemented in the
 
 The diagram below showcases the basic components of the system on a high level. The diagram excludes the html, css and manifest files used for the mod to run in the Spotfire sandbox environment. The mod utilizes the Tibco Spotfire API from main.js.
 
-![High Level Architectural Diagram](./diagrams/system_architecture_v3.png "System Architecture Diagram")
+![High Level Architectural Diagram](./diagrams/system_architecture_v4.png "System Architecture Diagram")
