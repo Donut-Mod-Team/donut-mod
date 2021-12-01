@@ -20,14 +20,14 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
 export function formatTotalSum(totalSum, lastSymbol) {
     if (totalSum != null) {
         if (lastSymbol != null && lastSymbol.length !== 0) {
-            lastSymbol = lastSymbol.toLowerCase().trim();
-            let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol
+            lastSymbol = lastSymbol.toLowerCase();
+            let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol;
             let total = totalSum;
             let isRounded = false;
             if (unit === "e") {
                 return total.toExponential(6);
             }
-            if (unit === ("b")) {
+            if (unit === "b") {
                 total = roundNumber(totalSum / 1000000000, 0);
                 isRounded = true;
             }
