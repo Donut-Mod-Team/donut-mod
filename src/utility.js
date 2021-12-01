@@ -21,28 +21,29 @@ export function formatTotalSum(totalSum, lastSymbol) {
     if (totalSum != null) {
         if (lastSymbol != null && lastSymbol.length !== 0) {
             lastSymbol = lastSymbol.toLowerCase().trim();
+            let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol
             let total = totalSum;
             let isRounded = false;
-            if (lastSymbol === "e+") {
+            if (unit === "e+") {
                 return total.toExponential(6);
             }
-            if (lastSymbol === "b") {
+            if (unit === ("b")) {
                 total = roundNumber(totalSum / 1000000000, 0);
                 isRounded = true;
             }
-            if (lastSymbol === "k") {
+            if (unit === "k") {
                 total = roundNumber(totalSum / 1000, 0);
                 isRounded = true;
             }
-            if (lastSymbol === "m") {
+            if (unit === "m") {
                 total = roundNumber(totalSum / 1000000, 0);
                 isRounded = true;
             }
-            if (lastSymbol === "t") {
+            if (unit === "t") {
                 total = roundNumber(totalSum / 1000000000000, 0);
                 isRounded = true;
             }
-            if (lastSymbol === "%") {
+            if (unit === "%") {
                 isRounded = true;
                 total = roundNumber(totalSum * 100, 2);
                 return total.toLocaleString(undefined, {
