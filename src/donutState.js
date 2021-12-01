@@ -157,6 +157,12 @@ export async function createDonutState(mod) {
         console.error(error);
     }
 
+    data = data.filter((d) => {
+        if (d.value !== 0) {
+            return d;
+        }
+    });
+
     /**
      * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
      */
