@@ -81,19 +81,30 @@ export async function createDonutState(mod) {
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
             // Extract the currency symbol from the formatted value if any
-            let currencySymbol =
-                dataViewCenterAxis != null ? getCurrencySymbolContinuesAxis(rows, resources.centerAxisName) : "";
-            let labelCurrencySymbol = getCurrencySymbolContinuesAxis(rows, resources.yAxisName);
+            let firstSymbols =
+                dataViewCenterAxis != null ? getFirstSymbolsContinuesAxis(rows, resources.centerAxisName) : "";
+            let labelCurrencySymbol = getFirstSymbolsContinuesAxis(rows, resources.yAxisName);
             let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             // Extract last symbols from the formatting
-            let lastSymbols = dataViewCenterAxis != null ? getLastCenterSymbols(rows, resources.centerAxisName) : "";
-            let labelLastSymbols = getLastCenterSymbols(rows, resources.yAxisName);
-            let formattedCenterValue =
-                dataViewCenterAxis != null
-                    ? currencySymbol +
-                      formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), lastSymbols) +
-                      lastSymbols
-                    : null;
+            let centerValueLastSymbols =
+                dataViewCenterAxis != null ? getLastSymbolsContinuousAxis(rows, resources.centerAxisName) : "";
+            let labelLastSymbols = getLastSymbolsContinuousAxis(rows, resources.yAxisName);
+            let formattedCenterValue = "";
+            if (centerValueLastSymbols === "E+") {
+                formattedCenterValue =
+                    dataViewCenterAxis != null
+                        ? firstSymbols +
+                          formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), centerValueLastSymbols) +
+                          ""
+                        : null;
+            } else {
+                formattedCenterValue =
+                    dataViewCenterAxis != null
+                        ? firstSymbols +
+                          formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), centerValueLastSymbols) +
+                          centerValueLastSymbols
+                        : null;
+            }
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -104,20 +115,37 @@ export async function createDonutState(mod) {
                 absPercentage: absPercentage,
                 centerSumFormatted: formattedCenterValue,
                 centerSum: centerSum,
-                currencySymbol: currencySymbol,
-                centerValueSumLastSymbol: lastSymbols,
+                centerValueFirstSymbols: firstSymbols,
+                centerValueSumLastSymbol: centerValueLastSymbols,
                 colorValue: leaf.formattedValue(),
-                totalCenterSumFormatted: currencySymbol + formatTotalSum(totalCenterSum, lastSymbols) + lastSymbols,
+                totalCenterSumFormatted: () => {
+                    if (centerValueLastSymbols === "E+") {
+                        return firstSymbols + formatTotalSum(totalCenterSum, centerValueLastSymbols);
+                    }
+                    return (
+                        firstSymbols + formatTotalSum(totalCenterSum, centerValueLastSymbols) + centerValueLastSymbols
+                    );
+                },
                 centerTotal: 0,
-                getLabelText: (modProperty) =>
-                    createLabelText(
+                getLabelText: (modProperty) => {
+                    if (labelLastSymbols === "E+") {
+                        return createLabelText(
+                            modProperty,
+                            absPercentage,
+                            labelCurrencySymbol +
+                                formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols),
+                            leaf.formattedValue()
+                        );
+                    }
+                    return createLabelText(
                         modProperty,
                         absPercentage,
                         labelCurrencySymbol +
                             formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols) +
                             labelLastSymbols,
                         leaf.formattedValue()
-                    ),
+                    );
+                },
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
@@ -165,11 +193,17 @@ export async function createDonutState(mod) {
  * @param {string} axisName
  * @returns {string} last symbol of formatted value/if any otherwise empty string
  */
-function getLastCenterSymbols(rows, axisName) {
+function getLastSymbolsContinuousAxis(rows, axisName) {
     let centerString = rows[0].continuous(axisName).formattedValue();
+    if (centerString.includes("E+")) {
+        return "E+";
+    }
+    if (!/\d/.test(centerString)) {
+        return "";
+    }
     let firstNumberIndex = centerString.search(/\d/);
     let centerValueSumLastSymbol = centerString.substr(firstNumberIndex);
-    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,\s]+/g, "");
+    centerValueSumLastSymbol = centerValueSumLastSymbol.replace(/[\d.,]+/g, "");
     return centerValueSumLastSymbol;
 }
 
@@ -203,11 +237,11 @@ function calculateTotalSum(leaves, yAxisName) {
  * @param {string} axisName
  * @returns {string} currency symbol or empty string if not a currency
  */
-function getCurrencySymbolContinuesAxis(rows, axisName) {
+function getFirstSymbolsContinuesAxis(rows, axisName) {
     let formattedCenterValue = rows[0].continuous(axisName).formattedValue();
     let firstNumberIndex = formattedCenterValue.search(/\d/);
     let currencySymbol = formattedCenterValue.substr(0, firstNumberIndex);
-    return currencySymbol.replace(/[\s-]+/g, "");
+    return currencySymbol.replace(/[-]+/g, "");
 }
 /**
  * This function creates the sector's label text based on the provided modProperty
