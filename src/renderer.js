@@ -145,14 +145,14 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
         if (sortingEnabled) {
             if (modProperty.circleType.value() === resources.popoutCircleTypeSemiValue) {
                 if (sortingOrder === resources.popoutSortedPlacementOrderAscendingValue) {
-                    return a.value - b.value;
+                    return a.absValue - b.absValue;
                 }
-                return b.value - a.value;
+                return b.absValue - a.absValue;
             } else {
                 if (sortingOrder === resources.popoutSortedPlacementOrderAscendingValue) {
-                    return b.value - a.value;
+                    return b.absValue - a.absValue;
                 }
-                return a.value - b.value;
+                return a.absValue - b.absValue;
             }
         }
         return null;
