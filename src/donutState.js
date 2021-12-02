@@ -113,7 +113,7 @@ export async function createDonutState(mod) {
                 value: yValue,
                 absValue: Math.abs(yValue),
                 id: leaf.key,
-                renderID: leaf.key !== null ? leaf.key.replace(/[^\w]/g, "") : index,
+                renderID: leaf.key !== null ? leaf.key.replace(/[^\w]/g, "") : "empty",
                 percentage: percentage.toFixed(1),
                 absPercentage: absPercentage,
                 centerSumFormatted: formattedCenterValue,
