@@ -77,6 +77,9 @@ export async function createDonutState(mod) {
     try {
         data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
+            if (rows.length === 0) {
+                return;
+            }
             let yValue = sumValue(rows, resources.yAxisName);
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
@@ -158,7 +161,7 @@ export async function createDonutState(mod) {
     }
 
     data = data.filter((d) => {
-        if (d.value !== 0) {
+        if (d !== undefined && d.value !== 0) {
             return d;
         }
     });
