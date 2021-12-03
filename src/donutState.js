@@ -75,7 +75,7 @@ export async function createDonutState(mod) {
 
     let data;
     try {
-        data = colorLeaves.map((leaf, index) => {
+        data = colorLeaves.map((leaf) => {
             let rows = leaf.rows();
             if (rows.length === 0) {
                 return;
