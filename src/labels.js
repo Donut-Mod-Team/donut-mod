@@ -12,7 +12,8 @@ import { checkIfRectanglesGoOutside } from "./utility";
  * @param {boolean} labelsPositionChanged
  */
 export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged) {
-    const middleRadiansThreshold = modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 2*Math.PI : Math.PI;
+    const middleRadiansThreshold =
+        modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 2 * Math.PI : Math.PI;
 
     const labelColorLuminance = calculateLuminance(
         parseInt(donutState.styles.fontColor.substr(1, 2), 16),
@@ -133,6 +134,7 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
         text = text.toString();
         label.text(text);
         while (
+            label.node() &&
             checkIfRectanglesGoOutside(label.node().getBoundingClientRect(), container.node().getBoundingClientRect())
         ) {
             if (text.length < 2) {
