@@ -18,70 +18,82 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
     // Select the settings icon svg and set the default opacity
     const settingsIcon = modContainer.select("#settings-icon");
 
+    // Extract the property values used to initialize the popout components
+    /***
+     *
+     * @type {{labelsPosition: *, labelsValue: *, circleType: *, labelsCategory: *, sortedPlacement: *, labelsPercentage: *, sortedPlacementOrder: *, labelsVisible: *}}
+     */
+    let properties = {
+        labelsVisible: modProperty.labelsVisible.value(),
+        sortedPlacement: modProperty.sortedPlacement.value(),
+        sortedPlacementOrder: modProperty.sortedPlacementOrder.value(),
+        labelsPosition: modProperty.labelsPosition.value(),
+        labelsPercentage: modProperty.labelsPercentage.value(),
+        labelsValue: modProperty.labelsValue.value(),
+        labelsCategory: modProperty.labelsCategory.value(),
+        circleType: modProperty.circleType.value()
+    };
+
     // Set the onclick behaviour for the icon
     settingsIcon.node().onclick = (e) => {
         tooltip.hide();
-        let property = {
-            labelsVisible: modProperty.labelsVisible.value(),
-            sortedPlacement: modProperty.sortedPlacement.value(),
-            sortedPlacementOrder: modProperty.sortedPlacementOrder.value(),
-            labelsPosition: modProperty.labelsPosition.value(),
-            labelsPercentage: modProperty.labelsPercentage.value(),
-            labelsValue: modProperty.labelsValue.value(),
-            labelsCategory: modProperty.labelsCategory.value(),
-            circleType: modProperty.circleType.value()
-        };
+
         popout.show(
             {
                 x: e.x,
                 y: e.y,
                 alignment: "Top",
                 autoClose: false,
-                // Track the change events and update the mod-property values
+                // Track the change events and update the mod-properties and component properties values
                 onChange: (event) => {
                     const { name, value } = event;
                     switch (name) {
                         case modProperty.labelsPosition.name:
-                            property.labelsPosition = value;
+                            properties.labelsPosition = value;
                             modProperty.labelsPosition.set(value);
                             break;
                         case modProperty.sortedPlacement.name:
-                            property.sortedPlacement = value;
+                            properties.sortedPlacement = value;
                             modProperty.sortedPlacement.set(value);
                             break;
                         case modProperty.sortedPlacementOrder.name:
-                            property.sortedPlacementOrder = value;
+                            properties.sortedPlacementOrder = value;
                             modProperty.sortedPlacementOrder.set(value);
                             break;
                         case modProperty.labelsVisible.name:
-                            property.labelsVisible = value;
+                            properties.labelsVisible = value;
                             modProperty.labelsVisible.set(value);
                             break;
                         case modProperty.labelsPercentage.name:
-                            property.labelsPercentage = value;
+                            properties.labelsPercentage = value;
                             modProperty.labelsPercentage.set(value);
                             break;
                         case modProperty.labelsValue.name:
-                            property.labelsValue = value;
+                            properties.labelsValue = value;
                             modProperty.labelsValue.set(value);
                             break;
                         case modProperty.labelsCategory.name:
-                            property.labelsCategory = value;
+                            properties.labelsCategory = value;
                             modProperty.labelsCategory.set(value);
                             break;
                         case modProperty.circleType.name:
-                            property.circleType = value;
+                            properties.circleType = value;
                             modProperty.circleType.set(value);
                             break;
                     }
                 }
             },
-            // Pass the popout sectors
-            () => createPopoutComponents(property)
+            // Pass the popout sectors the the mod by creating the components with the assigned properties
+            () => createPopoutComponents(properties)
         );
     };
 
-    function createPopoutComponents(property) {
+    /**
+     * Function creates and sets the popout components sections by given properties values object and returns the array with sections
+     * @param properties
+     * @return {PopoutSection[]} popout section components
+     */
+    function createPopoutComponents(properties) {
         return [
             // Define sector controlling when to show labels
             section({
@@ -91,19 +103,19 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
                         name: modProperty.labelsVisible.name,
                         text: resources.popoutLabelsVisibleAllText,
                         value: resources.popoutLabelsVisibleAllValue,
-                        checked: property.labelsVisible === resources.popoutLabelsVisibleAllValue
+                        checked: properties.labelsVisible === resources.popoutLabelsVisibleAllValue
                     }),
                     radioButton({
                         name: modProperty.labelsVisible.name,
                         text: resources.popoutLabelsVisibleMarkedText,
                         value: resources.popoutLabelsVisibleMarkedValue,
-                        checked: property.labelsVisible === resources.popoutLabelsVisibleMarkedValue
+                        checked: properties.labelsVisible === resources.popoutLabelsVisibleMarkedValue
                     }),
                     radioButton({
                         name: modProperty.labelsVisible.name,
                         text: resources.popoutLabelsVisibleNoneText,
                         value: resources.popoutLabelsVisibleNoneValue,
-                        checked: property.labelsVisible === resources.popoutLabelsVisibleNoneValue
+                        checked: properties.labelsVisible === resources.popoutLabelsVisibleNoneValue
                     })
                 ]
             }),
@@ -116,21 +128,21 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
                         text: resources.popoutDisplayedLabelsDataPercentageText,
                         enabled: true,
                         tooltip: resources.popoutDisplayedLabelsDataPercentageTooltip,
-                        checked: property.labelsPercentage === true
+                        checked: properties.labelsPercentage === true
                     }),
                     checkbox({
                         name: modProperty.labelsValue.name,
                         text: resources.popoutDisplayedLabelsDataValueText,
                         enabled: true,
                         tooltip: resources.popoutDisplayedLabelsDataValueTooltip,
-                        checked: property.labelsValue === true
+                        checked: properties.labelsValue === true
                     }),
                     checkbox({
                         name: modProperty.labelsCategory.name,
                         text: resources.popoutDisplayedLabelsDataCategoryText,
                         enabled: true,
                         tooltip: resources.popoutDisplayedLabelsDataCategoryTooltip,
-                        checked: property.labelsCategory === true
+                        checked: properties.labelsCategory === true
                     })
                 ]
             }),
@@ -142,13 +154,13 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
                         name: modProperty.labelsPosition.name,
                         text: resources.popoutLabelsPositionInsideText,
                         value: resources.popoutLabelsPositionInsideValue,
-                        checked: property.labelsPosition === resources.popoutLabelsPositionInsideValue
+                        checked: properties.labelsPosition === resources.popoutLabelsPositionInsideValue
                     }),
                     radioButton({
                         name: modProperty.labelsPosition.name,
                         text: resources.popoutLabelsPositionOutsideText,
                         value: resources.popoutLabelsPositionOutsideValue,
-                        checked: property.labelsPosition === resources.popoutLabelsPositionOutsideValue
+                        checked: properties.labelsPosition === resources.popoutLabelsPositionOutsideValue
                     })
                 ]
             }),
@@ -161,24 +173,25 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
                         text: resources.popoutSortedPlacementCheckboxText,
                         enabled: true,
                         tooltip: resources.popoutSortedPlacementCheckboxTooltip,
-                        checked: property.sortedPlacement === true
+                        checked: properties.sortedPlacement === true
                     }),
                     radioButton({
                         name: modProperty.sortedPlacementOrder.name,
                         text: resources.popoutSortedPlacementOrderAscendingText,
                         value: resources.popoutSortedPlacementOrderAscendingValue,
-                        enabled: property.sortedPlacement === true,
-                        checked: property.sortedPlacementOrder === resources.popoutSortedPlacementOrderAscendingValue
+                        enabled: properties.sortedPlacement === true,
+                        checked: properties.sortedPlacementOrder === resources.popoutSortedPlacementOrderAscendingValue
                     }),
                     radioButton({
                         name: modProperty.sortedPlacementOrder.name,
                         text: resources.popoutSortedPlacementOrderDescendingText,
                         value: resources.popoutSortedPlacementOrderDescendingValue,
-                        enabled: property.sortedPlacement === true,
-                        checked: property.sortedPlacementOrder === resources.popoutSortedPlacementOrderDescendingValue
+                        enabled: properties.sortedPlacement === true,
+                        checked: properties.sortedPlacementOrder === resources.popoutSortedPlacementOrderDescendingValue
                     })
                 ]
             }),
+            // Define options for chart visibility (semi-circle or circle)
             section({
                 heading: resources.popoutCircleTypeHeading,
                 children: [
@@ -186,13 +199,13 @@ export function initializeSettingsPopout(popout, tooltip, modProperty) {
                         name: modProperty.circleType.name,
                         text: resources.popoutCircleTypeWholeText,
                         value: resources.popoutCircleTypeWholeValue,
-                        checked: property.circleType === resources.popoutCircleTypeWholeValue
+                        checked: properties.circleType === resources.popoutCircleTypeWholeValue
                     }),
                     radioButton({
                         name: modProperty.circleType.name,
                         text: resources.popoutCircleTypeSemiText,
                         value: resources.popoutCircleTypeSemiValue,
-                        checked: property.circleType === resources.popoutCircleTypeSemiValue
+                        checked: properties.circleType === resources.popoutCircleTypeSemiValue
                     })
                 ]
             })
