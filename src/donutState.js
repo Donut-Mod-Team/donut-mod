@@ -265,8 +265,8 @@ function createLabelText(modProperty, sectorPercentage, sectorValue, sectorCateg
     let labelText = "";
     // Assigning a value to the labelValue depending on the modProperty selected
     modProperty.labelsPercentage.value() && labelValues.push(sectorPercentage + "%");
-    modProperty.labelsValue.value() && labelValues.push(sectorValue);
     modProperty.labelsCategory.value() && labelValues.push(sectorCategory);
+    modProperty.labelsValue.value() && labelValues.push(sectorValue);
 
     if (labelValues.length === 0) {
         return labelText;
@@ -274,12 +274,16 @@ function createLabelText(modProperty, sectorPercentage, sectorValue, sectorCateg
         labelText = labelValues[0];
         return labelText;
     } else {
-        // The returned labelText follows the format of "Value, Category (Percentage), e.g.: "22, Large Cap (38.6)"
+        // The returned labelText follows the format of "Category, Value (Percentage), e.g.: "Large Cap, 22, (38.6%)"
         labelText += labelValues[1];
         for (let i = 2; i < labelValues.length; i++) {
             labelText += ", " + labelValues[i];
         }
-        labelText += " (" + labelValues[0] + ")";
+        if (modProperty.labelsPercentage.value()) {
+            labelText += " (" + labelValues[0] + ")";
+        } else {
+            labelText = labelValues[0] + ", " + labelText;
+        }
     }
     return labelText;
 }
