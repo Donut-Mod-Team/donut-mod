@@ -79,5 +79,12 @@ export const resources = {
     arcsRadiusOuterOffset: 4.5,
     // Hover highlight sector-sides id prefix/sides identifier
     leftSectorSideIdentifier: "left",
-    rightSectorSideIdentifier: "right"
+    rightSectorSideIdentifier: "right",
+    // The default offset used which affects the positioning of the center text in the Y-axis on semi-circle mode
+    semiCircleCenterTextIncreasedHeightPositioning: 1.9,
+    // Offset used which affects the positioning of the center text in the Y-axis on semi-circle mode, when width is low
+    semiCircleCenterTextDecreasedHeightPositioning: 2,
+    // Threshold for specifying the width value of the canvas, after which the center text shall not follow
+    // the default Y-axis positioning offset
+    semiCircleCenterTextPositioningThreshold: 260
 };

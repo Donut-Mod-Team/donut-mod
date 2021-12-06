@@ -40,7 +40,12 @@ export function renderCenterText(donutState, radius, modProperty) {
         .text(donutState.centerExpression);
 
     let centerTextBox = d3.selectAll("#center-text").node().getBoundingClientRect();
-    let yPointDifference = centerTextBox.bottom - height / 2;
+    // Difference in Y-axis between the centerTextBox and the canvas' height,
+    // which affects the positioning of the center text for semi-circle
+    let yPointDifference =
+        width < resources.semiCircleCenterTextPositioningThreshold
+            ? centerTextBox.bottom - height / resources.semiCircleCenterTextDecreasedHeightPositioning
+            : centerTextBox.bottom - height / resources.semiCircleCenterTextIncreasedHeightPositioning;
     let centerTextSemiCircleTransformationHeight =
         donutState.donutCircle.y - centerTextBox.bottom - centerTextBox.height + yPointDifference;
 
