@@ -81,7 +81,7 @@ Spotfire.initialize(async (mod) => {
 
             if (donutState.data.length === 0) {
                 console.error(resources.errorNullDonutState(donutState));
-                mod.controls.errorOverlay.show(resources.errorEmptyDataOnYAxis);
+                mod.controls.errorOverlay.show(resources.errorEmptyDataOnYAxis, resources.errorOverlayCategoryGeneral);
                 errorOverlayVisualized = true;
                 return;
             }
