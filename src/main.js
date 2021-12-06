@@ -79,6 +79,13 @@ Spotfire.initialize(async (mod) => {
                 return;
             }
 
+            if (donutState.data.length === 0) {
+                console.error(resources.errorNullDonutState(donutState));
+                mod.controls.errorOverlay.show(resources.errorEmptyDataOnYAxis, resources.errorOverlayCategoryGeneral);
+                errorOverlayVisualized = true;
+                return;
+            }
+
             let modProperty = {
                 labelsPosition: labelsPosition,
                 sortedPlacement: sortedPlacement,

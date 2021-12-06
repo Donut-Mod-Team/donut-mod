@@ -8,6 +8,8 @@ export const resources = {
         "There was an issue related to the rendering of the mod; please try reloading and check the console for more details.",
     errorCanvasContainerDimensions:
         "The dimensions of the canvas' container are too small. Please try increasing the canvas' size.",
+    errorEmptyDataOnYAxis:
+        "The selected data loaded on the Y-axis does not contain any data. Please select non-empty data and reload the mod.",
 
     // Overlay error categories
     errorOverlayCategoryDataView: "DataView",
