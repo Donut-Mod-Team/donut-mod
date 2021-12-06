@@ -8,9 +8,6 @@
         "build": "webpack --mode production --devtool false",
         "build-watch": "webpack --watch",
         "start": "npm install && npm run build-watch",
-        "cypress:open": "cypress open",
-        "cypress:run": "mods-dev-server dist & npm run build-watch & cypress run --browser chrome",
-        "cypress:ci": "mods-dev-server dist & npm run build-watch & cypress run",
         "test": "jest"
     },
     "keywords": [],
@@ -26,7 +23,6 @@
         "babel-preset-env": "^1.7.0",
         "copy-webpack-plugin": "^6.0.3",
         "core-js": "^3.18.0",
-        "cypress": "^8.6.0",
         "d3": "^5.14.2",
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
