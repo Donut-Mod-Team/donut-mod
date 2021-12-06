@@ -133,31 +133,7 @@ The user can find in the top-right corner of the mod's canvas area a settings ic
 
 ## Testing
 
-Currently, Donut-Mod's testing strategy consists of User Interface related automated tests, as well as unit tests of some classes' components.
-Apart from the above, manual testing is being performed by the development team throughout every development stage, in order to ensure the quality of the delivered product.
-
-### Automated UI tests
-
-For this type of testing the `Cypress` testing framework is being used. In order to run these automated tests, first you need to make sure you have installed all the needed packages via:
-
-```shell
-npm install
-```
-
-Then, you have the option of running Cypress either in `headless` or in `headed` mode. Specifically, for headless try running in your console:
-
-```shell
-npm run cypress:run
-```
-
-> **_NOTE:_** The above command tries to run Cypress by using Chrome as the headless browser. Please edit the `package.json` file if you need to change it, or run the Cypress manually. For instance, you can use for firefox
-`cypress run --browser firefox` instead.
-
-In order to force the browser to be shown in order to have more specific control upon the process of the automated tests, by opening the Cypress Test Runner, please run in your console:
-
-```shell
-npm run cypress:open
-```
+The development team has been mainly focused on ensuring the quality of the delivered product by performing manual testing and verification throughout every development phase of the Donut Chart mod. In addition, unit tests responsible for testing some classes' components has also been implemented, hence introducing the corresponding Continuous Integration pipeline.
 
 ### Unit testing
 
