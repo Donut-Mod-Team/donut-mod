@@ -1,6 +1,7 @@
 # Donut Mod
 
 [![Node.js CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml)
+[![CodeQL CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/code_ql.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/code_ql.yml)
 
 The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using this donut chart representation.
 
