@@ -3,7 +3,7 @@ import { resources } from "./resources";
 import { checkIfRectanglesGoOutside } from "./utility";
 
 /**
- * This function is respondible to generate the labels and handle their behavior
+ * This function is responsible to generate the labels and handle their behavior
  * @param {d3.arc} arc
  * @param {d3.pie} pie
  * @param {donutState} donutState

@@ -5,6 +5,8 @@
  * @param {radius} radius
  * @returns boolean true if point is inside the circle
  */
+import { resources } from "./resources";
+
 export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
     let distanceX = point.x - circleCenter.x;
     let distanceY = point.y - circleCenter.y;
@@ -14,17 +16,18 @@ export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
 /***
  * Function returns the formatted value of a given number by a given symbol(last symbol can be B, M, K, T)
  * @param {number} totalSum
+ * @param {string} firstSymbol
  * @param {string} lastSymbol
  * @returns {string|Number} returns a formatted number or empty string if provided value is null
  */
-export function formatTotalSum(totalSum, lastSymbol) {
+export function formatTotalSum(totalSum, firstSymbol, lastSymbol) {
     if (totalSum != null) {
         if (lastSymbol != null && lastSymbol.length !== 0) {
             lastSymbol = lastSymbol.toLowerCase();
             let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol;
             let total = totalSum;
             let isRounded = false;
-            if (unit === "e") {
+            if (lastSymbol.includes(resources.scientificSymbol.toLowerCase())) {
                 return total.toExponential(6);
             }
             if (unit === "b") {
@@ -44,7 +47,6 @@ export function formatTotalSum(totalSum, lastSymbol) {
                 isRounded = true;
             }
             if (unit === "%") {
-                isRounded = true;
                 total = roundNumber(totalSum * 100, 2);
                 return total.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -53,24 +55,39 @@ export function formatTotalSum(totalSum, lastSymbol) {
             }
 
             if (!isRounded) {
-                roundNumber(total, 2);
-                return total.toLocaleString(undefined, {
+                return formatNumber(roundNumber(total, 2), firstSymbol, lastSymbol).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
             } else {
-                return total.toLocaleString(undefined, {
+                return formatNumber(total, firstSymbol, lastSymbol).toLocaleString(undefined, {
                     maximumFractionDigits: total % 1 !== 0 ? 2 : 0,
                     minimumFractionDigits: total % 1 !== 0 ? 2 : 0
                 });
             }
         }
-        return roundNumber(totalSum, 2).toLocaleString(undefined, {
+        return formatNumber(roundNumber(totalSum, 2), firstSymbol, lastSymbol).toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
     }
     return "";
+}
+
+/**
+ * Function that formats a number depending on the negative number representation
+ * @param {number} number
+ * @param {string} firstSymbol
+ * @param {string} lastSymbol
+ * @returns {number} number
+ */
+function formatNumber(number, firstSymbol, lastSymbol) {
+    if (firstSymbol.length > 0 && lastSymbol.length > 0) {
+        if (firstSymbol[0].includes("(") && lastSymbol[lastSymbol.length - 1].includes(")") && number < 0) {
+            return Math.abs(number);
+        }
+    }
+    return number;
 }
 
 /**
