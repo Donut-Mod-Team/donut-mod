@@ -6,7 +6,7 @@ To begin using this mod, there are a couple of things you will need to install f
 
 1. Spotfire:
 
-Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or   the web client, TIBCO Spotfire® Business Author.
+Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or   the web client, TIBCO Spotfire® Business Author. The mod is supported in Spotfire® 11.4 LTS (API Version 11.2), and 11.5 (API Version 11.3).
 
 2. Node.js:
 

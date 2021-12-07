@@ -1,10 +1,10 @@
 # Donut Chart mod for Tibco Spotfire 
-The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using a donut chart representation. A donut chart is a variation of a pie chart with a hole in the middle, which contains a dynamically changing center text.  
+The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using a donut chart representation. A donut chart is a variation of a pie chart with a hole in the middle, which contains a dynamically changing center text. 
 
 ![User_Guide_Donut_Chart_Example](./diagrams/Tibco_UG_Image.PNG "User Guide Donut Chart Example")
 
 ## Try this mod in TIBCO Spotfire® Analyst
-[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst.
+[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst. The mod is supported in Spotfire® 11.4 LTS (API Version 11.2), and 11.5 (API Version 11.3).
  
 ### How to open the mod
 1. Open Spotfire® Analyst, and create an analysis by loading some data.
