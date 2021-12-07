@@ -60,7 +60,6 @@ export async function createDonutState(mod) {
     let errors = await dataView.getErrors();
     if (errors.length > 0) {
         mod.controls.errorOverlay.show(errors, resources.errorOverlayCategoryDataView);
-        // TODO clear DOM
         return;
     }
 
@@ -123,7 +122,7 @@ export async function createDonutState(mod) {
             // Extract the first symbols from the formatted value if any
             let firstSymbols =
                 dataViewCenterAxis != null ? getFirstSymbolsContinuesAxis(rows, resources.centerAxisName) : "";
-            let labelCurrencySymbol = getFirstSymbolsContinuesAxis(rows, resources.yAxisName);
+            let labelFirstSymbols = getFirstSymbolsContinuesAxis(rows, resources.yAxisName);
             let centerSum = dataViewCenterAxis != null ? sumValue(rows, resources.centerAxisName) : null;
             // Extract last symbols from the formatting
             let centerValueLastSymbols =
@@ -135,14 +134,22 @@ export async function createDonutState(mod) {
                 formattedCenterValue =
                     dataViewCenterAxis != null
                         ? firstSymbols +
-                          formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), centerValueLastSymbols) +
+                          formatTotalSum(
+                              rows[0].continuous(resources.centerAxisName).value(),
+                              firstSymbols,
+                              centerValueLastSymbols
+                          ) +
                           ""
                         : null;
             } else {
                 formattedCenterValue =
                     dataViewCenterAxis != null
                         ? firstSymbols +
-                          formatTotalSum(rows[0].continuous(resources.centerAxisName).value(), centerValueLastSymbols) +
+                          formatTotalSum(
+                              rows[0].continuous(resources.centerAxisName).value(),
+                              firstSymbols,
+                              centerValueLastSymbols
+                          ) +
                           centerValueLastSymbols
                         : null;
             }
@@ -161,10 +168,12 @@ export async function createDonutState(mod) {
                 colorValue: leaf.formattedValue(),
                 totalCenterSumFormatted: () => {
                     if (centerValueLastSymbols === resources.scientificSymbol) {
-                        return firstSymbols + formatTotalSum(totalCenterSum, centerValueLastSymbols);
+                        return firstSymbols + formatTotalSum(totalCenterSum, firstSymbols, centerValueLastSymbols);
                     }
                     return (
-                        firstSymbols + formatTotalSum(totalCenterSum, centerValueLastSymbols) + centerValueLastSymbols
+                        firstSymbols +
+                        formatTotalSum(totalCenterSum, firstSymbols, centerValueLastSymbols) +
+                        centerValueLastSymbols
                     );
                 },
                 centerTotal: 0,
@@ -173,16 +182,24 @@ export async function createDonutState(mod) {
                         return createLabelText(
                             modProperty,
                             absPercentage,
-                            labelCurrencySymbol +
-                                formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols),
+                            labelFirstSymbols +
+                                formatTotalSum(
+                                    rows[0].continuous(resources.yAxisName).value(),
+                                    labelFirstSymbols,
+                                    labelLastSymbols
+                                ),
                             leaf.formattedValue()
                         );
                     }
                     return createLabelText(
                         modProperty,
                         absPercentage,
-                        labelCurrencySymbol +
-                            formatTotalSum(rows[0].continuous(resources.yAxisName).value(), labelLastSymbols) +
+                        labelFirstSymbols +
+                            formatTotalSum(
+                                rows[0].continuous(resources.yAxisName).value(),
+                                labelFirstSymbols,
+                                labelLastSymbols
+                            ) +
                             labelLastSymbols,
                         leaf.formattedValue()
                     );

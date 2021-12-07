@@ -108,12 +108,16 @@ export function renderCenterText(donutState, radius, modProperty) {
                     if (data[0].centerValueSumLastSymbol === resources.scientificSymbol) {
                         return (
                             data[0].centerValueFirstSymbols +
-                            formatTotalSum(centerTotal, data[0].centerValueSumLastSymbol)
+                            formatTotalSum(
+                                centerTotal,
+                                data[0].centerValueFirstSymbols,
+                                data[0].centerValueSumLastSymbol
+                            )
                         );
                     }
                     return (
                         data[0].centerValueFirstSymbols +
-                        formatTotalSum(centerTotal, data[0].centerValueSumLastSymbol) +
+                        formatTotalSum(centerTotal, data[0].centerValueFirstSymbols, data[0].centerValueSumLastSymbol) +
                         data[0].centerValueSumLastSymbol
                     );
                 })
