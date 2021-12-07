@@ -5,6 +5,8 @@
  * @param {radius} radius
  * @returns boolean true if point is inside the circle
  */
+import { resources } from "./resources";
+
 export function checkIfPointIsInsideCircle(point, circleCenter, radius) {
     let distanceX = point.x - circleCenter.x;
     let distanceY = point.y - circleCenter.y;
@@ -24,7 +26,7 @@ export function formatTotalSum(totalSum, lastSymbol) {
             let unit = lastSymbol.length > 1 ? lastSymbol[0] : lastSymbol;
             let total = totalSum;
             let isRounded = false;
-            if (unit === "e") {
+            if (lastSymbol.includes(resources.scientificSymbol.toLowerCase())) {
                 return total.toExponential(6);
             }
             if (unit === "b") {
@@ -44,7 +46,6 @@ export function formatTotalSum(totalSum, lastSymbol) {
                 isRounded = true;
             }
             if (unit === "%") {
-                isRounded = true;
                 total = roundNumber(totalSum * 100, 2);
                 return total.toLocaleString(undefined, {
                     minimumFractionDigits: 2,

@@ -1,6 +1,43 @@
 import { resources } from "./resources";
 import { calculatePercentageValue, formatTotalSum } from "./utility";
 
+/** Definition for the data included in the donutState.data array
+ * @typedef {{
+ *     color: string,
+ *     value: number,
+ *     absValue: number,
+ *     id: string | null,
+ *     renderID: string,
+ *     percentage: number,
+ *     absPercentage: number,
+ *     centerSumFormatted: string,
+ *     centerSum: number,
+ *     centerValueFirstSymbols: string,
+ *     centerValueSumLastSymbol: string,
+ *     colorValue: Spotfire.DataViewCategoricalValue.formattedValue,
+ *     totalCenterSumFormatted() : string,
+ *     centerTotal: number,
+ *     getLabelText(modProperty): string,
+ *     mark(operation?: Spotfire.MarkingOperation) : void,
+ *     markedRowCount(): Spotfire.DataViewHierarchyNode.markedRowCount,
+ *     tooltip(): Spotfire.DataViewRow | string,
+ * }} data
+ */
+
+/** Definition of the donutState object which is used to render the Donut Chart
+ * @typedef {{
+ *     data: data[],
+ *     size: Spotfire.Size,
+ *     dataView: Spotfire.DataView,
+ *     modControls: Spotfire.Controls,
+ *     donutCircle: {x: number, y: number, radius: number, innerRadius: number},
+ *     context: Spotfire.RenderContext,
+ *     centerExpression: string,
+ *     clearMarking(): Spotfire.DataView.clearMarking,
+ *     styles: {fontColor: string, fontFamily: string, fontWeight: string, fontSize: string, fontStyle: string, backgroundColor: string, lineStroke: string, tick: string}
+ * }} donutState
+ */
+
 /**
  * Render the visualization
  * @param {Spotfire.Mod} mod API
@@ -83,7 +120,7 @@ export async function createDonutState(mod) {
             let yValue = sumValue(rows, resources.yAxisName);
             let percentage = calculatePercentageValue(yValue, totalYSum, 1);
             let absPercentage = Math.abs(percentage).toFixed(1);
-            // Extract the currency symbol from the formatted value if any
+            // Extract the first symbols from the formatted value if any
             let firstSymbols =
                 dataViewCenterAxis != null ? getFirstSymbolsContinuesAxis(rows, resources.centerAxisName) : "";
             let labelCurrencySymbol = getFirstSymbolsContinuesAxis(rows, resources.yAxisName);
@@ -93,7 +130,8 @@ export async function createDonutState(mod) {
                 dataViewCenterAxis != null ? getLastSymbolsContinuousAxis(rows, resources.centerAxisName) : "";
             let labelLastSymbols = getLastSymbolsContinuousAxis(rows, resources.yAxisName);
             let formattedCenterValue = "";
-            if (centerValueLastSymbols === "E+") {
+            // Assign a value to formattedCenterValue depending on whether scientific symbol was included
+            if (centerValueLastSymbols === resources.scientificSymbol) {
                 formattedCenterValue =
                     dataViewCenterAxis != null
                         ? firstSymbols +
@@ -122,7 +160,7 @@ export async function createDonutState(mod) {
                 centerValueSumLastSymbol: centerValueLastSymbols,
                 colorValue: leaf.formattedValue(),
                 totalCenterSumFormatted: () => {
-                    if (centerValueLastSymbols === "E+") {
+                    if (centerValueLastSymbols === resources.scientificSymbol) {
                         return firstSymbols + formatTotalSum(totalCenterSum, centerValueLastSymbols);
                     }
                     return (
@@ -131,7 +169,7 @@ export async function createDonutState(mod) {
                 },
                 centerTotal: 0,
                 getLabelText: (modProperty) => {
-                    if (labelLastSymbols === "E+") {
+                    if (labelLastSymbols === resources.scientificSymbol) {
                         return createLabelText(
                             modProperty,
                             absPercentage,
@@ -166,9 +204,6 @@ export async function createDonutState(mod) {
         }
     });
 
-    /**
-     * @typedef {donutState} donutState containing mod, dataView, size, data[], modControls, context
-     */
     let donutState = {
         data: data,
         size: size,
@@ -204,8 +239,8 @@ export async function createDonutState(mod) {
  */
 function getLastSymbolsContinuousAxis(rows, axisName) {
     let centerString = rows[0].continuous(axisName).formattedValue();
-    if (centerString.includes("E+")) {
-        return "E+";
+    if (centerString.includes(resources.scientificSymbol)) {
+        return resources.scientificSymbol;
     }
     if (!/\d/.test(centerString)) {
         return "";

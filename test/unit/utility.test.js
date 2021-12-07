@@ -12,6 +12,7 @@ import {
     formatTotalSum,
     checkIfRectanglesGoOutside
 } from "../../src/utility";
+import { resources } from "../../src/resources";
 
 test("Check if two rectangles are overlapping", () => {
     const firstRectangle = document.createElement("div");
@@ -235,7 +236,7 @@ test("Check if a number is formatted correctly", () => {
                 minimumFractionDigits: 2
             })
     ).toBeTruthy();
-    expect(formatTotalSum(11000000000.1, "E+") === (11000000000.1).toExponential(6)).toBeTruthy();
+    expect(formatTotalSum(11000000000.1, resources.scientificSymbol) === (11000000000.1).toExponential(6)).toBeTruthy();
     expect(formatTotalSum(null) === "").toBeTruthy();
 });
 
