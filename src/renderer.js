@@ -231,5 +231,5 @@ function drawOuterLinesForNegativeValues(pie, donutState, padding, svg) {
  * @returns {string} string containing a value for opacity positive for negative value and zero if positive value
  * */
 function getOpacityForOuterSide(d) {
-    return d.data.value < 0 ? "0.8" : "0";
+    return d.data.value < 0 ? "1" : "0";
 }
