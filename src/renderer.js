@@ -9,10 +9,8 @@ import { refreshCenterTextOnMouseLeave, refreshCenterTextOnMouseover, renderCent
 /**
  * @param {object} donutState
  * @param {modProperty} modProperty
- * @param {boolean} circleTypeChanged
- * @param {boolean} labelsPositionChanged
  */
-export async function render(donutState, modProperty, circleTypeChanged, labelsPositionChanged) {
+export async function render(donutState, modProperty) {
     const width = donutState.size.width - resources.sizeModifier;
     const height = donutState.size.height - resources.sizeModifier;
 
@@ -164,7 +162,7 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
 
     drawRectangularSelection(donutState, modProperty);
     applyHoverEffect(pie, donutState);
-    addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged);
+    addLabels(arc, pie, donutState, modProperty);
     drawOuterLinesForNegativeValues(pie, donutState, padding, svg);
     renderCenterText(donutState, radius, modProperty);
 

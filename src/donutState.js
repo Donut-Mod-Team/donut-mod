@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { calculatePercentageValue, formatTotalSum } from "./utility";
+import { calculatePercentageValue, formatTotalSum, roundNumber } from "./utility";
 
 /** Definition for the data included in the donutState.data array
  * @typedef {{
@@ -105,6 +105,8 @@ export async function createDonutState(mod) {
     }
 
     let centerAxis = await mod.visualization.axis(resources.centerAxisName);
+    let yAxis = await mod.visualization.axis(resources.yAxisName);
+    let colorAxis = await mod.visualization.axis(resources.colorAxisName);
 
     let totalYSum = calculateTotalSum(colorLeaves, resources.yAxisName);
     let totalCenterSum = dataViewCenterAxis != null ? calculateTotalSum(colorLeaves, resources.centerAxisName) : null;
@@ -207,7 +209,26 @@ export async function createDonutState(mod) {
                 mark: (m) => (m ? leaf.mark(m) : leaf.mark()),
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
-                    return rows.length ? rows[0] : "N/A";
+                    return (
+                        colorAxis.parts[0].displayName +
+                        ": " +
+                        leaf.formattedValue() +
+                        "\n" +
+                        yAxis.parts[0].displayName +
+                        ": " +
+                        roundNumber(yValue, 2).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }) +
+                        "\n" +
+                        "Ratio: " +
+                        percentage +
+                        "%" +
+                        "\n" +
+                        centerAxis.parts[0].displayName +
+                        ": " +
+                        formattedCenterValue
+                    );
                 }
             };
         });

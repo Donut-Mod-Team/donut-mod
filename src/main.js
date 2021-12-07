@@ -64,8 +64,8 @@ Spotfire.initialize(async (mod) => {
             circleType
         ) => {
             let donutState = await createDonutState(mod);
-            let circleTypeChanged = reader.hasValueChanged(circleType);
-            let labelsPositionChanged = reader.hasValueChanged(labelsPosition);
+            // let circleTypeChanged = reader.hasValueChanged(circleType);
+            // let labelsPositionChanged = reader.hasValueChanged(labelsPosition);
 
             if (errorOverlayVisualized) {
                 mod.controls.errorOverlay.hide(resources.errorOverlayCategoryGeneral);
@@ -97,7 +97,7 @@ Spotfire.initialize(async (mod) => {
                 circleType: circleType
             };
             try {
-                await render(donutState, modProperty, circleTypeChanged, labelsPositionChanged);
+                await render(donutState, modProperty);
             } catch (error) {
                 console.error(error);
                 mod.controls.errorOverlay.show(resources.errorRendering, resources.errorOverlayCategoryGeneral);

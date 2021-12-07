@@ -8,10 +8,8 @@ import { checkIfRectanglesGoOutside } from "./utility";
  * @param {d3.pie} pie
  * @param {donutState} donutState
  * @param {modProperty} modProperty
- * @param {boolean} circleTypeChanged
- * @param {boolean} labelsPositionChanged
  */
-export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, labelsPositionChanged) {
+export function addLabels(arc, pie, donutState, modProperty) {
     const middleRadiansThreshold =
         modProperty.circleType.value() === resources.popoutCircleTypeSemiValue ? 2 * Math.PI : Math.PI;
 
@@ -98,23 +96,17 @@ export function addLabels(arc, pie, donutState, modProperty, circleTypeChanged, 
 
         if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleAllValue) {
             text = d.data.getLabelText(modProperty);
-            d3.timeout(
-                () => {
-                    return adjustLabelTextToFit(d, text);
-                },
-                circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
-            );
+            d3.timeout(() => {
+                return adjustLabelTextToFit(d, text);
+            }, resources.animationDuration);
         }
 
         if (modProperty.labelsVisible.value() === resources.popoutLabelsVisibleMarkedValue) {
             if (d.data.markedRowCount() > 0) {
                 text = d.data.getLabelText(modProperty);
-                d3.timeout(
-                    () => {
-                        return adjustLabelTextToFit(d, text);
-                    },
-                    circleTypeChanged || labelsPositionChanged ? resources.animationDuration : resources.timeoutDelay
-                );
+                d3.timeout(() => {
+                    return adjustLabelTextToFit(d, text);
+                }, resources.animationDuration);
             }
         }
         return text;
