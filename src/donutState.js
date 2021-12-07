@@ -155,6 +155,24 @@ export async function createDonutState(mod) {
                           centerValueLastSymbols
                         : null;
             }
+            let tooltipFormattedCenterValue =
+                centerAxis.parts.length !== 0
+                    ? centerAxis.parts[0].displayName + ": " + formattedCenterValue + "\n"
+                    : "";
+            let tooltipFormattedYValue =
+                yAxis.parts.length !== 0
+                    ? yAxis.parts[0].displayName +
+                      ": " +
+                      roundNumber(yValue, 2).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                      }) +
+                      "\n"
+                    : "";
+            let tooltipFormattedColorValue =
+                colorAxis.parts.length !== 0
+                    ? colorAxis.parts[0].displayName + ": " + leaf.formattedValue() + "\n"
+                    : "";
             return {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
@@ -210,24 +228,13 @@ export async function createDonutState(mod) {
                 markedRowCount: () => leaf.markedRowCount(),
                 tooltip: () => {
                     return (
-                        colorAxis.parts[0].displayName +
-                        ": " +
-                        leaf.formattedValue() +
-                        "\n" +
-                        yAxis.parts[0].displayName +
-                        ": " +
-                        roundNumber(yValue, 2).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }) +
-                        "\n" +
+                        tooltipFormattedColorValue +
+                        tooltipFormattedYValue +
                         "Ratio: " +
                         percentage +
                         "%" +
                         "\n" +
-                        centerAxis.parts[0].displayName +
-                        ": " +
-                        formattedCenterValue
+                        tooltipFormattedCenterValue
                     );
                 }
             };
