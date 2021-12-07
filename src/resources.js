@@ -88,5 +88,7 @@ export const resources = {
     semiCircleCenterTextDecreasedHeightPositioning: 2,
     // Threshold for specifying the width value of the canvas, after which the center text shall not follow
     // the default Y-axis positioning offset
-    semiCircleCenterTextPositioningThreshold: 260
+    semiCircleCenterTextPositioningThreshold: 260,
+    // Symbol used for scientific notation
+    scientificSymbol: "E+"
 };
