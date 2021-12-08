@@ -6,7 +6,7 @@ To begin using this mod, there are a couple of things you will need to install f
 
 1. Spotfire:
 
-Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or the web client, TIBCO Spotfire® Business Author. Mod version 1.1 is supported from Spotfire® 11.5 (API Version 1.3) and higher.
+Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or the web client, TIBCO Spotfire® Business Author. Mod version 1.0 is supported from Spotfire® 11.4 (API Version 1.2) and higher.
 
 2. Node.js:
 
@@ -17,18 +17,19 @@ To run the mod and install the necessary dependencies, [Node.js](https://nodejs.
 <!--Describe the prerequisites and how to use the add-on mode, as well as data compatibility.-->
 
 ### Option 1: Download and import the .mod file of a released version
-You first need to download the latest released mod file from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the under the releases tag, and, once on the release page, selecting the `Donut.Chart.v*.mod` file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file into the Spotfire canvas.
+You first need to download the mod file version 1.0 from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the under the releases tag, and, once on the release page, selecting the `Donut.Chart.v*.mod` file of the download options under assets tag. At this stage, you want to open Spotfire and connect the mod. Simply select some data, and switch from "Viewing" to "Editing" by using the drop-down option on the top-right. Afterwards you can simply drag and drop the mod file into the Spotfire canvas.
 
 ### Option 2: Download a released instance of the project's repository
-You first download the latest released repository from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
+You first download release 1.0 from our GitHub repository [releases page](https://github.com/Donut-Mod-Team/donut-mod/releases) found on the GitHub front page by pressing the releases button on the right under the releases tag, and, once on the release page, selecting one of the download options for source code.
 Once you have the repository downloaded and extracted, you navigate inside the folder using the command line.
 
-### Option 3: Get the latest version of the project's repository 
+### Option 3: Clone the latest version of the project's repository 
 You first need to clone or download the repository from the project's GitHub repository homepage, by pressing the `Code` button and selecting one of the cloning or download options.
-Once you have the repository downloaded and extracted, you navigate inside the folder using the command line. Alternatively, you can clone it via:
+Once you have the repository downloaded and extracted, you navigate inside the folder using the command line and checking out branch 11-4-LTS-API-1.2. Alternatively, you can clone it via:
 
 ```shell
 git clone https://github.com/Donut-Mod-Team/donut-mod.git
+git checkout 11.4-LTS-API-1.2
 ```
 
 ## Run the mod locally
@@ -87,8 +88,7 @@ Congratulations! You should now be able to see the Donut Chart!
 #### Tooltip
 
 - Tooltip showing while hovering over a data-set slice of the donut chart 
-- The data displayed in the tooltip is fully customizable from the Spotfire settings in the Desktop client
-- The default data displayed in the web-client is the values of the selected axes 
+- The data displayed in the tooltip is the values of the selected axes and the sector ratio
 
 #### Hover
 
