@@ -11,7 +11,7 @@ This document gives a descriptive overview for the requirements used for the dev
 * [DMT-7](https://donut-mod-team.atlassian.net/browse/DMT-7) Visualize Data
 
 
-## User Stories [last update: 2021/09/10]
+## User Stories [last update: 2021/11/08]
 * [DMT-57](https://donut-mod-team.atlassian.net/browse/DMT-57) As a data analyst, I want to be able to customize the visualization of the labels, so that I am able to quickly reference different values of the data.
 * [DMT-56](https://donut-mod-team.atlassian.net/browse/DMT-56) As a data analyst, I want the tooltip of a hovered over sector to be customizable, so that I can show data that is important to my analysis.
 * [DMT-55](https://donut-mod-team.atlassian.net/browse/DMT-55) As a data analyst, I want a setting panel from which I can customize features of the chart, so that I can visualize the data in a manner that suits my preference.
