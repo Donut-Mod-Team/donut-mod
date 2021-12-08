@@ -1,10 +1,10 @@
 # Donut Chart mod for Tibco Spotfire 
-The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using a donut chart representation. A donut chart is a variation of a pie chart with a hole in the middle, which contains a dynamically changing center text.  
+The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using a donut chart representation. A donut chart is a variation of a pie chart with a hole in the middle, which contains a dynamically changing center text. 
 
 ![User_Guide_Donut_Chart_Example](./diagrams/Tibco_UG_Image.PNG "User Guide Donut Chart Example")
 
 ## Try this mod in TIBCO Spotfire® Analyst
-[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst.
+[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst. Mod version 1.1 is supported from Spotfire® 11.5 (API Version 1.3) and higher, and mod version 1.0 is supported from 11.4 LTS (API Version 1.2).
  
 ### How to open the mod
 1. Open Spotfire® Analyst, and create an analysis by loading some data.
@@ -19,9 +19,14 @@ For general information on how to use and share visualization mods, [read the Sp
 
 In order to make the mod work properly the data table needs to be formatted in a certain way. The type of values on the Y-axis (“Sector size by”) need to be continuous and labeled correctly, but as long as the correct formatting is followed, all data types supported by Spotfire® are supported in the donut chart. 
 The type of values on the X-axis (“Color by”) need to be categorical. 
-The center value supports only numerical values and the formatting supported for the center values is currency, scientific notation(6 digits), as well as both integer and real numbers.
+The center value supports only numerical values.
 Data needs to be loaded on both the Y and X axis. 
 Percentages should be represented on a scale of 0-1. 
+
+## Formatting
+
+ The formatting supported for the center values and labels is currency, scientific notation (6 digits), as well as both integer and real numbers.
+ By default, the decimals in a number is formatted to two digits, and thousand separators are enabled. Neither of the aforementioned can be changed through the formatting settings.
 
 ## Setting up the Donut chart
 
@@ -76,7 +81,11 @@ Theme highlight colour effect (depending on the theme mode) on the edges of the 
 
 ### Tooltip
 
-When hovering over the sectors a tooltip popup is shown. The tooltip is fully customizable from the main chart property settings(available in the desktop client only). The default values displayed are the ones selected in the axes.
+#### Mod Version 1.1
+When hovering over the sectors a tooltip popup is shown. The tooltip is fully customizable from the main chart property settings (available in the desktop client only). The values and ratios displayed are the ones selected in the axes.
+
+#### Mod Version 1.0
+When hovering over the sectors a tooltip popup is shown. The values and ratios displayed are the ones selected in the axes.
 
 ### Semi-circle visualization
 
@@ -87,6 +96,8 @@ An additional functionality of switching between the whole-circle and the semi-c
 ## Help and support
 
 Please note that this Mod for TIBCO Spotfire® is not supported through support.tibco.com. In the event of issues or to get help or to suggest enhancements, please post in the TIBCO Community Wiki here: https://community.tibco.com/wiki
+
+For further assistance with the mod, feel free to visit the teams website where the mod is discussed in further detail. You can find the website for the Donut Mod here: https://donut-mod-team.github.io/
 
 ## More information about TIBCO Spotfire® Mods
 - [Spotfire® Mods on the TIBCO Community Exchange](https://community.tibco.com/exchange): A safe and trusted place to discover ready-to-use mods
