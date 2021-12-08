@@ -159,14 +159,12 @@ export async function createDonutState(mod) {
                 centerAxis.parts.length !== 0
                     ? centerAxis.parts[0].displayName + ": " + formattedCenterValue + "\n"
                     : "";
+            let tooltipLabelsLastSymbol = labelLastSymbols.includes(resources.scientificSymbol) ? "" : labelLastSymbols;
             let tooltipFormattedYValue =
                 yAxis.parts.length !== 0
                     ? yAxis.parts[0].displayName +
                       ": " +
-                      roundNumber(yValue, 2).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                      }) +
+                   labelFirstSymbols + formatTotalSum(yValue, labelFirstSymbols,labelLastSymbols) + tooltipLabelsLastSymbol +
                       "\n"
                     : "";
             let tooltipFormattedColorValue =
