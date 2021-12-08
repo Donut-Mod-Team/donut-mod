@@ -1,5 +1,5 @@
 import { resources } from "./resources";
-import { calculatePercentageValue, formatTotalSum, roundNumber } from "./utility";
+import { calculatePercentageValue, formatTotalSum } from "./utility";
 
 /** Definition for the data included in the donutState.data array
  * @typedef {{
