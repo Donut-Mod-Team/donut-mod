@@ -19,9 +19,14 @@ For general information on how to use and share visualization mods, [read the Sp
 
 In order to make the mod work properly the data table needs to be formatted in a certain way. The type of values on the Y-axis (“Sector size by”) need to be continuous and labeled correctly, but as long as the correct formatting is followed, all data types supported by Spotfire® are supported in the donut chart. 
 The type of values on the X-axis (“Color by”) need to be categorical. 
-The center value supports only numerical values and the formatting supported for the center values is currency, scientific notation(6 digits), as well as both integer and real numbers.
+The center value supports only numerical values.
 Data needs to be loaded on both the Y and X axis. 
 Percentages should be represented on a scale of 0-1. 
+
+## Formatting
+
+ The formatting supported for the center values and labels is currency, scientific notation (6 digits), as well as both integer and real numbers.
+ By default, the decimals in a number is formatted to two digits, and thousand separators are enabled. Neither of the aforementioned can be changed through the formatting settings.
 
 ## Setting up the Donut chart
 
