@@ -97,6 +97,8 @@ An additional functionality of switching between the whole-circle and the semi-c
 
 Please note that this Mod for TIBCO Spotfire® is not supported through support.tibco.com. In the event of issues or to get help or to suggest enhancements, please post in the TIBCO Community Wiki here: https://community.tibco.com/wiki
 
+For further assistance with the mod, feel free to visit the teams website where the mod is discussed in further detail. You can find the website for the Donut Mod here: https://donut-mod-team.github.io/
+
 ## More information about TIBCO Spotfire® Mods
 - [Spotfire® Mods on the TIBCO Community Exchange](https://community.tibco.com/exchange): A safe and trusted place to discover ready-to-use mods
 - [Spotfire® Mods Developer Documentation](https://tibcosoftware.github.io/spotfire-mods/docs/):  Introduction and tutorials for mods developers
