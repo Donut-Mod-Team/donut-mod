@@ -8,6 +8,8 @@ export const resources = {
         "There was an issue related to the rendering of the mod; please try reloading and check the console for more details.",
     errorCanvasContainerDimensions:
         "The dimensions of the canvas' container are too small. Please try increasing the canvas' size.",
+    errorEmptyDataOnYAxis:
+        "The selected data loaded on the Y-axis does not contain any data. Please select non-empty data and reload the mod.",
 
     // Overlay error categories
     errorOverlayCategoryDataView: "DataView",
@@ -79,5 +81,14 @@ export const resources = {
     arcsRadiusOuterOffset: 4.5,
     // Hover highlight sector-sides id prefix/sides identifier
     leftSectorSideIdentifier: "left",
-    rightSectorSideIdentifier: "right"
+    rightSectorSideIdentifier: "right",
+    // The default offset used which affects the positioning of the center text in the Y-axis on semi-circle mode
+    semiCircleCenterTextIncreasedHeightPositioning: 1.9,
+    // Offset used which affects the positioning of the center text in the Y-axis on semi-circle mode, when width is low
+    semiCircleCenterTextDecreasedHeightPositioning: 2,
+    // Threshold for specifying the width value of the canvas, after which the center text shall not follow
+    // the default Y-axis positioning offset
+    semiCircleCenterTextPositioningThreshold: 260,
+    // Symbol used for scientific notation
+    scientificSymbol: "E+"
 };

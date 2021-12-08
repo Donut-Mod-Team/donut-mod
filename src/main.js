@@ -79,6 +79,13 @@ Spotfire.initialize(async (mod) => {
                 return;
             }
 
+            if (donutState.data.length === 0) {
+                console.error(resources.errorNullDonutState(donutState));
+                mod.controls.errorOverlay.show(resources.errorEmptyDataOnYAxis, resources.errorOverlayCategoryGeneral);
+                errorOverlayVisualized = true;
+                return;
+            }
+
             let modProperty = {
                 labelsPosition: labelsPosition,
                 sortedPlacement: sortedPlacement,
@@ -92,7 +99,6 @@ Spotfire.initialize(async (mod) => {
             try {
                 await render(donutState, modProperty, circleTypeChanged, labelsPositionChanged);
             } catch (error) {
-                // TODO: Add checks depending on the type of error here (e.g. TypeError, RangeError etc)
                 console.error(error);
                 mod.controls.errorOverlay.show(resources.errorRendering, resources.errorOverlayCategoryGeneral);
                 errorOverlayVisualized = true;

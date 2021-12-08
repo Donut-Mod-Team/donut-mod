@@ -13,10 +13,21 @@ Overview of the system.
 
 The diagram below showcases the main use cases that are to be implemented in the Donut-Mod.
 
-![Use Case Diagram](./diagrams/Use_Case_Diagram_v1.png "Use Case Diagram")
+![Use Case Diagram](./diagrams/use_case_diagram_v2.png "Use Case Diagram")
 
 ### System Architecture
 
 The diagram below showcases the basic components of the system on a high level. The diagram excludes the html, css and manifest files used for the mod to run in the Spotfire sandbox environment. The mod utilizes the Tibco Spotfire API from main.js.
 
-![High Level Architectural Diagram](./diagrams/system_architecture_v4.png "System Architecture Diagram")
+![High Level Architectural Diagram](./diagrams/system_architecture_v5.png "System Architecture Diagram")
+
+
+### System Class diagram
+
+The diagram below showcases the classes of the system. The diagram excludes the html, css and manifest files used for the mod to run in the Spotfire sandbox environment. The mod utilizes the Tibco Spotfire API from main.js.
+
+![Class Diagram](./diagrams/system_class_diagram_v1.png "System Architecture Diagram")
+
+
+
+
