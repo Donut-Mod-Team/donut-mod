@@ -6,7 +6,7 @@ To begin using this mod, there are a couple of things you will need to install f
 
 1. Spotfire:
 
-Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or   the web client, TIBCO Spotfire® Business Author. The mod is supported in Spotfire® 11.4 LTS (API Version 11.2), and 11.5 (API Version 11.3).
+Either the desktop client, [Tibco Spotfire® Analyst](https://www.tibco.com/products/tibco-spotfire), or the web client, TIBCO Spotfire® Business Author. Mod version 1.1 is supported from Spotfire® 11.5 (API Version 1.3) and higher.
 
 2. Node.js:
 
@@ -86,7 +86,7 @@ Congratulations! You should now be able to see the Donut Chart!
 
 #### Tooltip
 
-- Tooltip showing while hovering over a data-set slice of the donut chart. 
+- Tooltip showing while hovering over a data-set slice of the donut chart 
 - The data displayed in the tooltip is fully customizable from the Spotfire settings in the Desktop client
 - The default data displayed in the web-client is the values of the selected axes 
 

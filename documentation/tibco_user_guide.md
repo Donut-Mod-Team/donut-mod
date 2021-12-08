@@ -4,7 +4,7 @@ The Donut Mod is an extension addon for the TIBCO Spotfire platform, which compl
 ![User_Guide_Donut_Chart_Example](./diagrams/Tibco_UG_Image.PNG "User Guide Donut Chart Example")
 
 ## Try this mod in TIBCO Spotfire® Analyst
-[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst. The mod is supported in Spotfire® 11.4 LTS (API Version 11.2), and 11.5 (API Version 11.3).
+[Download this mod.](https://github.com/Donut-Mod-Team/donut-mod/releases) Click the Download button and follow the instructions below the button to open the mod in Spotfire Analyst. Mod version 1.1 is supported from Spotfire® 11.5 (API Version 1.3) and higher, and mod version 1.0 is supported from 11.4 LTS (API Version 1.2).
  
 ### How to open the mod
 1. Open Spotfire® Analyst, and create an analysis by loading some data.
@@ -76,7 +76,11 @@ Theme highlight colour effect (depending on the theme mode) on the edges of the 
 
 ### Tooltip
 
-When hovering over the sectors a tooltip popup is shown. The tooltip is fully customizable from the main chart property settings(available in the desktop client only). The default values displayed are the ones selected in the axes.
+#### Mod Version 1.1
+When hovering over the sectors a tooltip popup is shown. The tooltip is fully customizable from the main chart property settings (available in the desktop client only). The values and ratios displayed are the ones selected in the axes.
+
+#### Mod Version 1.0
+When hovering over the sectors a tooltip popup is shown. The values and ratios displayed are the ones selected in the axes.
 
 ### Semi-circle visualization
 
