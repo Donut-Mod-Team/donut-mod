@@ -1,4 +1,4 @@
-## Getting Started with the Donut-Mod
+## Getting Started with the Donut Chart mod
 
 ## Dependencies
 
@@ -92,7 +92,7 @@ Congratulations! You should now be able to see the Donut Chart!
 
 #### Hover
 
-- Black/White colour effect (depending on if it's a light or dark mode) on the edges of the donut-slice shown when hovering over the slice
+- Theme highlight colour effect (depending on the theme mode) on the edges of the donut-slice shown when hovering over the slice. When hovering over the center value is updated to display the highlighted sectors information(if no sector is marked) and a tooltip is displayed.
 
 #### Negative values
 

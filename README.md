@@ -1,11 +1,13 @@
-# Donut Mod
+# Donut Chart
 
 [![Node.js CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/node.js.yml)
-[![CodeQL CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/code_ql.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/code_ql.yml)
+[![CodeQL CI](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/codeql-config.yml/badge.svg)](https://github.com/Donut-Mod-Team/donut-mod/actions/workflows/codeql-config.yml)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/Donut-Mod-Team/donut-mod.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Donut-Mod-Team/donut-mod/alerts/)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Donut-Mod-Team/donut-mod.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Donut-Mod-Team/donut-mod/context:javascript)
 
-The Donut Mod is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using this donut chart representation.
+![Donut Chart gif](/documentation/images/donut-chart.gif)
+
+The Donut Chart is an extension addon for the TIBCO Spotfire platform, which complements its environment by allowing the users to visualize their data using this donut chart representation.
 
 ## Requirements Specification
 
@@ -31,4 +33,4 @@ A complete guide to installation and getting started using mod can be found [her
 
 ## Licence
 
-Donut Mod is available under the [MIT license](LICENSE).
+Donut Chart is available under the [MIT license](LICENSE).
