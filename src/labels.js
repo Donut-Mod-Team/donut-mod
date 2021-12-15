@@ -36,7 +36,7 @@ export function addLabels(arc, pie, donutState, modProperty) {
         .enter()
         .append("text")
         .attr("id", function (d) {
-            return "labelID_" + d.data.renderID;
+            return "labelID_" + d.data.id;
         })
         .attr("dy", ".35em")
         .attr("fill", donutState.styles.fontColor)
@@ -120,7 +120,7 @@ export function addLabels(arc, pie, donutState, modProperty) {
     function adjustLabelTextToFit(d, text) {
         let labelNodes = d3.selectAll("g#labels").selectAll("text");
         let label = labelNodes.filter(function () {
-            return this.id === "labelID_" + d.data.renderID;
+            return this.id === "labelID_" + d.data.id;
         });
         let container = d3.select("#mod-container");
         text = text.toString();
