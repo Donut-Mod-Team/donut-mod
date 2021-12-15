@@ -157,8 +157,7 @@ export async function createDonutState(mod) {
                 color: rows.length ? rows[0].color().hexCode : "transparent",
                 value: yValue,
                 absValue: Math.abs(yValue),
-                id: leaf.key,
-                renderID: leaf.key !== null ? leaf.key.replace(/[^\w]/g, "") : "empty",
+                id: createId(leaf),
                 percentage: percentage.toFixed(1),
                 absPercentage: absPercentage,
                 centerSumFormatted: formattedCenterValue,
@@ -246,6 +245,21 @@ export async function createDonutState(mod) {
     };
 
     return donutState;
+}
+
+/**
+ * Function creates ID based on the leaf's key and parent node's keys
+ * @param {Spotfire.DataViewHierarchyNode} leaf
+ * @return {string} id
+ */
+function createId(leaf) {
+    let parts = [];
+    let node = leaf;
+    while (node) {
+        parts.push(node.key != null ? "v:" + node.key : "null");
+        node = node.parent;
+    }
+    return parts.join("-").replace(/[^\w]/g, "");
 }
 
 /***

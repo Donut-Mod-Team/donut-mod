@@ -46,7 +46,7 @@ function drawArc(pie, highlightArc, donutState, idKey) {
         .enter()
         .append("path")
         .attr("id", function (d) {
-            return "hoverID_" + idKey + "_" + d.data.renderID;
+            return "hoverID_" + idKey + "_" + d.data.id;
         })
         .attr("d", function (d) {
             highlightArc.startAngle(d.startAngle).endAngle(d.endAngle);
@@ -77,22 +77,22 @@ function drawArc(pie, highlightArc, donutState, idKey) {
 
 /**
  * Function hides the highlight effect for a given sector id by setting the opacity to 0
- * @param {string} renderID
+ * @param {string} id
  */
-export async function hideHighlightEffect(renderID) {
-    d3.select("path#hoverID_inner_" + renderID)
+export async function hideHighlightEffect(id) {
+    d3.select("path#hoverID_inner_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
-    d3.select("path#hoverID_outer_" + renderID)
+    d3.select("path#hoverID_outer_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
-    d3.select("path#hoverID_line_right_" + renderID)
+    d3.select("path#hoverID_line_right_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
-    d3.select("path#hoverID_line_left_" + renderID)
+    d3.select("path#hoverID_line_left_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "0");
@@ -100,22 +100,22 @@ export async function hideHighlightEffect(renderID) {
 
 /**
  * Function shows the highlight effect for a given sector id by setting the opacity to 1
- * @param renderID
+ * @param id
  */
-export async function showHighlightEffect(renderID) {
-    d3.select("path#hoverID_inner_" + renderID)
+export async function showHighlightEffect(id) {
+    d3.select("path#hoverID_inner_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
-    d3.select("path#hoverID_outer_" + renderID)
+    d3.select("path#hoverID_outer_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
-    d3.select("path#hoverID_line_right_" + renderID)
+    d3.select("path#hoverID_line_right_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
-    d3.select("path#hoverID_line_left_" + renderID)
+    d3.select("path#hoverID_line_left_" + id)
         .transition()
         .duration(resources.animationDuration)
         .style("opacity", "1");
@@ -140,7 +140,7 @@ function drawLines(pie, donutState, sectorSide) {
         .append("path")
         .attr("pointer-events", "none")
         .attr("id", function (d) {
-            return "hoverID_line_" + sectorSide + "_" + d.data.renderID;
+            return "hoverID_line_" + sectorSide + "_" + d.data.id;
         })
         .style("stroke", donutState.styles.fontColor)
         .style("stroke-width", "1px")
