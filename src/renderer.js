@@ -89,7 +89,7 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
         .enter()
         .append("svg:path")
         .attr("id", function (d) {
-            return "sectorID_" + d.data.renderID;
+            return "sectorID_" + d.data.id;
         })
         .on("click", function (d) {
             select(d);
@@ -128,14 +128,14 @@ export async function render(donutState, modProperty, circleTypeChanged, labelsP
 
     function onMouseLeave(d) {
         donutState.modControls.tooltip.hide();
-        hideHighlightEffect(d.data.renderID);
+        hideHighlightEffect(d.data.id);
         if (d3.select("#center-text").style("opacity") === "1" && d.data.centerTotal === 0) {
             refreshCenterTextOnMouseLeave(d);
         }
     }
 
     function onMouseOver(d) {
-        showHighlightEffect(d.data.renderID);
+        showHighlightEffect(d.data.id);
         if (d.data.centerTotal === 0 && d.data.centerSumFormatted != null) {
             refreshCenterTextOnMouseover(d);
         }
