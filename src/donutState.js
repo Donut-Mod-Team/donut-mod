@@ -255,11 +255,13 @@ export async function createDonutState(mod) {
 function createId(leaf) {
     let parts = [];
     let node = leaf;
+    // random number(1-1000) used for replacing values in the id to take account for special character cases that can't be handled in the dom
+    let replaceValue = Math.floor(Math.random() * 1001) + 1;
     while (node) {
         parts.push(node.key != null ? "v:" + node.key : "null");
         node = node.parent;
     }
-    return parts.join("-").replace(/[^\w]/g, "");
+    return parts.join("-").replace(/[^\w]/g, replaceValue + "");
 }
 
 /***
