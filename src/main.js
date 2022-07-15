@@ -71,7 +71,29 @@ Spotfire.initialize(async (mod) => {
                 mod.controls.errorOverlay.hide(resources.errorOverlayCategoryGeneral);
                 errorOverlayVisualized = false;
             }
-
+            if (donutState === undefined) {
+                const svgsectors = document.getElementById("sectors");
+                svgsectors.innerHTML = "";
+                const svgoutersectors = document.getElementById("outer-sectors");
+                svgoutersectors.innerHTML = "";
+                const svghighlightsectorinner = document.getElementById("highlight-sector-inner");
+                svghighlightsectorinner.innerHTML = "";
+                const svghighlightsectorouter = document.getElementById("highlight-sector-outer");
+                svghighlightsectorouter.innerHTML = "";
+                const svghighlightsidelinesleft = document.getElementById("highlight-side-lines-left");
+                svghighlightsidelinesleft.innerHTML = "";
+                const svghighlightsidelinesright = document.getElementById("highlight-side-lines-right");
+                svghighlightsidelinesright.innerHTML = "";
+                const svglabels = document.getElementById("labels");
+                svglabels.innerHTML = "";
+                const centercolor = document.getElementById("center-color");
+                centercolor.innerHTML = "";
+                const centertext = document.getElementById("center-text");
+                centertext.innerHTML = "";
+                const centerexpression = document.getElementById("center-expression");
+                centerexpression.innerHTML = "";
+                return;
+            }
             if (donutState == null) {
                 console.error(resources.errorNullDonutState(donutState));
                 mod.controls.errorOverlay.show(resources.errorGeneralOverlay, resources.errorOverlayCategoryGeneral);
