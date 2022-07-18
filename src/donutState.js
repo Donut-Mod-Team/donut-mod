@@ -248,18 +248,19 @@ export async function createDonutState(mod) {
 }
 
 /**
- * Function creates ID based on the leaf's key and parent node's keys
+ * Function creates ID based on the leaf's leaf index and parent node's leaf indexes
+
  * @param {Spotfire.DataViewHierarchyNode} leaf
  * @return {string} id
  */
-function createId(leaf) {
+ function createId(leaf) {
     let parts = [];
     let node = leaf;
     while (node) {
-        parts.push(node.key != null ? "v:" + node.key : "null");
+        parts.push(node.leafIndex != undefined ? node.leafIndex : "");
         node = node.parent;
     }
-    return parts.join("-").replace(/[^\w]/g, "");
+    return parts.join("");
 }
 
 /***
